@@ -1,22 +1,17 @@
 {
   "name": "robonomics-ui-vue",
-  "files": ["dist/**"],
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
+  "main": "index.js",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.js"
+      "import": "./index.js",
+      "require": "./index.js"
     }
   },
   "private": false,
-  "version": "0.0.3",
+  "version": "0.0.1-2",
   "scripts": {
-    "test-clear": "rimraf /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue3-components-guide/node_modules/robonomics-ui",
-    "test-copy": "cp -R /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue/dist /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue3-components-guide/node_modules/robonomics-ui",
     "dev": "vite",
     "build": "vite build",
-    "build-test": "vite build && yarn test-clear && yarn test-copy",
     "preview": "vite preview"
   },
   "dependencies": {
