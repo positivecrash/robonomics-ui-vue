@@ -22,7 +22,6 @@ export default defineConfig({
           vue: 'Vue',
         },
         format: 'cjs',
-        // format: 'cjs',
         dir: './dist',
         // chunkFileNames: '[name].js',
         inlineDynamicImports: true

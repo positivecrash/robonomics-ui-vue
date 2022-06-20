@@ -22,8 +22,6 @@
       <template v-if="!address">
         <robo-account-polkadot-connect
           v-if="!extension"
-          :summary="{}" 
-          :popup="{}"
         />
 
         <span v-if="extension">Turn on account in your extension</span>
@@ -31,11 +29,9 @@
 
       <robo-account-polkadot-connect
         v-if="allowShiftExtensions && extension"
-        :summary="{
-          icon: 'right-left', 
-          text: ' '
-        }" 
-        :popup="{}"
+        summaryIcon='right-left'
+        summaryText=''
+        popup
       />
 
       <robo-button v-if="copy && address" @click="clipboard" clean>
@@ -105,11 +101,13 @@ export default defineComponent({
       this.accountsList = this.setAccountsList(value)
       this.addressList = this.setAddressList(value)
 
-      if ( value.filter(account => account.address === this.address).length == 0 ) {
-        if(value.length > 0) {
-          this.$store.commit('setPolkadotAddress', account[0].address)
-        } else {
-          this.$store.commit('setPolkadotAddress', null)
+      if(value) {
+        if ( value.filter(account => account.address === this.address).length == 0 ) {
+          if(value.length > 0) {
+            this.$store.commit('setPolkadotAddress', account[0].address)
+          } else {
+            this.$store.commit('setPolkadotAddress', null)
+          }
         }
       }
     },

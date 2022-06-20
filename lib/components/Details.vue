@@ -1,6 +1,6 @@
 <template>
     <details
-      v-if="$slots.default && summary"  
+      v-if="$slots.default && (summaryText || summaryIcon)"  
       :class="classes" 
       tabindex="0"
       ref="details"
@@ -14,27 +14,27 @@
           @click="doFixRatio">
 
           <robo-button
-            v-if="summary.button"
-            :iconLeft="summary.icon ? summary.icon : null"
-            :outlined="summary.button.outlined ? true : false"
-            :loading="summary.loading"
-            :size="summary.button.size"
-            :type="summary.button.type"
+            v-if="summaryButton"
+            :iconLeft="summaryIcon ? summaryIcon : null"
+            :outlined="summaryButtonOutlined ? true : false"
+            :loading="summaryLoading"
+            :size="summaryButtonSize"
+            :type="summaryButtonType"
           >
-            <span v-if="summary.text">
-              {{summary.text}}
+            <span v-if="summaryText">
+              {{summaryText}}
             </span>
           </robo-button>
 
-          <div v-if="!summary.button && summary.text">
+          <div v-if="!summaryButton && summaryText">
             <robo-icon 
-              v-if="summary.icon && !summary.loading"
-              :icon="summary.icon" 
+              v-if="summaryIcon && !summaryLoading"
+              :icon="summaryIcon" 
             />
 
-            <robo-loader v-if="summary.loading" />
+            <robo-loader v-if="summaryLoading" />
 
-            {{summary.text}}
+            {{summaryText}}
 
             <robo-icon 
               v-if="type === 'inline'"
@@ -50,11 +50,11 @@
             <h3
               v-if="popup"
             >
-              <template v-if="popup.title">
-                {{popup.title}}
+              <template v-if="popupTitle">
+                {{popupTitle}}
               </template>
               <template v-else>
-                {{summary.text}}
+                {{summaryText}}
               </template>
             </h3>
 
@@ -64,12 +64,12 @@
               @click="closeDetails"
               class="robo-details-content-close"
               icon="xmark"
-              v-if="tooltip && tooltip.closeButton || popup"
+              v-if="tooltip && tooltipCloseButton || popup"
             />
         </div>
 
         <div 
-          v-if="popup && popup.overlay"
+          v-if="popup && popupOverlay"
           class="robo-overlay" 
           aria-hidden="true"
           @click="closeDetails"
@@ -85,36 +85,21 @@ export default defineComponent({
 
   props: {
 
-    content: {
-      type: Object,
-      default: {},
-      
+    contentCloseOutOfFocus: {
+      type: Boolean,
+      default: true
+    },
+
+    contentOffset: {
+      type: Boolean,
+      default: false
+    },
+
+    contentTextalign: {
+      type: String,
+      default: 'justify',
       validator: function (value) {
-        let valid = true;
-
-        // closeOutOfFocus
-        if( value.closeOutOfFocus && typeof value.closeOutOfFocus !== 'boolean') {
-          console.warn('[robonomics-ui-vue3]: "Details" component has wrong prop "content.closeOutOfFocus", required Boolean type')
-          valid = false
-        }
-
-        // offset
-        if( value.offset && typeof value.offset !== 'boolean') {
-          console.warn('[robonomics-ui-vue3]: "Details" component has wrong prop "content.offset", required Boolean type')
-          valid = false
-        }
-        
-        // textalign
-        if( value.textalign && 
-        !['justify', 'left', 'right', 'center'].includes(value.textalign) ) {
-          console.warn('[robonomics-ui-vue3]: "Details" component has wrong prop "content.textalign". Current value:', value.textalign)
-          valid = false
-        } 
-        else if ( !value.textalign ) {
-          value.textalign = 'justify'
-        }
-
-        return valid
+        return ['justify', 'left', 'right', 'center'].includes(value)
       }
     },
 
@@ -124,140 +109,99 @@ export default defineComponent({
     },
 
     popup: {
-      type: Object,
-      default: null,
-      
+      type: Boolean,
+      default: false
+    },
+
+    popupOverlay: {
+      type: Boolean,
+      default: true
+    },
+
+    popupTitle: {
+      type: String,
+      default: null
+    },
+
+    summaryButton: {
+      type: Boolean,
+      default: false
+    },
+
+    summaryButtonOutlined: {
+      type: Boolean,
+      default: false
+    },
+
+    summaryButtonSize: {
+      type: String,
+      default: 'normal',
       validator: function (value) {
-        let valid = true;
-
-        // overlay
-        if( typeof value.overlay !== 'undefined' && typeof value.overlay !== 'boolean') {
-          console.warn('[robonomics-ui-vue3]: "Details" component has wrong prop "popup.overlay", required Boolean type')
-          valid = false
-        }
-        else if ( typeof value.overlay === 'undefined' ) {
-          value.overlay = true
-        }
-
-        // title
-        if( value.title && typeof value.title !== 'string') {
-          console.warn('[robonomics-ui-vue3]: "Details" component has wrong prop "popup.title", required String type')
-          valid = false
-        }
-
-        return valid
+        return ['small', 'normal', 'big'].includes(value)
       }
     },
 
-    summary: {
-      type: Object,
-      default: null,
-      
+    summaryButtonType: {
+      type: String,
+      default: 'primary',
       validator: function (value) {
-        let valid = true;
-
-        if(value.button) {
-          // button outlined
-          if( value.button.outlined && typeof value.button.outlined !== 'boolean') {
-            console.warn('[robonomics-ui-vue3]: "Details" component has wrong prop "summary.button.outlined", required Boolean type')
-            valid = false
-          }
-
-          // button size
-          if( value.button.size && !['small', 'normal', 'big'].includes(value.button.size) ) {
-            console.warn('[robonomics-ui-vue3]: "Details" component has wrong prop "summary.button.size". Current value:', value.button.size)
-            valid = false
-          }
-
-          // button type
-          if( value.button.type && !['primary', 'ok', 'alarm', 'na'].includes(value.button.type) ) {
-            console.warn('[robonomics-ui-vue3]: "Details" component has wrong prop "summary.button.type". Current value:', value.button.type)
-            valid = false
-          }
-        }
-
-        // icon
-        if( value.icon && typeof value.icon !== 'string') {
-          console.warn('[robonomics-ui-vue3]: "Details" component has wrong prop "summary.icon", required String type')
-          valid = false
-        }
-
-        // loading
-        if( value.loading && typeof value.loading !== 'boolean') {
-          console.warn('[robonomics-ui-vue3]: "Details" component has wrong prop "summary.loading", required Boolean type')
-          valid = false
-        }
-        else if ( !value.loading ) {
-          value.loading = false
-        }
-
-        // text
-        if( value.text && typeof value.text !== 'string') {
-          console.warn('[robonomics-ui-vue3]: "Details" component has wrong prop "summary.text", required String type')
-          valid = false
-        }
-
-        return valid
+        return ['primary', 'ok', 'alarm', 'na'].includes(value)
       }
     },
 
+    summaryIcon: {
+      type: String,
+      default: null
+    },
+
+    summaryLoading: {
+      type: Boolean,
+      default: null
+    },
+
+    summaryText: {
+      type: String,
+      default: null
+    },
 
     tooltip: {
-      type: Object,
-      default: null,
-      
+      type: Boolean,
+      default: false
+    },
+
+    tooltipCloseButton: {
+      type: Boolean,
+      default: true
+    },
+
+    tooltipPlacement: {
+      type: String,
+      default: 'bottom-start',
       validator: function (value) {
-        let valid = true;
-
-        // closeButton
-        if( value.closeButton && typeof value.closeButton !== 'boolean') {
-          console.warn('[robonomics-ui-vue3]: "Details" component has wrong prop "tooltip.closeButton", required Boolean type')
-          valid = false
-        } 
-        else if ( !value.closeButton ) {
-          value.closeButton = true
-        }
-
-        // placement
-        // TODO: auto detection
-        if( value.placement && 
-        !['bottom-start',
+        return ['bottom-start',
           'bottom-end',
           'top-start',
           'top-end',
           'start-top',
           'start-bottom',
           'end-top',
-          'end-bottom'].includes(value.placement) ) {
-          console.warn('[robonomics-ui-vue3]: "Details" component has wrong prop "tooltip.placement". Current value:', value.placement)
-          valid = false
-        } 
-        else if ( !value.placement ) {
-          value.placement = 'bottom-start'
-        }
+          'end-bottom'].includes(value)
+      }
+    },
 
-        // ratio
-        if( value.ratio && 
-        !['auto', 'none'].includes(value.ratio) ) {
-          console.warn('[robonomics-ui-vue3]: "Details" component has wrong prop "tooltip.ratio". Current value:', value.ratio)
-          valid = false
-        } 
-        else if ( !value.ratio ) {
-          value.ratio = 'auto'
-        }
+    tooltipRatio: {
+      type: String,
+      default: 'auto',
+      validator: function (value) {
+        return ['auto', 'none'].includes(value)
+      }
+    },
 
-        // theme
-        if( value.theme && 
-        !['dark',
-          'light'].includes(value.theme) ) {
-          console.warn('[robonomics-ui-vue3]: "Details" component has wrong prop "tooltip.theme". Current value:', value.theme)
-          valid = false
-        } 
-        else if ( !value.theme ) {
-          value.theme = 'dark'
-        }
-
-        return valid
+    tooltipTheme: {
+      type: String,
+      default: 'dark',
+      validator: function (value) {
+        return ['dark', 'light'].includes(value)
       }
     },
 
@@ -280,28 +224,28 @@ export default defineComponent({
       let classes = {
         [`robo-details`]: true,
         [`robo-details--${this.type}`]: this.type,
-        [`robo-details--closeOutOfFocus`]: this.content.closeOutOfFocus || this.tooltip,
+        [`robo-details--closeOutOfFocus`]: this.contentCloseOutOfFocus || this.tooltip,
       }
 
       if (this.content) {
         Object.assign(classes, {
-          [`robo-details--offset`]: this.content.offset,
-          [`robo-details--content-align--${this.content.textalign}`]: this.content.textalign,
+          [`robo-details--offset`]: this.contentOffset,
+          [`robo-details--content-align--${this.contentTextalign}`]: this.contentTextalign,
         })
       }
 
       if (this.summary) {
         Object.assign(classes, {
-          [`robo-details--loading`]: this.summary.loading
+          [`robo-details--loading`]: this.summaryLoading
         })
       }
 
       if (this.tooltip) {
         Object.assign(classes, {
           [`robo-details--tooltip`]: this.tooltip,
-          [`robo-details--tooltip-closable`]: this.tooltip.closeButton,
-          [`robo-details--tooltip--${this.tooltip.placement}`]: this.tooltip.placement,
-          [`robo-details--tooltip-theme--${this.tooltip.theme}`]: this.tooltip.theme,
+          [`robo-details--tooltip-closable`]: this.tooltipCloseButton,
+          [`robo-details--tooltip--${this.tooltipPlacement}`]: this.tooltipPlacement,
+          [`robo-details--tooltip-theme--${this.tooltipTheme}`]: this.tooltipTheme,
         })
       }
 
@@ -341,7 +285,7 @@ export default defineComponent({
     doFixRatio() {
 
       if(this.tooltip) {
-        if(this.tooltip.ratio === 'auto' && this.type === 'tooltip') {
+        if(this.tooltipRatio === 'auto' && this.type === 'tooltip') {
           let o = this
 
           /* wait for details openning */
@@ -407,6 +351,7 @@ export default defineComponent({
                     }
             })
         }
+
     }
   
 })

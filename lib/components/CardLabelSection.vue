@@ -14,13 +14,10 @@
 
         <robo-details 
           v-if="info" 
-          :summary="{
-              text: 'i',
-              button: {
-                size: 'small'
-              }
-          }"
-          :tooltip="{}"
+          summaryText='i'
+          summaryButton
+          summaryButtonSize='small'
+          tooltip
         >
           <slot/>
         </robo-details>

@@ -8,14 +8,20 @@
     }
   },
   "private": false,
-  "version": "0.0.1-6",
+  "version": "0.0.1-9",
   "scripts": {
-    "test-clear": "rimraf /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue3-components-guide/node_modules/robonomics-ui",
-    "test-copy": "cp -R /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue/dist /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue3-components-guide/node_modules/robonomics-ui",
+    "test-clear": "rimraf /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue3-components-guide/node_modules/robonomics-ui-vue",
+    "test-copy": "cp -R /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue/dist /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue3-components-guide/node_modules/robonomics-ui-vue",
     "dev": "vite",
     "build": "vite build",
     "build-test": "vite build && yarn test-clear && yarn test-copy",
     "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.1.1",
+    "@fortawesome/free-solid-svg-icons": "^6.1.1",
+    "@fortawesome/vue-fontawesome": "^3.0.0-5",
+    "@polkadot/util-crypto": "^9.4.1"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^13.3.0",
@@ -26,10 +32,6 @@
     "rollup-plugin-postcss": "^4.0.2",
     "vite": "^2.9.9",
     "vuex": "^4.0.2",
-    "@fortawesome/fontawesome-svg-core": "^6.1.1",
-    "@fortawesome/free-solid-svg-icons": "^6.1.1",
-    "@fortawesome/vue-fontawesome": "^3.0.0-5",
-    "@polkadot/util-crypto": "^9.4.1",
     "vue": "^3.2.25"
   },
   "description": "Vue 3 UI components for Robonomics dApp",
