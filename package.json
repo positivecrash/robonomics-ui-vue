@@ -1,8 +1,6 @@
 {
   "name": "robonomics-ui-vue",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist/*.js", "dist/*.css"],
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "exports": {
@@ -17,7 +15,8 @@
     "test-clear": "rimraf /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue3-components-guide/node_modules/robonomics-ui",
     "test-copy": "cp -R /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue/dist /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue3-components-guide/node_modules/robonomics-ui",
     "dev": "vite",
-    "build": "vite build && yarn test-clear && yarn test-copy",
+    "build": "vite build",
+    "build-test": "vite build && yarn test-clear && yarn test-copy",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -39,5 +38,9 @@
     "vuex": "^4.0.2"
   },
   "description": "Vue 3 UI components for Robonomics dApp",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/positivecrash/robonomics-ui-vue.git"
+  }
 }
