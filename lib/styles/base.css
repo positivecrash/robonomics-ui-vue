@@ -1,0 +1,71 @@
+:root {
+	--font-size: 1.2rem;
+    --font-family: 'Roboto Mono', Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
+	
+	--space: 1rem;
+
+	--color-dark: #000000;
+	--color-light: #ffffff;
+	--color-blue: #3333CE;
+	--color-blue-light: #9898fa;
+	/* --color-bluegreen-light: #8fe9ee; */
+	--color-bluegreen-light: #dcfffc;
+	--color-green: #8CD517;
+	--color-orange: #ffa600;
+	--color-red: #CE3333;
+	--color-gray: #AEADB4;
+	--color-gray-light: #EBEAF0;
+
+	--color-text: var(--color-dark);
+	--color-link: var(--color-blue);
+	--color-link-hover: var(--color-green);
+	--color-card-background: var(--color-light);
+	--color-body: var(--color-gray-light);
+
+	--input-bg: var(--color-card-background);
+	--input-text-color: var(--color-text);
+	--input-border-color: var(--color-text);
+	--input-border-width: 1px;
+	--input-padding-g: var(--space);
+	--input-padding-v: var(--space);
+	--select-tog-size: 1rem;
+
+	--card-padding: calc(var(--space) * 2);
+
+	--animation-bump: cubic-bezier(0.6, 0.04, 0.98, 0.335);
+
+	--size-logo-title-gorizontal: 4rem;
+
+	--card-label-height: calc( var(--space) * 1.5);
+	--card-border-color: var(--color-card-background);
+
+	--aside-size-left: 14rem;
+	--aside-size-right: 16rem;
+	--layout-maxwidth: 1920px;
+
+	--gap-layout: calc( var(--space) * 2);
+	--gap-text: calc( var(--space) * 2);
+	
+	--border-radius: 6px;
+}
+
+html, body, #app {
+	height: 100%;
+    position: relative;
+}
+
+
+body {
+	background-color: var(--color-body);
+}
+
+.robo-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 1;
+	background: rgba(0, 0, 0, 0.4);
+	backdrop-filter: blur(2px);
+}

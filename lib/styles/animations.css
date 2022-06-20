@@ -1,0 +1,21 @@
+@keyframes svgStrokeDash {
+    0% {
+    stroke-dashoffset: 1000;
+    }
+    100% {
+    stroke-dashoffset: 0;
+    }
+}
+
+@keyframes FadeIn {
+	to {
+	    visibility: visible;
+		opacity: 1;
+	}
+}
+
+@keyframes TrasnalteYnone {
+	to{
+		transform: translateY(0);
+	}
+}

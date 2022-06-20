@@ -1,0 +1,36 @@
+html {
+    font-size: 100%;
+}
+
+body, #app {
+    font-family: var(--font-family);
+    font-size: var(--font-size);
+    line-height: 1.5;
+}
+
+body *::selection {
+    color: var(--color-light);
+    background-color: var(--color-dark); 
+}
+
+@media screen and (max-width: 1400px) {
+    html {
+        font-size: 90%;
+    }
+}
+
+@media screen and (max-width: 1000px) {
+    html {
+        font-size: 80%;
+    }
+}
+
+a {
+    color: var(--color-link);
+    text-decoration: none;
+    transition: all 0.3s ease-in-out;
+}
+
+a:hover {
+    color: var(--color-link-hover)
+}
