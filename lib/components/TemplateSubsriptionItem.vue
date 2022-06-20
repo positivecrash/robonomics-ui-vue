@@ -16,7 +16,7 @@
                     block
                     fitLabeled
                     icon-left="power-off"
-                    type = "ok"
+                    :type = "deviceIsOn ? 'ok' : 'alarm'"
                 >
                 </robo-button>
 
@@ -25,7 +25,7 @@
                     block
                     fitLabeled
                     icon-left="power-off"
-                    type = "ok"
+                    :type = "deviceIsOn ? 'ok' : 'alarm'"
                 >
                     {{nameModel}}
                 </robo-button>
@@ -191,6 +191,10 @@ export default defineComponent({
       deviceInfoLink: {
           type: String,
           default: null
+      },
+      deviceIsOn: {
+          type: Boolean,
+          default: false
       },
       status: {
         type: String,
