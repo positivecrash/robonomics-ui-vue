@@ -41,7 +41,6 @@
 
 <script>
 import { defineComponent } from 'vue'
-import extensions from '../extensionsPolkadot'
 
 export default defineComponent({
   name: 'RoboAccountPolkadotExtensions',
@@ -59,7 +58,26 @@ export default defineComponent({
   data() {
       return {
             getExtension: null,
-            extensionsData: extensions,
+            extensionsData: [
+                {
+                    extesion: 'polkadot-js',
+                    name: 'Polkadot{.js}',
+                    picture: 'PolkadotJSLogo.svg',
+                    install: 'https://polkadot.js.org/extension/'
+                },
+                {
+                    extesion: 'talisman',
+                    name: 'Talisman',
+                    picture: 'TalismanLogo.svg',
+                    install: 'https://app.talisman.xyz/spiritkeys'
+                },
+                {
+                    extesion: 'subwallet-js',
+                    name: 'SubWallet',
+                    picture: 'SubWalletLogo.svg',
+                    install: 'https://subwallet.app/download.html'
+                },
+            ],
             addresses: null
       }
   },
@@ -78,12 +96,12 @@ export default defineComponent({
         onLoad(interval) {
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
-                    if (window.injectedWeb3) {
+                    if (window.injectedWeb3) { 
                         resolve()
                     }
                 }, interval);
 
-                setTimeout(() => reject(console.warn('[robonomics-ui-vue]: no extension found in robo-account-polkadot-extensions')), 1000);
+                setTimeout(() => reject(new Error("no extension")), 1000);
             })
         },
 
@@ -112,12 +130,8 @@ export default defineComponent({
   },
 
   async mounted() {
-    try {
-        await this.onLoad(500)
-        this.getExtension =  window.injectedWeb3[this.extension]
-    } catch (e) {
-      console.warn('[robonomics-ui-vue]: no extension found in robo-account-polkadot-extensions')
-    }
+    await this.onLoad(500)
+    this.getExtension =  window.injectedWeb3[this.extension]
   }
 })
 </script>

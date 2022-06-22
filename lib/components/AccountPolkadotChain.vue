@@ -21,7 +21,7 @@ export default defineComponent({
             Polkadot: '0',
           },
 
-          chainSelected: this.$store.getters.polkadot.chain ? this.$store.getters.polkadot.chain : '32'
+          chainSelected: this.$store.getters['robonomicsUIvue/polkadot'].chain ? this.$store.getters['robonomicsUIvue/polkadot'].chain : '32'
       }
   },
 
@@ -36,7 +36,7 @@ export default defineComponent({
 
   watch: {
       "chainSelected": function(value) {
-          this.$store.commit("setPolkadotChain", value)
+          this.$store.commit("robonomicsUIvue/setPolkadotChain", value)
       }
   }
 })

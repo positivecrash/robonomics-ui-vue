@@ -66,7 +66,8 @@ export default defineComponent({
         [`robo-select`]: true,
         [`robo-select--clean`]: this.clean,
         [`robo-select--block`]: this.block,
-        [`robo-select--disabled`]: this.disabled || this.options.length < 2,
+        [`robo-select--disabled`]: this.disabled,
+        [`robo-select--single`]: this.options.length < 2,
       };
     },
 
@@ -84,22 +85,22 @@ export default defineComponent({
     },
   },
 
-  methods: {
-    setWidth() {
-      // let options = this.$refs.select.options
-      // console.log('options', this.options)
-      // console.log('this.selected', this.selected)
-      // if(this.options) {
-      //   let choosen = Object.values(this.options).filter(opt => opt.value === this.selected)
-      //   let activeOptionText = choosen[0].innerText
-      //   this.$refs.select.style.width = activeOptionText.length + 1 + 'ch'
-      // } 
-    }
-  },
+  // methods: {
+  //   setWidth() {
+  //     let options = this.$refs.select.options
+  //     console.log('options', this.options)
+  //     console.log('this.selected', this.selected)
+  //     if(this.options) {
+  //       let choosen = Object.values(options).filter(opt => opt.value === this.selected)
+  //       let activeOptionText = choosen[0].innerText
+  //       this.$refs.select.style.width = activeOptionText.length + 1 + 'ch'
+  //     } 
+  //   }
+  // },
 
-  mounted() {
-    this.setWidth()
-  }
+  // mounted() {
+  //   this.setWidth()
+  // }
 
 })
 </script>
@@ -127,7 +128,7 @@ export default defineComponent({
     --webkit-appearance: none;
     appearance: none;
     border: 0;
-    box-sizing: content-box;
+    box-sizing: border-box;
     display: block;
     width: 100%;
 
@@ -158,8 +159,13 @@ export default defineComponent({
     pointer-events: none;
   }
 
-  .robo-select--disabled, .robo-select--disabled select {
+  .robo-select--disabled, .robo-select--disabled select,
+  .robo-select--single, .robo-select--single select {
     cursor: not-allowed
+  }
+
+  .robo-select--single select {
+    padding-right: 0;
   }
 
 </style>

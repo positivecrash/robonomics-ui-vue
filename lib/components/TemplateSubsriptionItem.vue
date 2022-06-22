@@ -12,20 +12,24 @@
                 mediaMobile="transfer"
             >
                 <robo-button 
-                    v-if="statusBufer !== 'new' && screenWidth > 1200"
+                    v-if="screenWidth > 1200"
                     block
+                    :disabled="(statusBufer === 'new') ? 'disabled' : null"
                     fitLabeled
                     icon-left="power-off"
-                    :type = "deviceIsOn ? 'ok' : 'alarm'"
+                    :type = "buttonSwitchType"
+                    @click="switchToggle"
                 >
                 </robo-button>
 
                 <robo-button 
-                    v-if="statusBufer !== 'new' && screenWidth < 1200"
+                    v-if="screenWidth < 1200"
                     block
+                    :disabled="(statusBufer === 'new') ? 'disabled' : null"
                     fitLabeled
                     icon-left="power-off"
-                    :type = "deviceIsOn ? 'ok' : 'alarm'"
+                    :type = "buttonSwitchType"
+                    @click="switchToggle"
                 >
                     {{nameModel}}
                 </robo-button>
@@ -216,11 +220,12 @@ export default defineComponent({
         return {
             statusBufer: this.status,
             itemOffset: 'x05',
-            screenWidth: 0
+            screenWidth: 0,
+            deviceSwitch: this.deviceIsOn
         }
     },
 
-    emits: ['update:address', 'update:name', 'onAdd', 'onDelete', 'onCancel'],
+    emits: ['update:address', 'update:name', 'onAdd', 'onDelete', 'onCancel', 'onSwitch'],
 
     computed: {
         classes() {
@@ -255,7 +260,19 @@ export default defineComponent({
                 // device
                 return '100px auto auto 100px'
             }
-        }
+        },
+
+        buttonSwitchType() {
+            if ( this.statusBufer === 'new' ) {
+                return 'na'
+            } else if ( this.statusBufer !== 'new' ) {
+                if(this.deviceSwitch) {
+                    return 'ok'
+                } else {
+                    return 'alarm'
+                }
+            }
+        },
     },
 
     methods: {
@@ -306,6 +323,16 @@ export default defineComponent({
             else {
                 return 'x4'
             }
+        },
+
+        switchToggle() {
+            if(this.deviceSwitch) {
+                this.deviceSwitch = false
+            } else {
+                this.deviceSwitch = true
+            }
+
+            this.$emit('onSwitch')
         }
     },
 

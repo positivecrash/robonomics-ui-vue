@@ -1,61 +1,72 @@
 <template>
 
-    <robo-grid  
-      flex
-      offset="x0"
-      gap="x05"
-      :class="classes"
-    >
-      <template v-if="address && !selectable">
-        <span v-html="short ? shortAddress(address) : address" />
-      </template>
+  <robo-grid  
+    flex
+    offset="x0"
+    gap="x05"
+    :class="classes"
+  >
 
-      <template v-if="address && selectable">
-        <robo-select
-            :values="addressList"
-            :options="accountsList"
-            v-model="address"
-            clean
-        />
-      </template>
+    <template v-if="!address">
+      <robo-account-polkadot-connect v-if="!extension" />
+      <span v-if="extension">Turn on account in your extension</span>
+    </template>
+    <template v-else>
       
-      <template v-if="!address">
-        <robo-account-polkadot-connect
-          v-if="!extension"
+        <robo-grid  
+          flex
+          offset="x0"
+          gap="x0">
+          <img v-if="extensionShowIcon" :src="extensionPic" class="extensionLogo" />
+          <span v-if="!selectable" v-html="short ? shortAddress(address) : address" />
+          <robo-select
+              v-else
+              :values="addressList"
+              :options="accountsList"
+              v-model="address"
+              clean
+          />
+        </robo-grid>
+
+        <robo-button 
+          v-if="copy" 
+          @click="clipboard"
+          clean 
+          :iconLeft="clipboardCopied ? 'check' : 'copy'"
         />
 
-        <span v-if="extension">Turn on account in your extension</span>
-      </template>
+    </template>
 
-      <robo-account-polkadot-connect
-        v-if="allowShiftExtensions && extension"
-        summaryIcon='right-left'
-        summaryText=''
-        popup
-      />
-
-      <robo-button v-if="copy && address" @click="clipboard" clean>
-        <font-awesome-icon icon="copy" class="icon" v-if="!clipboardCopied" />
-        <font-awesome-icon icon="check" class="icon" v-if="clipboardCopied" />
-      </robo-button>
-    </robo-grid>
+    <robo-account-polkadot-connect
+      v-if="extensionAllowShift && extension"
+      summaryIcon='right-left'
+      summaryText=''
+      popup
+    />
+  </robo-grid>
 
 </template>
 
 <script>
 import { defineComponent } from 'vue'
+import { encodeAddress } from "@polkadot/util-crypto"
+import extensions from '../extensionsPolkadot'
 
 export default defineComponent({
   name: 'RoboAccountPolkadot',
 
   props: {
-    allowShiftExtensions: {
-        type: Boolean,
-        default: false
-    },
     copy: {
         type: Boolean,
         default: true
+    },
+    extensionAllowShift: {
+      type: Boolean,
+      default: false
+    },
+    extensionShowIcon: {
+      type: Boolean,
+      default: false
     },
     inline: {
         type: Boolean,
@@ -74,12 +85,13 @@ export default defineComponent({
 
   data () {
       return {
-        address: this.$store.getters.polkadot.address ? this.$store.getters.polkadot.address : null,
-        extension: this.$store.getters.polkadot.extension ? this.$store.getters.polkadot.extension : null,
+        address: this.$store.getters['robonomicsUIvue/polkadot'].address ?? '',
+        extension: this.$store.getters['robonomicsUIvue/polkadot'].extension ?? '',
         accounts: null,
         clipboardCopied: false,
-        accountsList: this.setAccountsList(this.accounts) || null,
-        addressList: this.setAddressList(this.accounts) || null,
+        accountsList: this.setAccountsList(this.accounts) ?? null,
+        addressList: this.setAddressList(this.accounts) ?? null,
+        extensionsData: extensions
       }
   },
 
@@ -87,32 +99,30 @@ export default defineComponent({
     "$store.state.robonomicsUIvue.polkadot.address": function(value) {
       this.address = value
     },
-    "$store.getters.polkadot.extension": function(value) {
+    "$store.state.robonomicsUIvue.polkadot.extension": async function(value) {
       this.extension = value
+      this.accounts = await this.$store.dispatch("robonomicsUIvue/getPolkadotAccounts")
     },
-    "$store.getters.polkadot.chain": async function() {
-      this.$store.commit('setPolkadotAddress', this.address)
-      this.accounts = await this.$store.dispatch("getPolkadotAccounts")
+    "$store.state.robonomicsUIvue.polkadot.chain": async function() {
+      this.accounts = await this.$store.dispatch("robonomicsUIvue/getPolkadotAccounts")
     },
     "address": function(value) {
-      this.$store.commit('setPolkadotAddress', value)
+      this.$store.commit('robonomicsUIvue/setPolkadotAddress', value)
     },
     "accounts": function(value) {
-      this.accountsList = this.setAccountsList(value)
-      this.addressList = this.setAddressList(value)
-
-      if(value) {
-        if ( value.filter(account => account.address === this.address).length == 0 ) {
-          if(value.length > 0) {
-            this.$store.commit('setPolkadotAddress', account[0].address)
-          } else {
-            this.$store.commit('setPolkadotAddress', null)
-          }
-        }
+      if(value.length > 0) {
+        this.accountsList = this.setAccountsList(value)
+        this.addressList = this.setAddressList(value)
+        this.isAddressInAccounts(this.address, value)
+      } else {
+        this.$store.commit('robonomicsUIvue/setPolkadotAddress', '')
       }
     },
     "extension": async function() {
-      this.accounts = await this.$store.dispatch("getPolkadotAccounts")
+      this.accounts = await this.$store.dispatch("robonomicsUIvue/getPolkadotAccounts")
+    },
+    "short": function() {
+      this.accountsList = this.setAccountsList(this.accounts)
     }
   },
 
@@ -122,6 +132,14 @@ export default defineComponent({
         [`robo-account`]: true,
         [`robo-account--inline`]: this.inline
       };
+    },
+
+    extensionData() {
+        return this.extensionsData.find(ext => ext.extesion === this.extension)
+    },
+
+    extensionPic() {
+        return new URL(`../images/${this.extensionData.picture}`, import.meta.url)
     }
   },
 
@@ -145,12 +163,12 @@ export default defineComponent({
     onLoad(interval) {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                if (window.injectedWeb3) { 
+                if (window.injectedWeb3) {
                     resolve()
                 }
             }, interval);
 
-            setTimeout(() => reject(new Error("no extension")), 1000);
+            setTimeout(() => reject(console.warn('[robonomics-ui-vue]: no extension found in robo-account-polkadot')), 1000);
         })
     },
 
@@ -158,7 +176,6 @@ export default defineComponent({
       let result = []
 
       if(accounts) {
-        
         if(this.short) {
           Object.keys(accounts).map(key => {
             result.push(this.shortAddress(accounts[key].address))
@@ -187,39 +204,55 @@ export default defineComponent({
 
       return result
     },
+
+    isAddressInAccounts(address, accounts) {
+      if( address &&  accounts.length > 0) {
+
+        // if no address found in accounts
+        if ( accounts.filter(account => account.address === address).length == 0 ) {
+          
+          const addressEncoded = encodeAddress(address, this.$store.getters['robonomicsUIvue/polkadot'].chain)
+          if( accounts.filter(account => account.address === addressEncoded).length == 0 ) {
+            // check chain format
+            this.$store.commit('robonomicsUIvue/setPolkadotAddress', addressEncoded)
+          }
+          else {
+            // set first addres in the accounts list
+            this.$store.commit('robonomicsUIvue/setPolkadotAddress', accounts[0].address)
+          }
+          
+        }
+      }
+    }
   },
 
   async mounted() {
 
-    await this.onLoad(500)
+    try {
+      await this.onLoad(500)
 
-    // get list of accounts if there is extension
-    if( this.extension ) {
-      this.accounts = await this.$store.dispatch("getPolkadotAccounts")
-    }
+      // get list of accounts if there is extension
+      this.accounts = await this.$store.dispatch("robonomicsUIvue/getPolkadotAccounts")
 
-    // check if active address is still avalaibale
-    if( this.address && this.accounts ) {
+      if(this.accounts.length > 0){
 
-      if ( this.accounts.filter(account => account.address === this.address).length == 0 ) {
-        this.$store.commit('setPolkadotAddress', account[0].address)
+          if(!this.address) {
+            // set active address if there is extension & accounts but no active address
+            this.$store.commit('robonomicsUIvue/setPolkadotAddress', this.accounts[0].address)
+          } else {
+            // check if active address is still avalaibale
+            this.isAddressInAccounts(this.address, this.accounts)
+          }
+
+          this.accountsList = this.setAccountsList(this.accounts)
+          this.addressList = this.setAddressList(this.accounts)
+
+      } else {
+        this.$store.commit('robonomicsUIvue/setPolkadotAddress', '')
       }
-
-    }
-
-    // check if active address is still avalaibale, if no - delete it
-    if( this.address && !this.accounts ) {
-      this.$store.commit('setPolkadotAddress', null)
-    }
-
-    // set active address if there is extension & accounts but no active address
-    if( !this.address && this.extension && this.accounts.length > 0 ) {
-      this.$store.commit('setPolkadotAddress', this.accounts[0].address)
-    }
-
-    if(this.accounts) {
-      this.accountsList = this.setAccountsList(this.accounts)
-      this.addressList = this.setAddressList(this.accounts)
+    } catch (e) {
+      this.$store.commit('robonomicsUIvue/setPolkadotExtension', '')
+      this.$store.commit('robonomicsUIvue/setPolkadotAddress', '')
     }
     
   }
@@ -255,6 +288,11 @@ export default defineComponent({
 <style scoped>
     .robo-account--inline {
         display: inline-flex !important;
+    }
+
+    .extensionLogo {
+      width: 20px;
+      margin-right: 3px;
     }
 </style>
 

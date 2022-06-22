@@ -26,7 +26,7 @@
             </span>
           </robo-button>
 
-          <div v-if="!summaryButton && summaryText">
+          <div v-if="!summaryButton && (summaryText || summaryIcon)">
             <robo-icon 
               v-if="summaryIcon && !summaryLoading"
               :icon="summaryIcon" 
@@ -225,19 +225,9 @@ export default defineComponent({
         [`robo-details`]: true,
         [`robo-details--${this.type}`]: this.type,
         [`robo-details--closeOutOfFocus`]: this.contentCloseOutOfFocus || this.tooltip,
-      }
-
-      if (this.content) {
-        Object.assign(classes, {
-          [`robo-details--offset`]: this.contentOffset,
-          [`robo-details--content-align--${this.contentTextalign}`]: this.contentTextalign,
-        })
-      }
-
-      if (this.summary) {
-        Object.assign(classes, {
-          [`robo-details--loading`]: this.summaryLoading
-        })
+        [`robo-details--offset`]: this.contentOffset,
+        [`robo-details--content-align--${this.contentTextalign}`]: this.contentTextalign,
+        [`robo-details--loading`]: this.summaryLoading
       }
 
       if (this.tooltip) {

@@ -28,8 +28,8 @@ export default defineConfig({
       },
       // manualChunks: id => path.parse(id).name,
       plugins: [
-        resolve()
-    ],
+          resolve()
+      ],
     }
   },
 

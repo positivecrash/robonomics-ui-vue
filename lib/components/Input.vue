@@ -21,15 +21,12 @@
 
         <robo-details 
           v-if="tip" 
-          :summary="{
-              text: 'i',
-              button: {
-                size: 'small'
-              }
-          }"
-          :tooltip="{
-              placement: 'bottom-end'
-          }"
+          
+          summaryButton
+          summaryButtonSize = 'small'
+          summaryText = 'i'
+          tooltip
+          tooltipPlacement = 'bottom-end'
         >
           <div v-html="tip" />
         </robo-details>

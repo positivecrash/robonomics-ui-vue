@@ -1,16 +1,39 @@
 <template>
     <div class="robo-sidebar-itemWrap">
-        <component 
-            :is="href ? 'a' : 'span'"
-            :href="href"
-            :class="classList"
-            :target="external() ? '_blank' : null"
-            :rel="external() ? 'noopener' : null"
-            :aria-current="current ? 'page' : null"
+
+      <component 
+        :is="setComponentTag"
+        :aria-current="current ? 'page' : null"
+        :class="classList"
+        :rel="external() ? 'noopener' : null"
+        :target="external() ? '_blank' : null"
+      >
+        <slot/>
+        <font-awesome-icon v-if="external()" icon="arrow-up-right-from-square" class="external-icon" />
+      </component>
+
+      <router-link 
+        v-if="router"
+        :class="classList"
+        :to="router ? router : null"
         >
-            <slot/>
-            <font-awesome-icon v-if="external()" icon="arrow-up-right-from-square" class="external-icon" />
-        </component>
+        <slot/>
+      </router-link>
+
+          <!-- <component 
+              :is="setComponentTag"
+
+              :aria-current="current ? 'page' : null"
+              :class="classList"
+              :href="href"
+              :rel="external() ? 'noopener' : null"
+              :target="external() ? '_blank' : null"
+              :to="router ? router : null"  
+          >
+              <slot/>
+              <font-awesome-icon v-if="external()" icon="arrow-up-right-from-square" class="external-icon" />
+          </component> -->
+      
     </div>
 </template>
 
@@ -57,10 +80,6 @@ export default defineComponent({
   name: 'RoboSidebarItem',
 
   props: {
-    href: {
-      type: String,
-      default: null
-    },
     current: {
       type: Boolean,
       default: false
@@ -69,14 +88,31 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
+    href: {
+      type: String,
+      default: null
+    },
+    router: {
+      type: Object,
+      default: null
+    }
   },
 
   computed: {
     classList() {
       return {
         [`robo-sidebar-item`]: true,
-        [`robo-sidebar-item--disabled`]: !this.href || this.disabled
+        [`robo-sidebar-item--disabled`]: (!this.href && !this.router) || this.disabled
       };
+    },
+    setComponentTag(){
+      if(this.href) {
+        return 'a'
+      } else {
+        if (!this.router) {
+          return 'span'
+        }
+      }
     }
   },
 

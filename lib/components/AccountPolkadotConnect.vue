@@ -2,7 +2,7 @@
     <robo-text weight="bold">
 
         <robo-details 
-            contentOffset="true"
+            contentOffset
             :summaryIcon="summaryIcon"
             :summaryText="summaryText"
             popup
