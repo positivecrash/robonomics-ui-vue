@@ -43,6 +43,7 @@
 	--aside-size-right: 16rem;
 	--layout-maxwidth: 1920px;
 
+	--gap: var(--space);
 	--gap-layout: calc( var(--space) * 2);
 	--gap-text: calc( var(--space) * 2);
 	

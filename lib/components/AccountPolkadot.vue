@@ -1,6 +1,7 @@
 <template>
 
   <robo-grid  
+    align="right"
     flex
     offset="x0"
     gap="x05"
@@ -49,7 +50,7 @@
 
 <script>
 import { defineComponent } from 'vue'
-import { encodeAddress } from "@polkadot/util-crypto"
+// import { encodeAddress } from "@polkadot/util-crypto"
 import extensions from '../extensionsPolkadot'
 
 export default defineComponent({

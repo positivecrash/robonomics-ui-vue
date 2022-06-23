@@ -1,6 +1,14 @@
 <template>
-    <div :class="classList">
+    <div :class="classList" ref="text">
         <slot/>
+
+        <robo-icon 
+          v-if="highlightLabelClose && highlightLabel"
+          @click="close"
+          
+          class="robo-text-close"
+          icon="xmark"
+        />
     </div>
 </template>
 
@@ -24,6 +32,14 @@ export default defineComponent({
       validator: function (value) {
         return ['success', 'error', 'link'].indexOf(value) !== -1;
       }
+    },
+    highlightLabelClose: {
+      type: Boolean,
+      default: false
+    },
+    highlightLabelCloseReopen: {
+      type: Boolean,
+      default: false
     },
     size: {
       type: String,
@@ -49,6 +65,8 @@ export default defineComponent({
     }
   },
 
+  emits: ['onClose'],
+
   computed: {
     classList() {
       return {
@@ -59,8 +77,18 @@ export default defineComponent({
         [`robo-text--gap`]: this.gap,
         [`robo-text--highlight-${this.highlight}`]: this.highlight,
         [`robo-text--highlight-label-${this.highlightLabel}`]: this.highlightLabel,
+        [`robo-text--highlight-label-closable`]: this.highlightLabelClose,
+        [`open`]: this.highlightLabelCloseReopen,
       };
-    },
+    }
+  },
+
+  methods: {
+    close() {
+      this.$refs.text.classList.remove('open')
+      this.$refs.text.classList.add('hide')
+      this.$emit('onClose')
+    }
   }
 
 })
@@ -126,14 +154,16 @@ export default defineComponent({
       --color-text: var(--color-blue);
       color: var(--color-blue)
     }
+    /* - HIGHLIGHT */
 
 
-
+    /* + HIGHLIGHT LABEL */
     div[class *= 'robo-text--highlight-label-' ]{
       --input-text-color: var(--color-light);
       --color-text: var(--color-light);
       color: var(--color-light);
-      padding: calc(var(--space) * 0.4)
+      padding: calc(var(--space) * 0.4);
+      max-width: 100%;
     }
 
     .robo-text--highlight-label-success {
@@ -147,5 +177,42 @@ export default defineComponent({
     .robo-text--highlight-label-link {
       background-color: var(--color-blue)
     }
-    /* - HIGHLIGHT */
+    /* - HIGHLIGHT LABEL */
+
+
+    /* + HIGHLIGHT LABEL REMOVE */
+    @keyframes hide {
+        to {
+            opacity: 0;
+            visibility: hidden;
+        }
+    }
+
+    @keyframes open {
+        to {
+            opacity: 1;
+            visibility: visible;
+        }
+    }
+
+    .robo-text.open {
+      animation: open 0.4s linear 0.2s forwards;
+    }
+
+    .robo-text.hide {
+      animation: hide 0.4s linear 0.2s forwards;
+    }
+
+    .robo-text--highlight-label-closable {
+      padding-right: calc(var(--space) + 0.8rem) !important;
+      position: relative;
+    }
+
+    .robo-text-close {
+      position: absolute;
+      top: 0.4rem;
+      right: 0.4rem;
+      cursor: pointer;
+    }
+    /* - HIGHLIGHT LABEL REMOVE */
 </style>

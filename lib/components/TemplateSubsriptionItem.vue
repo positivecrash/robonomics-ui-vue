@@ -2,38 +2,12 @@
     <div :class="classes" ref="item">
 
         <robo-grid 
+            v-if="statusBufer !== 'deleted'"
             :columns="columnsWidth" 
             valign="center" 
             :offset="itemOffset"
             gap="x1"
         >
-            <robo-grid-item 
-                v-if="type === 'device'" 
-                mediaMobile="transfer"
-            >
-                <robo-button 
-                    v-if="screenWidth > 1200"
-                    block
-                    :disabled="(statusBufer === 'new') ? 'disabled' : null"
-                    fitLabeled
-                    icon-left="power-off"
-                    :type = "buttonSwitchType"
-                    @click="switchToggle"
-                >
-                </robo-button>
-
-                <robo-button 
-                    v-if="screenWidth < 1200"
-                    block
-                    :disabled="(statusBufer === 'new') ? 'disabled' : null"
-                    fitLabeled
-                    icon-left="power-off"
-                    :type = "buttonSwitchType"
-                    @click="switchToggle"
-                >
-                    {{nameModel}}
-                </robo-button>
-            </robo-grid-item>
 
             <robo-grid-item mediaMobile="transfer">
                 <robo-input 
@@ -41,13 +15,15 @@
                     placeholder = "Robonomics parachain address"
                     v-model="addressModel"
                     :disabled="(statusBufer !== 'new') ? true : false"
+                    :tip="tipAddress ?? null"
                 />
             </robo-grid-item>
             <robo-grid-item>
                 <robo-input 
                     label="Name"
                     v-model="nameModel"
-                    tip="You may take custom name for the account by <a href='https://wiki.polkadot.network/docs/learn-identity' target='_blank'>setting an identity</a>"
+                    :disabled="(statusBufer === 'loading') ? true : false"
+                    :tip="tipName ?? null"
                 />
             </robo-grid-item>
 
@@ -59,7 +35,7 @@
                     outlined
                     fitLabeled
                     block
-                    @click="$emit('onAdd')"
+                    @click="addItem"
                 >
                 </robo-button>
 
@@ -69,7 +45,7 @@
                     outlined
                     fitLabeled
                     block
-                    @click="$emit('onAdd')"
+                    @click="addItem"
                 >
                     Add
                 </robo-button>
@@ -96,79 +72,59 @@
                 </robo-button>
 
                 <robo-button 
-                    v-if="statusBufer === 'added' && type === 'subsription' && screenWidth > 1200"
+                    v-if="statusBufer === 'added' && screenWidth > 1200"
+                    @mouseover="hoverAdded = true" @mouseleave="hoverAdded = false"
+                    @click="deleteItem"
+
                     block
                     fitLabeled
-                    icon-left="minus"
+                    :icon-left="hoverAdded ? 'minus' : 'check'"
                     outlined
-                    type = "alarm"
-                    @click="deleteDelay"
+                    title="remove item"
+                    :type="hoverAdded ? 'alarm' : 'ok'"
                 ></robo-button>
 
                 <robo-button 
-                    v-if="statusBufer === 'added' && type === 'subsription' && screenWidth < 1200"
+                    v-if="statusBufer === 'added' && screenWidth < 1200"
+                    @mouseover="hoverAdded = true" @mouseleave="hoverAdded = false"
+                    @click="deleteItem"
+
                     block
                     fitLabeled
-                    icon-left="minus"
+                    icon-left="hoverAdded ? 'minus' : 'check'"
                     outlined
-                    type = "alarm"
-                    @click="deleteDelay"
+                    title="remove item"
+                    :type="hoverAdded ? 'alarm' : 'ok'"
+                    
                 >
                     Remove
-                </robo-button>
-
-
-                <robo-button 
-                    v-if="statusBufer === 'deleted' && type === 'subsription' && screenWidth > 1200"
-                    block
-                    fitLabeled
-                    icon-left="arrow-rotate-left"
-                    outlined
-                    type = "alarm"
-                    @click="deleteCancel"
-                />
-
-                <robo-button 
-                    v-if="statusBufer === 'deleted' && type === 'subsription' && screenWidth < 1200"
-                    block
-                    fitLabeled
-                    icon-left="arrow-rotate-left"
-                    outlined
-                    type = "alarm"
-                    @click="deleteCancel"
-                >Restore</robo-button>
-
-
-                <robo-button 
-                    v-if="statusBufer === 'added' && type === 'device' &&  deviceInfoLink && screenWidth > 1200"
-                    block
-                    fitLabeled
-                    :href="deviceInfoLink"
-                    icon-left="pencil"
-                    outlined
-                ></robo-button>
-
-                <robo-button 
-                    v-if="statusBufer === 'added' && type === 'device' &&  deviceInfoLink && screenWidth < 1200"
-                    block
-                    fitLabeled
-                    :href="deviceInfoLink"
-                    icon-left="pencil"
-                    outlined
-                >
-                    Edit
                 </robo-button>
 
             </robo-grid-item>
         </robo-grid>
 
+
         <robo-text 
             v-if="statusBufer === 'deleted'"
+            @on-close="removeItem"
+
+            class="robo-template-subsribe-item-message-deleted"
+            highlightLabel="error"
+            highlightLabelClose
+            weight="bold"
+        >Item deleted</robo-text>
+
+        <robo-text 
+            v-if="messageBufer"
+            :key="messageKey"
+
             class="robo-template-subsribe-item-message"
             highlightLabel="error"
+            highlightLabelClose
+            :highlightLabelCloseReopen="messageReopen"
             weight="bold"
         >
-            Will be deleted on {{deleteDelayTime}}s ...
+            {{messageBufer}}
         </robo-text>
     </div>
 </template>
@@ -207,6 +163,14 @@ export default defineComponent({
             return ['new', 'loading', 'added', 'deleted'].includes(value)
         }
       },
+      tipAddress: {
+        type: String,
+        default: null
+      },
+      tipName: {
+        type: String,
+        default: null
+      },
       type: {
         type: String,
         default: 'subsription',
@@ -218,20 +182,35 @@ export default defineComponent({
 
     data () {
         return {
-            statusBufer: this.status,
+            deviceSwitch: this.deviceIsOn,
             itemOffset: 'x05',
             screenWidth: 0,
-            deviceSwitch: this.deviceIsOn
+            statusBufer: this.status,
+            messageBufer: null,
+            messageReopen: false,
+            messageKey: 0,
+            hoverAdded: false
         }
     },
 
-    emits: ['update:address', 'update:name', 'onAdd', 'onDelete', 'onCancel', 'onSwitch'],
+    emits: ['update:address', 'update:name', 'onAdd', 'onDelete'],
+
+    watch: {
+        statusBufer: function(value) {
+
+            if(value === 'new') {
+                this.messageReopen = true
+                this.messageKey += 1
+            }
+
+        }
+    },
 
     computed: {
         classes() {
             return {
                 [`robo-template-subsribe-item`]: true,
-                [`robo-template-subsribe-item--${this.status}`]: this.status,
+                [`robo-template-subsribe-item--${this.statusBufer}`]: this.statusBufer,
             }
         },
 
@@ -276,43 +255,58 @@ export default defineComponent({
     },
 
     methods: {
-        deleteDelay() {
+        addItem() {
+            this.$emit('onAdd',
+                () => this.addStarted(),
+                (status, message) => this.addStatus(status, message)
+            )
+        },
 
-            if(this.statusBufer === 'added') {
-                
+        addStarted() {
+            this.statusBufer = 'loading'
+        },
+
+        addStatus(status, message) {
+
+           if(status) {
+               this.statusBufer = 'added'
+           } else {
+               this.statusBufer = 'new'
+           }
+
+           if(message) {
+               this.messageBufer = message
+           }
+        },
+
+        deleteItem() {
+            this.$emit('onDelete',
+                () => this.deleteStarted(),
+                (status, message) => this.deleteStatus(status, message)
+            )
+        },
+
+        deleteStarted() {
+            this.statusBufer = 'loading'
+        },
+
+        deleteStatus(status, message) {
+         
+           if(status) {
                 this.statusBufer = 'deleted'
-                this.$refs.item.classList.add('removeDelay')
+           } else {
+               this.statusBufer = 'added'
+           }
 
-                if(this.statusBufer === 'added') {
-                    return
-                }
-
-                setTimeout(() => {
-                    
-                    if (this.statusBufer === 'deleted' ) {
-                        this.$emit('onDelete')
-                        this.$refs.item.classList.remove('removeDelay')
-                        this.$refs.item.classList.add('remove')
-
-                        setTimeout(() => {
-                            this.$refs.item.remove()
-                        }, 1000)
-                    }
-                }, 1000 * this.deleteDelayTime)
-            }
-            
+           if(message) {
+               this.messageBufer = message
+           }
         },
 
-
-        deleteCancel() {
-
-            if(this.statusBufer === 'deleted') {
-                
-                this.statusBufer = 'added'
-                this.$refs.item.classList.remove('removeDelay', 'remove')
-                this.$emit('onCancel')
-            }
+        removeItem() {
+            this.$refs.item.remove()
         },
+
 
         itemOffsetCalc() {
             if( window.innerWidth > 1200 ) {
@@ -333,7 +327,7 @@ export default defineComponent({
             }
 
             this.$emit('onSwitch')
-        }
+        },
     },
 
     mounted() {
@@ -357,8 +351,8 @@ export default defineComponent({
     }
 
     .robo-template-subsribe-item--loading {
+        filter: grayscale(1);
         pointer-events: none;
-        opacity: 0.7;
     }
 
     .robo-template-subsribe-item--deleted .robo-input {
@@ -367,40 +361,43 @@ export default defineComponent({
     }
 
 
+    /* + SERVICE MESSAGE */
     .robo-template-subsribe-item {
         position: relative;
     }
 
     .robo-template-subsribe-item-message {
-        position: absolute;
+        position: absolute !important;
         top: var(--space);
         left: 0;
+        z-index: 1;
     }
 
-    @keyframes hide {
-        to {
-            opacity: 0;
-            visibility: hidden;
-        }
+    .robo-template-subsribe-item > .robo-grid {
+        padding-bottom: 0 !important;
     }
-
-    @keyframes blink {
-        35% {
-            opacity: 0.4;
-        }
-    }
-
-    .robo-template-subsribe-item.removeDelay {
-        animation: blink 1s linear infinite;
-    }
-
-    .robo-template-subsribe-item.remove {
-        animation: hide 0.4s linear 0.2s forwards;
-    }
+    /* - SERVICE MESSAGE */
 
     @media screen and (max-width: 1200px) {
         .robo-grid--mobile-transfer {
           grid-template-columns: 1fr !important;
         }
     }
+
+    .robo-template-subsribe-item-message-deleted {
+        margin-top: calc(var(--gap-layout) * .5);
+    }
+</style>
+
+<style>
+.robo-template-subsribe-item .robo-btn.robo-btn--alarm.robo-btn--outlined .robo-btn--part {
+    --border: var(--color-red);
+    --color: var(--color-red);
+    --border-hover: var(--color-red);
+    --color-hover: var(--color-red);
+    --border-2: var(--color-red);
+    --color-2: var(--color-red);
+    --border-2-hover: var(--color-red);
+    --color-2-hover: var(--color-red);
+}
 </style>

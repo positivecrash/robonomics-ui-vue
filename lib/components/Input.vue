@@ -177,12 +177,14 @@ export default defineComponent({
 
     /* + disabled */
 
-    .robo-input--disabled .robo-input-label {
+    /* .robo-input--disabled .robo-input-label {
         color: var(--color-gray)
-    }
+    } */
 
     .robo-input--disabled input {
         border-color: var(--color-gray);
+        color: var(--color-dark);
+        opacity: 0.6;
     }
     /* - disabled */
 </style>

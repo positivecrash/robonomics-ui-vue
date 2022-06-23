@@ -1,12 +1,21 @@
 <template>
     <a 
-        :href="to ? to : '#'"
-        :class="classList"
-        :target="external() ? '_blank' : null"
-        :rel="external() ? 'noopener' : null"
+      v-if="href"
+      :class="classList"
+      :href="href"
+      :target="external() ? '_blank' : null"
+      :rel="external() ? 'noopener' : null"
     >
-        <slot/>
+      <slot/>
     </a>
+
+    <router-link 
+        v-if="router"
+        :class="classList"
+        :to="router ? router : null"
+        >
+        <slot/>
+    </router-link>
 </template>
 
 <script>
@@ -16,13 +25,17 @@ export default defineComponent({
   name: 'RoboLink',
 
   props: {
-    to: {
-        type: String,
-        default: null
-    },
     disabled: {
         type: Boolean,
         default: false
+    },
+    href: {
+        type: String,
+        default: null
+    },
+    router: {
+      type: Object,
+      default: null
     }
   },
 
@@ -30,7 +43,7 @@ export default defineComponent({
     classList() {
       return {
         [`robo-link`]: true,
-        [`robo-link--disabled`]: this.disabled || !this.to
+        [`robo-link--disabled`]: this.disabled || (!this.href && !this.router)
       };
     }
   },
@@ -38,9 +51,9 @@ export default defineComponent({
   methods: {
     external() {
       
-      if( this.to ) {
+      if( this.href ) {
         let parser = document.createElement('a')
-        parser.to = this.to
+        parser.to = this.href
         if (  parser.host !== window.location.host ) {
           return true
         }

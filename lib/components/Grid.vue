@@ -98,6 +98,7 @@ export default defineComponent({
         [`robo-grid--align-${this.align}`]: this.align,
         [`robo-grid--embed`]: this.embed,
         [`robo-grid--flex`]: this.flex,
+        [`robo-grid--grid`]: !this.flex,
       };
     },
     style() {
@@ -238,16 +239,31 @@ export default defineComponent({
       }
     }
 
-    .robo-grid--valign-top { align-items: start; }
-    .robo-grid--valign-center { align-items: center; }
-    .robo-grid--valign-bottom { align-items: end; }
-    .robo-grid--valign-stretch { align-items: stretch; }
+    /* + VALIGN */
+    .robo-grid--flex .robo-grid--valign-top { align-items: flex-start; }
+    .robo-grid--grid .robo-grid--valign-top { align-items: start; }
 
-    .robo-grid--align-left { justify-content: start; }
+    .robo-grid--valign-center { align-items: center; }
+
+    .robo-grid--flex .robo-grid--valign-bottom { align-items: flex-end; }
+    .robo-grid--grid .robo-grid--valign-bottom { align-items: end; }
+
+    .robo-grid--valign-stretch { align-items: stretch; }
+    /* - VALIGN */
+
+    /* + ALIGN */
+    .robo-grid--flex .robo-grid--align-left { justify-content: flex-start; }
+    .robo-grid--grid .robo-grid--align-left { justify-content: start; }
+
     .robo-grid--align-center { justify-content: center; }
-    .robo-grid--align-right { justify-content: end; }
-    .robo-grid--align-stretch { justify-content: stretch; }
+
+    .robo-grid--flex .robo-grid--align-right { justify-content: flex-end; }
+    .robo-grid--grid .robo-grid--align-right { justify-content: end; }
+
+    .robo-grid--grid .robo-grid--align-stretch { justify-content: stretch; }
+
     .robo-grid--align-space-between { justify-content: space-between; }
+    /* - ALIGN */
 
 
     .robo-grid--align-fit-content.robo-grid-columns-1 { grid-template-columns: repeat(1, max-content); }
