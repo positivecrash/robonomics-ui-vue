@@ -1,6 +1,6 @@
 <template>
     <div :class="classList" tabindex="-1">
-      <robo-button @click="toggleCollapse" class="robo-grid-item-toggler" outlined v-if="collapse" size="small" :icon-left="collapseIcon">
+      <robo-button @click="toggleCollapse" class="robo-grid-item-toggler" outlined v-if="collapseText" size="small" :icon-left="collapseIcon">
         <span v-if="collapseText">{{collapseText}}</span>
       </robo-button>
       
@@ -102,21 +102,8 @@ export default defineComponent({
 })
 </script>
 
-<style scoped>
-
-    .robo-grid-item--valign-top { align-self: start; }
-    .robo-grid-item--valign-center { align-self: center; }
-    .robo-grid-item--valign-bottom { align-self: end; }
-    .robo-grid-item--valign-stretch { align-self: stretch; }
-
-    .robo-grid-item--align-left { justify-self: start; }
-    .robo-grid-item--align-center { justify-self: center; }
-    .robo-grid-item--align-right { justify-self: end; }
-    .robo-grid-item--align-stretch { justify-self: stretch; }
-
-
-
-    .robo-grid-item--mobile-collapse .robo-grid-item-toggler {
+<style>
+.robo-grid-item--mobile-collapse .robo-grid-item-toggler {
       display: none;
     }
 
@@ -135,6 +122,19 @@ export default defineComponent({
           display: none;
         }
     }
+</style>
+
+<style scoped>
+
+    .robo-grid-item--valign-top { align-self: start; }
+    .robo-grid-item--valign-center { align-self: center; }
+    .robo-grid-item--valign-bottom { align-self: end; }
+    .robo-grid-item--valign-stretch { align-self: stretch; }
+
+    .robo-grid-item--align-left { justify-self: start; }
+    .robo-grid-item--align-center { justify-self: center; }
+    .robo-grid-item--align-right { justify-self: end; }
+    .robo-grid-item--align-stretch { justify-self: stretch; }
 
 
     /* Expand */

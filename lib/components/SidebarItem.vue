@@ -5,6 +5,7 @@
         :is="setComponentTag"
         :aria-current="current ? 'page' : null"
         :class="classList"
+        :href="href"
         :rel="external() ? 'noopener' : null"
         :target="external() ? '_blank' : null"
       >
@@ -19,20 +20,6 @@
         >
         <slot/>
       </router-link>
-
-          <!-- <component 
-              :is="setComponentTag"
-
-              :aria-current="current ? 'page' : null"
-              :class="classList"
-              :href="href"
-              :rel="external() ? 'noopener' : null"
-              :target="external() ? '_blank' : null"
-              :to="router ? router : null"  
-          >
-              <slot/>
-              <font-awesome-icon v-if="external()" icon="arrow-up-right-from-square" class="external-icon" />
-          </component> -->
       
     </div>
 </template>

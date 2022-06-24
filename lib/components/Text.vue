@@ -19,6 +19,10 @@ export default defineComponent({
   name: 'RoboText',
 
   props: {
+    gap: {
+        type: Boolean,
+        default: false
+    },
     highlight: {
       type: String,
       default: null,
@@ -41,6 +45,14 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
+    hyphen: {
+      type:Boolean,
+      default: false
+    },
+    inline: {
+        type: Boolean,
+        default: false
+    },
     size: {
       type: String,
       default: null,
@@ -55,14 +67,6 @@ export default defineComponent({
         return ['bold', 'normal', 'light'].indexOf(value) !== -1;
       }
     },
-    inline: {
-        type: Boolean,
-        default: false
-    },
-    gap: {
-        type: Boolean,
-        default: false
-    }
   },
 
   emits: ['onClose'],
@@ -78,6 +82,7 @@ export default defineComponent({
         [`robo-text--highlight-${this.highlight}`]: this.highlight,
         [`robo-text--highlight-label-${this.highlightLabel}`]: this.highlightLabel,
         [`robo-text--highlight-label-closable`]: this.highlightLabelClose,
+        [`robo-text--hyphen`]: this.hyphen,
         [`open`]: this.highlightLabelCloseReopen,
       };
     }
@@ -101,6 +106,14 @@ export default defineComponent({
 
     .robo-text--gap:not(:last-child) {
         margin-bottom: var(--space);
+    }
+
+    .robo-text--hyphen {
+      text-align: justify !important;
+      -webkit-hyphens: auto;
+      -moz-hyphens: auto;
+      -ms-hyphens: auto;
+      hyphens: auto;
     }
 
     /* + SIZE */
@@ -161,6 +174,7 @@ export default defineComponent({
     div[class *= 'robo-text--highlight-label-' ]{
       --input-text-color: var(--color-light);
       --color-text: var(--color-light);
+      border-radius: var(--border-radius);
       color: var(--color-light);
       padding: calc(var(--space) * 0.4);
       max-width: 100%;

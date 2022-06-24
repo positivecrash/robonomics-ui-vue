@@ -1,13 +1,41 @@
 <template>
-    <component 
-      :is="href ? 'a' : 'button'"
-      :href="href"
+    <keep-alive>
+      <component 
+        v-if="!router"
+        :is="href ? 'a' : 'button'"
+        v-bind="$attrs"
+
+        :href="href"
+        :disabled="disableCompute"
+        :class="classList"
+        :target="external() ? '_blank' : null"
+        :rel="external() ? 'noopener' : null"
+        :to="router ?? null"
+      >
+
+        <span class="robo-btn--part">
+          <robo-loader class="robo-btn--subpart" v-if="loading" />
+          <robo-icon class="robo-btn--subpart" :icon="iconLeft" v-if="iconLeft && !loading"/>
+          <span class="robo-btn--subpart" v-if="slotLength > 0" ref="text"><slot /></span>
+          <robo-icon class="robo-btn--subpart" :icon="iconRight" v-if="iconRight && !loading" />
+        </span>
+
+        <span class="robo-btn--part" v-if="right">{{right}}</span>
+    
+      </component>
+    </keep-alive>
+
+
+
+
+    <router-link
+      v-if="router"
+      v-bind="$attrs"
+
       :disabled="disableCompute"
       :class="classList"
-      :target="external() ? '_blank' : null"
-      :rel="external() ? 'noopener' : null"
+      :to="router"
     >
-
       <span class="robo-btn--part">
         <robo-loader class="robo-btn--subpart" v-if="loading" />
         <robo-icon class="robo-btn--subpart" :icon="iconLeft" v-if="iconLeft && !loading"/>
@@ -16,9 +44,9 @@
       </span>
 
       <span class="robo-btn--part" v-if="right">{{right}}</span>
-  
 
-    </component>
+    </router-link>
+
 </template>
 
 <script>
@@ -69,6 +97,10 @@ export default defineComponent({
     },
     right: {
       type: String,
+      default: null
+    },
+    router: {
+      type: Object || String,
       default: null
     },
     size: {
@@ -326,6 +358,7 @@ export default defineComponent({
   /* Disabled */
   .robo-btn[disabled] {
     cursor: not-allowed;
+    pointer-events: none;
   }
 
   .robo-btn[disabled] .robo-btn--part:nth-child(2n+1) {

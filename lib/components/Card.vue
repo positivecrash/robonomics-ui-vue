@@ -8,6 +8,16 @@
 
         <slot/>
 
+        <robo-button 
+          v-if="allowExpand" 
+          @click="expand = !expand"
+
+          class="robo-card-expand"
+          clean
+          :iconLeft="expand ? 'down-left-and-up-right-to-center' : 'up-right-and-down-left-from-center'"
+          type="na"
+        />
+
     </div>
 </template>
 
@@ -18,6 +28,10 @@ export default defineComponent({
   name: 'RoboCard',
 
   props: {
+    allowExpand: {
+      type: Boolean,
+      default: false
+    },
     backColor: {
       type: String,
       default: 'light',
@@ -59,21 +73,34 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
+    paddings: {
+      type: Boolean,
+      default: true
+    },
     progress: {
       type: Number,
       default: null
     },
   },
 
+  data() {
+    return {
+      expand: false
+    }
+  },
+
   computed: {
     classList() {
       return {
         [`robo-card`]: true,
+        [`robo-card--expandable`]: this.allowExpand,
         [`robo-card--solid`]: !this.outlined,
         [`robo-card--outlined`]: this.outlined,
         [`robo-card--disabled`]: this.disabled,
         [`robo-card--backimage`]: this.backImage,
         [`robo-card--backcolor-${this.backColor}`]: this.backColor,
+        [`robo-card--paddings`]: this.paddings,
+        [`expand`]: this.expand,
       };
     },
     styles() {
@@ -123,6 +150,10 @@ export default defineComponent({
         border-radius: var(--border-radius);
     }
 
+    .robo-card:not(.robo-card--paddings) {
+      --card-padding: 0;
+    }
+
     .robo-card .robo-progress {
       position: absolute;
       top: 0;
@@ -154,6 +185,22 @@ export default defineComponent({
       margin-top: 10px;
     }
 
+
+    /* + Card expand */
+
+    .robo-card--expandable.expand {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1000;
+      overflow: auto;
+      transition: 0.2s all linear;
+    }
+
+    /* - Card expand */
+
 </style>
 
 <style>
@@ -163,5 +210,30 @@ export default defineComponent({
         filter: grayscale(1);
         opacity: 0.8;
     }
+
+    .robo-card img {
+      display: inline-block;
+      max-width: 100%;
+    }
+
+    /* + Card expand */
+    
+    .robo-card--expandable .robo-card-expand {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+    }
+
+    .robo-card--expandable.expand .robo-card-expand {
+      top: 1rem;
+      right: 1rem;
+    }
+
+    .robo-card.robo-card--expandable.expand .robo-card-label {
+      top: 0;
+      left: 0;
+    }
+
+    /* - Card expand */
 
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div :class="classes" ref="item">
+    <div :class="classes" ref="item" :key="itemKey">
 
         <robo-grid 
             v-if="statusBufer !== 'deleted'"
@@ -156,6 +156,10 @@ export default defineComponent({
           type: Boolean,
           default: false
       },
+      disabled: {
+          type: Boolean,
+          default: false
+      },
       status: {
         type: String,
         default: 'new',
@@ -211,6 +215,7 @@ export default defineComponent({
             return {
                 [`robo-template-subsribe-item`]: true,
                 [`robo-template-subsribe-item--${this.statusBufer}`]: this.statusBufer,
+                [`robo-template-subsribe-item--disabled`]: this.disabled,
             }
         },
 
@@ -386,6 +391,11 @@ export default defineComponent({
 
     .robo-template-subsribe-item-message-deleted {
         margin-top: calc(var(--gap-layout) * .5);
+    }
+
+    .robo-template-subsribe-item--disabled {
+        pointer-events: none;
+        filter: grayscale(1)
     }
 </style>
 

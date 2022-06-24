@@ -12,7 +12,7 @@
     <router-link 
         v-if="router"
         :class="classList"
-        :to="router ? router : null"
+        :to="router"
         >
         <slot/>
     </router-link>

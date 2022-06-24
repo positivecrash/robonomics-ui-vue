@@ -58,7 +58,9 @@
               </template>
             </h3>
 
-            <slot/>
+            <div class="robo-details-content-inside">
+              <slot/>
+            </div>
 
             <robo-icon 
               @click="closeDetails"
@@ -349,28 +351,34 @@ export default defineComponent({
 
 <style>
   /* Tweak for card labels */
+  .robo-details summary .robo-btn {
+      letter-spacing: 0;
+      pointer-events: none;
+      text-transform: none;
+  }
+  
   .robo-card-label summary .robo-btn .robo-btn--part {
     --padding-v: calc(var(--space) * 0.18);
     --padding-g: calc(var(--space) * 0.5);
   }
 
-  .robo-details[open] .robo-btn .robo-btn--part:nth-child(2n+1) {
+  .robo-details[open] summary .robo-btn .robo-btn--part:nth-child(2n+1) {
     background-color: var(--background-hover);
     border-color: var(--border-hover);
     color: var(--color-hover);
   }
 
-  .robo-details[open] .robo-btn .robo-btn--part:nth-child(2n+1) .robo-loader {
+  .robo-details[open] summary .robo-btn .robo-btn--part:nth-child(2n+1) .robo-loader {
     --loader-color: var(--color-hover)
   }
 
-  .robo-details[open] .robo-btn .robo-btn--part:nth-child(2n) {
+  .robo-details[open] summary .robo-btn .robo-btn--part:nth-child(2n) {
     background-color: var(--background-2-hover);
     border-color: var(--border-2-hover);
     color: var(--color-2-hover);
   }
 
-  .robo-details[open] .robo-btn .robo-btn--part:nth-child(2n) .robo-loader {
+  .robo-details[open] summary .robo-btn .robo-btn--part:nth-child(2n) .robo-loader {
     --loader-color: var(--color-2-hover)
   }
 </style>
@@ -425,12 +433,6 @@ export default defineComponent({
       font-weight: bold;
     }
 
-    .robo-btn {
-      letter-spacing: 0;
-      pointer-events: none;
-      text-transform: none;
-    }
-
     .robo-details--loading summary {
       pointer-events: none;
       cursor: not-allowed;
@@ -477,12 +479,19 @@ export default defineComponent({
     .robo-details--tooltip .robo-details-content {
       --tip-content-padding: calc(var(--space) * 0.5);
       font-size: inherit;
+      overflow: hidden;
       max-width: 450px;
       max-height: 450px;
-      overflow: auto;
       position: absolute;
       padding: var(--tip-content-padding);
       z-index: 1000;
+    }
+
+    .robo-details-content-inside {
+      overflow: auto;
+      max-height: inherit;
+      padding: var(--tip-content-padding);
+      position: relative;
     }
 
     /* + position */
