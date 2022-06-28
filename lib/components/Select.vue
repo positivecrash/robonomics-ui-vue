@@ -152,7 +152,7 @@ export default defineComponent({
     color: var(--input-text-color);
   }
 
-  .icon {
+  .robo-icon {
     position: absolute;
     right: calc(var(--input-padding-g) * 0.5);
     top: calc(50% - var(--select-tog-size) * 0.5 - 0.125em); /* -0.125em - taken from Font Awesome styles */

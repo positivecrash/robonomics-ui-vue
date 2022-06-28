@@ -14,6 +14,13 @@ export default defineComponent({
   name: 'RoboList',
 
   props: {
+    gap: {
+      type: String,
+      default: 'x1',
+      validator(value) {
+        return ['x0', 'x05', 'x1', 'x2', 'x4'].includes(value)
+      }
+    },
     fullLine: {
       type: Boolean,
       default: false
@@ -40,6 +47,7 @@ export default defineComponent({
         [`robo-list`]: true,
         [`robo-list-fullline`]: this.fullLine,
         [`robo-list--theme-${this.theme}`]: this.theme,
+        [`robo-list--gap-${this.gap}`]: this.gap,
       };
     },
 
@@ -59,5 +67,13 @@ export default defineComponent({
     .robo-list {
         list-style: none;
     }
+</style>
+
+<style>
+  .robo-list--gap-x0 { --list-gap: 0; }
+  .robo-list--gap-x05 { --list-gap: calc(var(--gap-text) * 0.5); }
+  .robo-list--gap-x1 { --list-gap: calc(var(--gap-text) * 1); }
+  .robo-list--gap-x2 { --list-gap: calc(var(--gap-text) * 2); }
+  .robo-list--gap-x4 { --list-gap: calc(var(--gap-text) * 4); }
 </style>
 

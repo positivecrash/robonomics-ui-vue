@@ -10,25 +10,13 @@
             weight="bold"
         />
         
-        <input 
+        <textarea 
             @focus="focused"
             @blur="blurred"
             v-model="inputModel"
 
-            class="robo-input-control"
             :disabled = "disabled"
             :placeholder="placeholder ? placeholder : null"
-            :type="inputType"
-        />
-
-        <input 
-            v-if="inputType === 'color'"
-            v-model="inputModel"
-
-            class="robo-input-color"
-            :disabled = "disabled"
-            :placeholder="placeholder ? placeholder : null"
-            type="text"
         />
 
         <robo-details 
@@ -51,7 +39,7 @@
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'RoboInput',
+  name: 'RoboTextarea',
 
   props: {
     disabled: {
@@ -62,17 +50,16 @@ export default defineComponent({
         type: String,
         default: null
     },
-    inputType: {
-        type: String,
-        default: 'text'
+    offset: {
+      type: String,
+      default: 'x2',
+      validator(value) {
+        return ['x0', 'x05', 'x1', 'x2', 'x4'].includes(value)
+      }
     },
     modelValue: {
         type: String,
         required: true
-    },
-    placeholder: {
-        type: String,
-        default: null
     },
     tip: {
         type: String,
@@ -91,11 +78,11 @@ export default defineComponent({
   computed: {
     classes() {
       return {
-        [`robo-input`]: true,
-        [`robo-input--labeled`]: this.label,
-        [`robo-input--focused`]: this.focusedStatus,
-        [`robo-input--disabled`]: this.disabled,
-        [`robo-input--type-color`]: this.inputType === 'color',
+        [`robo-textarea`]: true,
+        [`robo-textarea--disabled`]: this.disabled,
+        [`robo-textarea--focused`]: this.focusedStatus,
+        [`robo-textarea--labeled`]: this.label,
+        [`robo-textarea-offset-${this.offset}`]: this.offset,
       };
     },
 
@@ -132,18 +119,23 @@ export default defineComponent({
 </script>
 
 <style scoped>
-    .robo-input {
+    .robo-textarea {
         --background: var(--color-light);
         --border: var(--color-dark);
         --border-active: var(--color-blue);
         --color: var(--color-dark);
         --label: var(--color-dark);
         --label-active: var(--color-blue);
+        --offset: 0;
 
         position: relative;
     }
 
-    .robo-input input{
+    .robo-textarea:not(:last-child) {
+      margin-bottom: var(--offset);
+    }
+
+    .robo-textarea textarea{
         background-color: var(--background);
         border: 1px solid var(--border);
         color: var(--color);
@@ -157,7 +149,7 @@ export default defineComponent({
 
 
     /* + label */
-    .robo-input-label {
+    .robo-textarea-label {
         color: var(--label);
         left: var(--space);
         position: absolute;
@@ -165,23 +157,23 @@ export default defineComponent({
         transition: 0.2s all ease;
     }
 
-    .robo-input--labeled input {
+    .robo-textarea--labeled textarea {
         padding-top: calc(var(--space) * 2);
     }
     /* - label */
 
     /* + focus */
-    .robo-input--focused input {
+    .robo-textarea--focused textarea {
         border-color: var(--border-active);
     }
 
-    .robo-input--focused .robo-input-label {
+    .robo-textarea--focused .robo-textarea-label {
         color: var(--label-active);
     }
     /* - focus */
 
     /* + tip */
-    .robo-input .robo-details {
+    .robo-textarea .robo-details {
         position: absolute;
         top: calc(var(--space) * (-0.5));
         right: calc(var(--space) * (-0.5));
@@ -194,28 +186,19 @@ export default defineComponent({
         color: var(--color-gray)
     } */
 
-    .robo-input--disabled input {
+    .robo-textarea--disabled input {
         border-color: var(--color-gray);
         color: var(--color-dark);
         opacity: 0.6;
     }
     /* - disabled */
 
-    /* + type = color */
-    .robo-input--type-color .robo-input-control {
-      border: 0;
-      height: calc(var(--space) * 2 + var(--font-size) * 1.5);
-      padding: 0;
-      width: calc(var(--space) * 2 + var(--font-size) * 1.5);
-    }
+    /* + Offset */
+    .robo-textarea-offset-x0 { --offset: 0; }
+    .robo-textarea-offset-x05 { --offset: calc(var(--gap-layout) * 0.25); }
+    .robo-textarea-offset-x1 { --offset: calc(var(--gap-layout) * 0.5); }
+    .robo-textarea-offset-x2 { --offset: var(--gap-layout); }
+    .robo-textarea-offset-x4 { --offset: calc( var(--gap-layout) * 2); }
+    /* - Offset */
 
-    .robo-input--type-color input {
-      display: inline-block;
-    }
-
-    .robo-input-color {
-      margin-left: var(--space);
-      width: auto !important;
-    }
-    /* - type = color */
 </style>

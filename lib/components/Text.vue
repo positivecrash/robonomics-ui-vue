@@ -9,6 +9,15 @@
           class="robo-text-close"
           icon="xmark"
         />
+
+        <robo-button 
+          v-if="copy"  
+          @click="clipboard" 
+          class="robo-text-copy"
+          clean 
+          :iconLeft="clipboardCopied ? 'check' : 'copy'"
+        />
+
     </div>
 </template>
 
@@ -19,6 +28,14 @@ export default defineComponent({
   name: 'RoboText',
 
   props: {
+    break: {
+        type: Boolean,
+        default: false
+    },
+    copy: {
+        type: Boolean,
+        default: false
+    },
     gap: {
         type: Boolean,
         default: false
@@ -69,6 +86,12 @@ export default defineComponent({
     },
   },
 
+  data() {
+    return {
+      clipboardCopied: false
+    }
+  },
+
   emits: ['onClose'],
 
   computed: {
@@ -76,6 +99,7 @@ export default defineComponent({
       return {
         [`robo-text`]: true,
         [`robo-text--${this.size}`]: this.size,
+        [`robo-text--break`]: this.break,
         [`robo-text--${this.weight}`]: this.weight,
         [`robo-text--inline`]: this.inline,
         [`robo-text--gap`]: this.gap,
@@ -93,7 +117,17 @@ export default defineComponent({
       this.$refs.text.classList.remove('open')
       this.$refs.text.classList.add('hide')
       this.$emit('onClose')
-    }
+    },
+
+    clipboard() {
+        navigator.clipboard.writeText(this.$refs.text.innerText)
+        this.clipboardCopied = true;
+
+        const o = this
+        setTimeout(function(){
+            o.clipboardCopied = false;
+        }, 1500);
+    },
   }
 
 })
@@ -229,4 +263,12 @@ export default defineComponent({
       cursor: pointer;
     }
     /* - HIGHLIGHT LABEL REMOVE */
+
+    .robo-text--break { word-break: break-all; }
+</style>
+
+<style>
+  .robo-text-copy {
+    margin-left: var(--space);
+  }
 </style>

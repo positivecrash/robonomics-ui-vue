@@ -149,6 +149,10 @@ export default defineComponent({
     margin-top: var(--space)
 }
 
+.robo-template-service-item h3 {
+    margin-bottom: var(--space);
+}
+
 .robo-template-service-item .providers a:not(:last-child), .robo-template-service-item .providers span:not(:last-child), .robo-template-service-item .providers .icon {
     margin-right: calc(var(--space) * 2)
 }

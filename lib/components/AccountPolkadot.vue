@@ -1,7 +1,6 @@
 <template>
 
-  <robo-grid  
-    align="right"
+  <robo-grid 
     flex
     offset="x0"
     gap="x05"

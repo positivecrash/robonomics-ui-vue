@@ -1,7 +1,7 @@
 <template>
     <div :class="classList">
         <span v-if="textLeft" v-html="textLeft" />
-        <robo-icon :icon="icon" />
+        <robo-icon :icon="icon" :color="color" />
         <span v-if="textRight" v-html="textRight" />
     </div>
 </template>
@@ -58,6 +58,18 @@ export default defineComponent({
             case 'error':
                 return 'circle-xmark'
         }
+    },
+    color() {
+      switch(this.type) {
+            case 'success':
+                return 'var(--color-green)'
+            case 'info':
+                return 'var(--color-blue)'
+            case 'warning':
+                return 'var(--color-orange)'
+            case 'error':
+                return 'var(--color-red)'
+        }
     }
   },
 
@@ -76,14 +88,14 @@ export default defineComponent({
         line-height: 1.2;
     }
 
-    .robo-status .icon {
+    /* .robo-status .robo-icon {
       color: var(--status-color);
     }
 
     .robo-status--success { --status-color: var(--color-green); }
     .robo-status--info { --status-color: var(--color-blue); }
     .robo-status--warning { --status-color: var(--color-orange); }
-    .robo-status--error { --status-color: var(--color-red); }
+    .robo-status--error { --status-color: var(--color-red); } */
 
     .robo-status--gap-top { margin-top: var(--status-gap) }
     .robo-status--gap-right { margin-right: var(--status-gap) }

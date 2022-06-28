@@ -21,7 +21,7 @@ export default defineComponent({
 
 <style scoped>
     li {
-        margin-bottom: var(--gap-text);
+        margin-bottom: var(--list-gap);
         position: relative;
         padding-left: var(--gap-text);
     }
@@ -43,6 +43,7 @@ export default defineComponent({
     }
 
     ol li {
+      --list-gap: var(--gap-text);
       counter-increment: counter;
       padding-left: calc(var(--gap-text)*1.5);
     }

@@ -99,7 +99,7 @@ export default defineComponent({
 
     contentTextalign: {
       type: String,
-      default: 'justify',
+      default: 'left',
       validator: function (value) {
         return ['justify', 'left', 'right', 'center'].includes(value)
       }

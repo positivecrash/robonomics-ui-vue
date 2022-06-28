@@ -22,6 +22,7 @@
                 <robo-input 
                     label="Name"
                     v-model="nameModel"
+                    @input="statusBufer = 'edit' "
                     :disabled="(statusBufer === 'loading') ? true : false"
                     :tip="tipName ?? null"
                 />
@@ -91,11 +92,34 @@
 
                     block
                     fitLabeled
-                    icon-left="hoverAdded ? 'minus' : 'check'"
+                    :icon-left="hoverAdded ? 'minus' : 'check'"
                     outlined
                     title="remove item"
                     :type="hoverAdded ? 'alarm' : 'ok'"
                     
+                >
+                    Remove
+                </robo-button>
+
+
+                <robo-button 
+                    v-if="statusBufer === 'edit' && screenWidth > 1200"
+                    @click="editItem"
+
+                    block
+                    fitLabeled
+                    icon-left="floppy-disk"
+                    title="save changes"
+                ></robo-button>
+
+                <robo-button 
+                    v-if="statusBufer === 'edit' && screenWidth < 1200"
+                    @click="editItem"
+
+                    block
+                    fitLabeled
+                    icon-left="floppy-disk"
+                    title="save changes"
                 >
                     Remove
                 </robo-button>
@@ -197,9 +221,13 @@ export default defineComponent({
         }
     },
 
-    emits: ['update:address', 'update:name', 'onAdd', 'onDelete'],
+    emits: ['update:address', 'update:name', 'onAdd', 'onDelete', 'onEdit'],
 
     watch: {
+        status: function(value) {
+            this.statusBufer = value
+        },
+
         statusBufer: function(value) {
 
             if(value === 'new') {
@@ -310,6 +338,30 @@ export default defineComponent({
 
         removeItem() {
             this.$refs.item.remove()
+        },
+
+        editItem() {
+            this.$emit('onEdit',
+                () => this.editStarted(),
+                (status, message) => this.editStatus(status, message)
+            )
+        },
+
+        editStarted() {
+            this.statusBufer = 'loading'
+        },
+
+        editStatus(status, message) {
+         
+           if(status) {
+                this.statusBufer = 'added'
+           } else {
+               this.statusBufer = 'edit'
+           }
+
+           if(message) {
+               this.messageBufer = message
+           }
         },
 
 

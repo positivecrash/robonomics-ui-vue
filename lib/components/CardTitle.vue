@@ -52,5 +52,10 @@ export default defineComponent({
 
   .robo-card-title--2 {
     font-size: calc(var(--font-size) * 1.2);
+    margin-bottom: calc(var(--gap-text) * 0.6);
+  }
+
+  .robo-card-title--3 {
+    margin-bottom: calc(var(--gap-text) * 0.4);
   }
 </style>
