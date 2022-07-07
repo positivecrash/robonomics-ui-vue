@@ -13,14 +13,14 @@
         <input 
             @focus="focused"
             @blur="blurred"
+            v-bind="$attrs"
             v-model="inputModel"
 
             class="robo-input-control"
             :disabled = "disabled"
             :placeholder="placeholder ? placeholder : null"
-            :type="inputType"
         />
-
+        
         <input 
             v-if="inputType === 'color'"
             v-model="inputModel"
@@ -62,9 +62,16 @@ export default defineComponent({
         type: String,
         default: null
     },
-    inputType: {
-        type: String,
-        default: 'text'
+    // inputType: {
+    //     type: String,
+    //     default: 'text'
+    // },
+    offset: {
+      type: String,
+      default: 'x2',
+      validator(value) {
+        return ['x0', 'x05', 'x1', 'x2', 'x4'].includes(value)
+      }
     },
     modelValue: {
         type: String,
@@ -82,7 +89,8 @@ export default defineComponent({
 
   data() {
       return {
-          focusedStatus: false
+          focusedStatus: false,
+          inputType: this.$attrs.type
       }
   },
 
@@ -96,12 +104,13 @@ export default defineComponent({
         [`robo-input--focused`]: this.focusedStatus,
         [`robo-input--disabled`]: this.disabled,
         [`robo-input--type-color`]: this.inputType === 'color',
+        [`robo-input-offset-${this.offset}`]: this.offset,
       };
     },
 
     inputModel: {
       get() {
-        if(!this.modelValue) {
+        if(!this.modelValue && this.modelValue != '') {
           console.warn('[robonomics-ui-vue3 warn]: `robo-input` component is missing required v-model directive')
         } else {
           return this.modelValue
@@ -141,6 +150,10 @@ export default defineComponent({
         --label-active: var(--color-blue);
 
         position: relative;
+    }
+
+    .robo-input:not(:last-child) {
+      margin-bottom: var(--offset);
     }
 
     .robo-input input{
@@ -218,4 +231,12 @@ export default defineComponent({
       width: auto !important;
     }
     /* - type = color */
+
+    /* + Offset */
+    .robo-input-offset-x0 { --offset: 0; }
+    .robo-input-offset-x05 { --offset: calc(var(--gap-layout) * 0.25); }
+    .robo-input-offset-x1 { --offset: calc(var(--gap-layout) * 0.5); }
+    .robo-input-offset-x2 { --offset: var(--gap-layout); }
+    .robo-input-offset-x4 { --offset: calc( var(--gap-layout) * 2); }
+    /* - Offset */
 </style>

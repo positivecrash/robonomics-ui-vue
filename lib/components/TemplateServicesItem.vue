@@ -1,7 +1,7 @@
 <template>
     <robo-card :paddings="false" :class="classes">
         <component 
-            v-if="picture"
+            v-if="picture && !router"
             :is="href ? 'a' : 'div'"
 
             :href="href ?? null"
@@ -13,6 +13,16 @@
                 :src="picture" 
             />
         </component>
+
+        <router-link 
+            v-if="picture && router"
+            :to="router"
+        >
+            <img 
+                :alt="title ?? 'Robonomics Dapp Service'" 
+                :src="picture" 
+            />
+        </router-link>
 
         <h3 v-if="title">
             <a 

@@ -146,7 +146,7 @@ export default defineComponent({
   methods: {
     shortAddress(address) {
       const addressArray = address.split('')
-      const result = addressArray.slice(0, 6) + "..." + addressArray.slice(-4)
+      const result = addressArray.slice(0, 4) + "..." + addressArray.slice(-4)
       return result.replace(/,/g, '')
     },
 

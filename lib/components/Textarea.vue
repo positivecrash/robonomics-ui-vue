@@ -9,15 +9,16 @@
             :size="labelSize"
             weight="bold"
         />
-        
+
         <textarea 
             @focus="focused"
             @blur="blurred"
-            v-model="inputModel"
+            v-bind="$attrs"
+            v-model.trim="inputModel"
+            ref="textarea"
 
             :disabled = "disabled"
-            :placeholder="placeholder ? placeholder : null"
-        />
+        ></textarea>
 
         <robo-details 
           v-if="tip" 
@@ -69,7 +70,8 @@ export default defineComponent({
 
   data() {
       return {
-          focusedStatus: false
+          focusedStatus: false,
+          // textHidden: ''
       }
   },
 
@@ -88,13 +90,14 @@ export default defineComponent({
 
     inputModel: {
       get() {
-        if(!this.modelValue) {
-          console.warn('[robonomics-ui-vue3 warn]: `robo-input` component is missing required v-model directive')
+        if(!this.modelValue && this.modelValue != '' ) {
+          console.warn('[robonomics-ui-vue3 warn]: `robo-textarea` component is missing required v-model directive')
         } else {
           return this.modelValue
         }
       },
       set(value) {
+        console.log('value',value)
         this.$emit('update:modelValue', value)
       }
     },
@@ -106,13 +109,20 @@ export default defineComponent({
   },
 
   methods: {
-      focused() {
-        this.focusedStatus = true
-      },
+    // hideText() {
+    //   if(this.allowHide) {
+    //     this.textHidden = this.inputModel.replace(/\S/gi, '*')
+    //     console.log('this.textHidden',this.textHidden)
+    //   }
+    // },
 
-      blurred() {
-        this.focusedStatus = false
-      },
+    focused() {
+      this.focusedStatus = true
+    },
+
+    blurred() {
+      this.focusedStatus = false
+    },
   }
 
 })

@@ -3,6 +3,7 @@
 
       <select 
         :name="name" 
+        v-bind="$attrs"
         v-model="selected" 
         ref="select"
         @change="setWidth"

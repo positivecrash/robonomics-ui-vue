@@ -27,7 +27,13 @@ export default defineComponent({
 
   computed: {
       chainsNames() {
-          return Object.keys(this.chains)
+        let chains = []
+        //   return Object.keys(this.chains)
+        Object.keys(this.chains).forEach((key) => {
+            chains.push(`${key} chain`)
+        })
+
+        return chains
       },
       chainPrefixes(){
           return Object.values(this.chains)

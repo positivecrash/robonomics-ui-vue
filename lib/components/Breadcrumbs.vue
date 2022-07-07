@@ -1,5 +1,5 @@
 <template>
-    <nav aria-label="Breadcrumb" class="robo-breadcrumb">
+    <nav aria-label="breadcrumbs" class="robo-breadcrumb">
         <ol>
             <li v-for="(item, index) in items" :key="index">
                 <a :href="item.href" :aria-current="item.active ? 'page' : null">

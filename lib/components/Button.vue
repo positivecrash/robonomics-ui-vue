@@ -65,10 +65,12 @@ export default defineComponent({
       default: false
     },
     disabled: {
-      type: String,
+      type: [String, Boolean],
       default: null,
       validator: function (value) {
-        return ['disabled', 'ok', 'alarm'].indexOf(value) !== -1;
+        if(typeof value === 'string') {
+          return ['', 'disabled', 'ok', 'alarm'].indexOf(value) !== -1;
+        }
       }
     },
     fitLabeled: {
@@ -100,7 +102,7 @@ export default defineComponent({
       default: null
     },
     router: {
-      type: Object || String,
+      type: [Object,String],
       default: null
     },
     size: {
@@ -122,7 +124,7 @@ export default defineComponent({
 
   data() {
     return {
-      slotLength: 1
+      slotLength: 1,
     }
   },
 
@@ -143,7 +145,7 @@ export default defineComponent({
     },
     disableCompute(){
       // if(this.disabled || this.loading) {
-      if(this.disabled) {
+      if(this.disabled || this.disabled === '') {
         return true
       } else {
         return null
