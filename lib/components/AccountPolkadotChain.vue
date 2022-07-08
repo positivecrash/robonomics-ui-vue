@@ -9,18 +9,14 @@
 
 <script>
 import { defineComponent } from 'vue'
+import chains from '../polkadotChains'
 
 export default defineComponent({
   name: 'RoboAccountPolkadotChain',
 
   data() {
       return {
-          chains: {
-            Robonomics: '32',
-            Kusama: '2',
-            Polkadot: '0',
-          },
-
+          chains: chains,
           chainSelected: this.$store.getters['robonomicsUIvue/polkadot'].chain ? this.$store.getters['robonomicsUIvue/polkadot'].chain : '32'
       }
   },

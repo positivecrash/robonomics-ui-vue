@@ -41,7 +41,7 @@
 
 <script>
 import { defineComponent } from 'vue'
-import extensions from '../extensionsPolkadot'
+import extensions from '../polkadotExtensions'
 
 export default defineComponent({
   name: 'RoboAccountPolkadotExtensions',
@@ -83,7 +83,7 @@ export default defineComponent({
                     }
                 }, interval);
 
-                setTimeout(() => reject(console.warn('[robonomics-ui-vue]: no extension found in robo-account-polkadot-extensions')), 1000);
+                setTimeout(() => reject(console.warn('[robonomics-ui-vue]: no extension found in robo-account-polkadot-extensions')), 2000);
             })
         },
 

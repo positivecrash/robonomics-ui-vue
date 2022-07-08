@@ -22,7 +22,7 @@
                 <robo-input 
                     label="Name"
                     v-model="nameModel"
-                    @input="statusBufer = 'edit' "
+                    @input="nameEdit"
                     :disabled="(statusBufer === 'loading') ? true : false"
                     :tip="tipName ?? null"
                 />
@@ -338,6 +338,12 @@ export default defineComponent({
 
         removeItem() {
             this.$refs.item.remove()
+        },
+
+        nameEdit() {
+            if( this.statusBufer !== 'new' ) {
+                this.statusBufer = 'edit'
+            }
         },
 
         editItem() {
