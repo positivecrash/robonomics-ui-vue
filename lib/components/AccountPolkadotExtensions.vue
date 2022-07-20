@@ -75,18 +75,6 @@ export default defineComponent({
   },
  
   methods: {
-        onLoad(interval) {
-            return new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    if (window.injectedWeb3) {
-                        resolve()
-                    }
-                }, interval);
-
-                setTimeout(() => reject(console.warn('[robonomics-ui-vue]: no extension found in robo-account-polkadot-extensions')), 2000);
-            })
-        },
-
       async enable() {
 
         await this.getExtension.enable().then(
@@ -113,7 +101,7 @@ export default defineComponent({
 
   async mounted() {
     try {
-        await this.onLoad(500)
+        await this.$store.dispatch("robonomicsUIvue/waitWeb3Injected")
         this.getExtension =  window.injectedWeb3[this.extension]
     } catch (e) {
       console.warn('[robonomics-ui-vue]: no extension found in robo-account-polkadot-extensions')

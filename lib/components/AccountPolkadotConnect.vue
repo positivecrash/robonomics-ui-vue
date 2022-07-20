@@ -10,9 +10,9 @@
         >
         <robo-text weight="normal">Choose one of the prefferable extension:</robo-text>
 
-        <robo-account-polkadot-extensions extension="polkadot-js" />
-        <robo-account-polkadot-extensions extension="talisman" />
         <robo-account-polkadot-extensions extension="subwallet-js" />
+        <robo-account-polkadot-extensions extension="talisman" />
+        <robo-account-polkadot-extensions extension="polkadot-js" />
 
         </robo-details>
     </robo-text>

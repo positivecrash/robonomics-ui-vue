@@ -17,6 +17,7 @@
                     :disabled="(statusBufer !== 'new') ? true : false"
                     :tip="tipAddress ?? null"
                 />
+                
             </robo-grid-item>
             <robo-grid-item>
                 <robo-input 
