@@ -37,11 +37,36 @@
         </robo-grid>
 
         <robo-button 
-          v-if="copy && !addressLocalAllowEdit" 
+          v-if="!info && copy && !addressLocalAllowEdit" 
           @click="clipboard"
           clean 
           :iconLeft="clipboardCopied ? 'check' : 'copy'"
         />
+
+        <robo-details 
+            v-if="info"
+            summaryIcon='circle-info'
+            summaryText=''
+            tooltip
+            tooltipTheme='light'
+        >
+          <!-- {{accounts}} -->
+          <template v-for="acc in accounts" :key="acc.id">
+            <div v-if="acc.address === address">
+              <div>
+                <img :src="acc.avatar" />
+                <span>{{acc.name}}</span>
+              </div>
+              <div>
+                {{acc.address}}
+              </div>
+              <div>
+                <span>type:</span>
+                <span>{{acc.type}}</span>
+              </div>
+            </div>
+          </template>
+        </robo-details>
 
     </template>
 
@@ -51,6 +76,7 @@
       summaryText=''
       popup
     />
+
   </robo-grid>
 
 </template>
@@ -88,6 +114,10 @@ export default defineComponent({
     extensionShowIcon: {
       type: Boolean,
       default: false
+    },
+    info: {
+        type: Boolean,
+        default: true
     },
     inline: {
         type: Boolean,
@@ -136,7 +166,9 @@ export default defineComponent({
     },
 
     extensionPic() {
-        return new URL(`../images/${this.extensionData.picture}`, import.meta.url)
+        if(this.extensionData){
+          return new URL(`../images/${this.extensionData.picture}`, import.meta.url)
+        }
     },
 
     addressChain() {
@@ -171,34 +203,6 @@ export default defineComponent({
             o.clipboardCopied = false;
         }, 1500);
     },
-    
-    // setAccountsList(accounts) {
-    //   let 
-    //     result = [],
-    //     accountLocal
-
-    //   if(accounts) {
-
-    //     Object.keys(accounts).map(key => {
-  
-    //       if( !this.isLocalFormat ) {
-    //         accountLocal = accounts[key].address
-    //       } else {
-    //         accountLocal = encodeAddress(accounts[key].address, this.addressChain)
-    //       }
-
-    //       if(this.short) {
-    //         accountLocal = this.shortAddress(accountLocal)
-    //       }
-
-    //       result.push(accountLocal)
-
-    //     })
-
-    //   }
-
-    //   return result
-    // },
 
     setAddressListFormatted(accounts) {
       let 
