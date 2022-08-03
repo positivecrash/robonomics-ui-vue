@@ -62,7 +62,7 @@ export default defineComponent({
     },
     mediaMobile: {
       type: String,
-      default: 'transfer',
+      default: 'none',
       validator(value) {
         return ['transfer', 'no-cols', 'none'].includes(value)
       }

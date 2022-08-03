@@ -1,18 +1,45 @@
 <template>
     <div :class="classList" tabindex="-1">
-      <robo-button @click="toggleCollapse" class="robo-grid-item-toggler" outlined v-if="collapseText" size="small" :icon-left="collapseIcon">
+      <robo-button 
+        @click="toggleCollapse" 
+        class="robo-grid-item-toggler" 
+        outlined v-if="collapseText" 
+        size="small" 
+        :icon-left="(mediaMobile === 'collapse-left') ? collapseIcon : null"
+        :icon-right="(mediaMobile === 'collapse-right') ? collapseIcon : null"
+      >
         <span v-if="collapseText">{{collapseText}}</span>
       </robo-button>
       
-      <div class="robo-grid-item-content">  
-        <div class="robo-grid-item-close-wrap" v-if="collapse" aria-hidden="true">
-          <span v-if="collapseIcon">
-            <robo-icon :icon="collapseIcon" />
-          </span>
-          <span v-if="collapseText">{{collapseText}}</span>
-          <robo-icon class="robo-grid-item-close" icon="circle-xmark" @click="toggleCollapse" />
-        </div>
-        <slot/>
+      <div class="robo-grid-item-content">
+
+          <div class="robo-grid-item-close-wrap" v-if="collapse" aria-hidden="true">
+            <span v-if="collapseIcon">
+              <robo-icon :icon="collapseIcon" />
+            </span>
+            <span v-if="collapseText">{{collapseText}}</span>
+            <!-- <robo-button 
+              class="robo-grid-item-close"
+              type="dark"
+              @click="toggleCollapse"
+            >
+              [x] Close
+            </robo-button> -->
+            <robo-icon class="robo-grid-item-close" icon="circle-xmark" size="big" @click="toggleCollapse" />
+            <!-- <robo-button 
+              class="robo-grid-item-closeToggle"
+              block 
+              type="dark"
+              @click="toggleCollapse"
+            >
+              [x] Close
+            </robo-button> -->
+          </div>
+
+          <div class="robo-grid-item-content-inside">
+            <slot/>
+          </div>
+
       </div>
 
       <div 
@@ -103,13 +130,18 @@ export default defineComponent({
 </script>
 
 <style>
-.robo-grid-item--mobile-collapse .robo-grid-item-toggler {
+  .robo-grid-item--mobile-collapse .robo-grid-item-toggler {
       display: none;
     }
 
     @media screen and (max-width: 1000px) {
         .robo-grid-template-columns--left-center-right .robo-grid-item--mobile-collapse .robo-grid-item-toggler {
           display: inline-block;
+        }
+
+        .robo-grid-template-columns--left-center-right > .robo-grid-item--mobile-collapse-right > .robo-grid-item-content .robo-grid {
+          /* justify-content: start; */
+          text-align: left;
         }
     }
 
@@ -122,6 +154,31 @@ export default defineComponent({
           display: none;
         }
     }
+
+    /* .robo-grid-item-closeToggle {
+      font-weight: bold;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      background-color: var(--color-dark);
+      color: var(--color-light);
+      width: 3.5rem;
+      white-space: nowrap;
+      display: none;
+    }
+
+    .robo-grid-item--mobile-collapse-left .robo-grid-item-closeToggle {
+      right: 0;
+    }
+
+    .robo-grid-item--mobile-collapse-right .robo-grid-item-closeToggle {
+      left: 0;
+    }
+
+    .robo-grid-item-closeToggle .robo-btn--part {
+      transform: rotate(-90deg);
+      transform-origin: 0 0;
+    } */
 </style>
 
 <style scoped>
@@ -161,44 +218,8 @@ export default defineComponent({
       display: none;
     }
 
-    .robo-grid-item-close-wrap span {
+    .robo-grid-item-close-wrap span:not(:last-child) {
       margin-right: var(--space);
-    }
-
-    @keyframes slideLeft {
-      from {
-        transform: translateX(-100%);
-      }
-      to {
-        transform: translateX(0);
-      }
-    }
-
-    @keyframes slideLeftReverse {
-      from {
-        transform: translateX(0);
-      }
-      to {
-        transform: translateX(-100%);
-      }
-    }
-
-    @keyframes slideRight {
-      from {
-        transform: translateX(200%);
-      }
-      to {
-        transform: translateX(0);
-      }
-    }
-
-    @keyframes slideRightReverse {
-      from {
-        transform: translateX(0);
-      }
-      to {
-        transform: translateX(200%);
-      }
     }
 
     .robo-grid-item--sticky-all {
@@ -223,62 +244,7 @@ export default defineComponent({
         display: block;
       }
 
-      /* .robo-grid-item.robo-grid-item--open .robo-grid-item-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 1;
-        background: rgba(0, 0, 0, 0.4);
-        backdrop-filter: blur(2px);
-      } */
-
-      .robo-grid-item--mobile-collapse .robo-grid-item-content {
-        background: #fff;
-        position: fixed;
-        z-index: 1000;
-        top: 0;
-        bottom: 0;
-        padding: calc(var(--gap-layout) * 1.5);
-      }
-
-      .robo-grid-item--mobile-collapse-left .robo-grid-item-content {
-        transform: translateX(-100%);
-        transform-origin: 0 50%;
-        left: 0;
-        right: 50%;
-      }
-
-      .robo-grid-item--mobile-collapse-right .robo-grid-item-content {
-        transform: translateX(200%);
-        transform-origin: 100% 50%;
-        left: 50%;
-        right: 0;
-      }
-
-      .robo-grid-item--mobile-collapse-left.robo-grid-item--open .robo-grid-item-content {
-        animation: slideLeft 0.2s ease-in-out forwards;
-      }
-
-      .robo-grid-item--mobile-collapse-right.robo-grid-item--open .robo-grid-item-content {
-        animation: slideRight 0.2s ease-in-out forwards;
-      }
-
-      .robo-grid-item--mobile-collapse-left.robo-grid-item--close .robo-grid-item-content {
-        animation: slideLeftReverse 0.2s ease-in-out forwards;
-      }
-
-      .robo-grid-item--mobile-collapse-right.robo-grid-item--close .robo-grid-item-content {
-        animation: slideRightReverse 0.2s ease-in-out forwards;
-      }
-
       /* For sidebars layout */
-      .robo-grid-template-columns--left-center-right > .robo-grid-item--mobile-collapse-left {
-          grid-row: 1;
-          grid-column: 1 / 3;
-      }
-
       .robo-grid-template-columns--left-center-right > .robo-grid-item--mobile-collapse-left {
           grid-row: 1;
           grid-column: 1 / 3;
@@ -294,16 +260,129 @@ export default defineComponent({
         grid-column: 1 / 6;
       }
     }
+    
 
+    /* + Slide actions */
 
-    @media screen and (max-width: 500px) {
-      .robo-grid-item--mobile-collapse-left.robo-grid-item--open .robo-grid-item-content {
-        right: 20%;
+      @media screen and (max-width: 1000px) {
+        .robo-grid-item--mobile-collapse > .robo-grid-item-content {
+          background: #fff;
+          position: fixed;
+          z-index: 1000;
+          top: 0;
+          bottom: 0;
+          padding: calc(var(--gap-layout) * 1.5);
+          height: 100vh; /* fallback */
+          height: 100svh; /* smallest */
+          overflow: hidden;
+        }
+
+        .robo-grid-item--mobile-collapse .robo-grid-item-content-inside {
+            overflow-y: scroll;
+            height: 90%;
+            padding-left: 1rem;
+        }
+
+        /* .robo-grid-item--mobile-collapse.robo-grid-item--open > .robo-grid-item-content .robo-grid-item-closeToggle {
+          display: block;
+        } */
+
+        .robo-grid-item--mobile-collapse-left > .robo-grid-item-content {
+          transform: translateX(-100%);
+          transform-origin: 0 50%;
+          left: 0;
+          right: 50%;
+        }
+
+      .robo-grid-item--mobile-collapse-right > .robo-grid-item-content {
+        transform: translateX(200%);
+        transform-origin: 100% 50%;
+        left: 50%;
+        right: 0;
       }
 
-      .robo-grid-item--mobile-collapse-right.robo-grid-item--open .robo-grid-item-content {
-        left: 20%;
+      .robo-grid-item--mobile-collapse-left.robo-grid-item--open > .robo-grid-item-content {
+        animation: slideLeft 0.2s ease-in-out forwards;
+        transform-origin: 0 50%;
+        /* animation: slide 0.2s ease-in-out forwards; */
+      }
+
+      .robo-grid-item--mobile-collapse-right.robo-grid-item--open > .robo-grid-item-content {
+        animation: slideRight 0.2s ease-in-out forwards;
+        transform-origin: 100% 50%;
+        /* animation: slide 0.2s ease-in-out forwards; */
+      }
+
+      .robo-grid-item--mobile-collapse-left.robo-grid-item--close > .robo-grid-item-content {
+        animation: slideLeftReverse 0.2s ease-in-out forwards;
+        /* animation: slideReverse 0.2s ease-in-out forwards; */
+      }
+
+      .robo-grid-item--mobile-collapse-right.robo-grid-item--close > .robo-grid-item-content {
+        animation: slideRightReverse 0.2s ease-in-out forwards;
+        /* animation: slideReverse 0.2s ease-in-out forwards; */
+      }
+
+
+        .robo-grid-item--mobile-collapse-left.robo-grid-item--open > .robo-grid-item-content {
+          right: 0;
+        }
+
+        .robo-grid-item--mobile-collapse-right.robo-grid-item--open > .robo-grid-item-content {
+          left: 0;
+        }
+      }
+
+
+
+    /* @keyframes slide {
+      to {
+        width: 100%;
       }
     }
+    @keyframes slideReverse {
+      to {
+        width: 0;
+      }
+    } */
+
+
+    @keyframes slideLeft {
+      /* from {
+        transform: translateX(-100%);
+      } */
+      to {
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes slideLeftReverse {
+      /* from {
+        transform: translateX(0);
+      } */
+      to {
+        transform: translateX(-100%);
+      }
+    }
+
+    @keyframes slideRight {
+      /* from {
+        transform: translateX(200%);
+      } */
+      to {
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes slideRightReverse {
+      /* from {
+        transform: translateX(0);
+      } */
+      to {
+        transform: translateX(200%);
+      }
+    }
+
+    /* - Slide actions */
 
 </style>

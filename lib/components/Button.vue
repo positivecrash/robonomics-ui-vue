@@ -116,7 +116,7 @@ export default defineComponent({
       type: String,
       default: 'primary',
       validator: function (value) {
-        return ['primary', 'ok', 'alarm', 'na'].indexOf(value) !== -1;
+        return ['primary', 'ok', 'alarm', 'na', 'dark'].indexOf(value) !== -1;
       }
     },
 
@@ -307,6 +307,7 @@ export default defineComponent({
     --color-2: #fff;
   }
   /* end of Ok */
+  
 
   /* Alarm */
   .robo-btn.robo-btn--alarm .robo-btn--part:nth-child(2n+1) {
@@ -355,6 +356,30 @@ export default defineComponent({
     --color-2: #fff;
   }
   /* end of Na */
+
+  /* Dark */
+  .robo-btn.robo-btn--dark .robo-btn--part:nth-child(2n+1) {
+    --border: var(--color-dark);
+    --background: var(--color-dark);
+  }
+
+  .robo-btn.robo-btn--dark .robo-btn--part:nth-child(2n) {
+    --border-2: var(--color-dark);
+    --color-2: var(--color-dark);
+  }
+
+  .robo-btn.robo-btn--dark.robo-btn--outlined .robo-btn--part:nth-child(2n+1) {
+    --border: var(--color-dark);
+    --background: transparent;
+    --color: var(--color-dark);
+  }
+
+  .robo-btn.robo-btn--dark.robo-btn--outlined .robo-btn--part:nth-child(2n) {
+    --border-2: var(--color-dark);
+    --background-2: var(--color-dark);
+    --color-2: #fff;
+  }
+  /* end of Dark */
 
 
   /* Disabled */

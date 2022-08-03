@@ -5,14 +5,15 @@
             contentOffset
             :summaryIcon="summaryIcon"
             :summaryText="summaryText"
+            summaryButtonSize='big'
             popup
             :popupTitle="popupTitle"
         >
         <robo-text weight="normal">Choose one of the prefferable extension:</robo-text>
 
-        <robo-account-polkadot-extensions extension="subwallet-js" />
-        <robo-account-polkadot-extensions extension="talisman" />
-        <robo-account-polkadot-extensions extension="polkadot-js" />
+        <template v-for="item in walletsList" :key="item.id">
+            <robo-account-polkadot-extensions :wallet="item.wallet" />
+        </template>
 
         </robo-details>
     </robo-text>
@@ -20,6 +21,7 @@
 
 <script>
 import { defineComponent } from 'vue'
+import wallets from '../polkadotExtensions'
 
 export default defineComponent({
     name: 'RoboAccountPolkadotConnect',
@@ -39,6 +41,12 @@ export default defineComponent({
             type: String,
             default: 'connect account'
         }
-    }
+    },
+
+    data() {
+      return {
+        walletsList: wallets
+      }
+    },
 })
 </script>

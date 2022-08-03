@@ -12,12 +12,12 @@
       <span v-if="extension">Turn on account in your extension</span>
     </template>
     <template v-else>
-      
         <robo-grid  
           flex
           offset="x0"
           gap="x0">
           <img v-if="extensionShowIcon && !isLocalAddress" :src="extensionPic" class="extensionLogo" />
+
           <robo-select
               v-if="selectable && !isLocalAddress"
               :values="addressList"
@@ -28,6 +28,7 @@
           <span 
             v-if="!selectable && !addressLocalAllowEdit" 
             v-html="short ? shortAddress(address) : address" 
+            class="robo-formatview-address"
           />
           <robo-input 
             v-if="isLocalAddress && addressLocalAllowEdit"
@@ -47,17 +48,25 @@
             v-if="info"
             summaryIcon='circle-info'
             summaryText=''
+            summaryButtonSize='big'
             tooltip
             tooltipTheme='light'
         >
-          <!-- {{accounts}} -->
           <template v-for="acc in accounts" :key="acc.id">
             <div v-if="acc.address === address">
-              <div>
-                <img :src="acc.avatar" />
+              <robo-grid  
+              flex
+              offset="x0"
+              gap="x05">
+
+                <img 
+                  v-if="acc.avatar && acc.avatar != ''"
+                  :src="acc.avatar" 
+                />
+
                 <span>{{acc.name}}</span>
-              </div>
-              <div>
+              </robo-grid>
+              <div class="robo-formatview-address">
                 {{acc.address}}
               </div>
               <div>
@@ -141,6 +150,7 @@ export default defineComponent({
         address: this.addressLocal ?? (this.$store.getters['robonomicsUIvue/polkadot'].address ?? ''),
         // address: encodeAddress(this.$store.getters['robonomicsUIvue/polkadot'].address, this.addressChain) ?? '',
         extension: this.$store.getters['robonomicsUIvue/polkadot'].extension ?? '',
+        wallet: this.$store.getters['robonomicsUIvue/polkadot'].wallet ?? '',
         accounts: null,
         clipboardCopied: false,
         addressListFormatted: [],
@@ -150,8 +160,6 @@ export default defineComponent({
         isLocalAddress: this.addressLocal ? true : false,
       }
   },
-  
-
   computed: {
     
     classes() {
@@ -162,13 +170,14 @@ export default defineComponent({
     },
 
     extensionData() {
-        return this.extensionsData.find(ext => ext.extesion === this.extension)
+      // return this.extensionsData.find(ext => ext.extension === this.extension)
+      return this.extensionsData.find(ext => ext.wallet === this.wallet)
     },
 
     extensionPic() {
-        if(this.extensionData){
-          return new URL(`../images/${this.extensionData.picture}`, import.meta.url)
-        }
+      if(this.extensionData){
+        return new URL(`../images/${this.extensionData.picture}`, import.meta.url)
+      }
     },
 
     addressChain() {
@@ -291,10 +300,14 @@ export default defineComponent({
 
         this.$emit('beforeInjected')
         await this.$store.dispatch("robonomicsUIvue/waitWeb3Injected")
-        this.$emit('afterInjected')
+        // this.$store.commit('robonomicsUIvue/initExtensionObject')
+        // this.$emit('afterInjected')
 
         // get list of accounts if there is extension
         this.accounts = await this.$store.dispatch("robonomicsUIvue/getPolkadotAccounts", this.addressChain)
+
+        // this need to be after getPolkadotAccounts, so there is an object initialization there
+        this.$emit('afterInjected')
 
         if(this.accounts.length > 0){
     
@@ -315,6 +328,7 @@ export default defineComponent({
 
         } else {
           this.$store.commit('robonomicsUIvue/setPolkadotAddress', '')
+          this.$emit('afterInjected')
         }
 
       } catch {
@@ -335,6 +349,7 @@ export default defineComponent({
 
       this.$watch('$store.state.robonomicsUIvue.polkadot.extension', async (value) => {
         this.extension = value
+        this.wallet = this.$store.state.robonomicsUIvue.polkadot.wallet
         this.accounts = await this.$store.dispatch("robonomicsUIvue/getPolkadotAccounts")
       })
 

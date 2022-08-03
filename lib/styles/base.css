@@ -70,3 +70,9 @@ body {
 	background: rgba(0, 0, 0, 0.4);
 	backdrop-filter: blur(2px);
 }
+
+.robo-formatview-address {
+	word-wrap: break-word;
+	white-space: nowrap;
+	overflow-x: scroll;
+}

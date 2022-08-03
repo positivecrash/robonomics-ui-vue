@@ -42,7 +42,6 @@ export default defineComponent({
   .robo-card-title {
     font-weight: bold;
     text-transform: uppercase;
-    letter-spacing: 1px;
     margin-bottom: var(--gap-text);
   }
 

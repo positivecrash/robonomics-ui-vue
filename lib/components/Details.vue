@@ -187,7 +187,8 @@ export default defineComponent({
           'start-top',
           'start-bottom',
           'end-top',
-          'end-bottom'].includes(value)
+          'end-bottom',
+          'fix'].includes(value)
       }
     },
 
@@ -207,6 +208,12 @@ export default defineComponent({
       }
     },
 
+  },
+
+  data() {
+    return {
+      tooltipPlacementValue: this.tooltipPlacement
+    }
   },
 
   computed: {
@@ -236,7 +243,7 @@ export default defineComponent({
         Object.assign(classes, {
           [`robo-details--tooltip`]: this.tooltip,
           [`robo-details--tooltip-closable`]: this.tooltipCloseButton,
-          [`robo-details--tooltip--${this.tooltipPlacement}`]: this.tooltipPlacement,
+          [`robo-details--tooltip--${this.tooltipPlacementCalc}`]: this.tooltipPlacementCalc,
           [`robo-details--tooltip-theme--${this.tooltipTheme}`]: this.tooltipTheme,
         })
       }
@@ -248,6 +255,10 @@ export default defineComponent({
       }
 
       return classes
+    },
+
+    tooltipPlacementCalc() {
+      return this.tooltipPlacementValue
     }
   },
 
@@ -274,6 +285,16 @@ export default defineComponent({
       return out;
     },
 
+    tooltipPlacementRecalc() {
+      let self = this
+      setTimeout( function(){
+        let out = self.isOutOfViewport(self.$refs.content)
+        if(out.any) {
+          self.tooltipPlacementValue = 'fix'
+        }
+      }, 10)
+    },
+
     doFixRatio() {
 
       if(this.tooltip) {
@@ -289,12 +310,13 @@ export default defineComponent({
                 let tipContentWidth = tipContent.offsetWidth || tipContent.clientWidth
                 let tipContentHeight = tipContent.offsetHeight
                 let ratio = tipContentHeight/tipContentWidth
+                let out
                 
                 /* if the width is less than the height by more than 1.5 times, swap it for better view */
                 if (ratio > 1.3 && ratio < 3 ) {
                   tipContent.style.width = tipContentHeight + 'px'
                   tipContent.style.maxHeight = tipContentWidth + 10 + 'px'
-                  let out = o.isOutOfViewport(tipContent)
+                  out = o.isOutOfViewport(tipContent)
 
                   /* Try to catch if tip is going out the view */
                   if( out.left || out.right ) {
@@ -308,7 +330,7 @@ export default defineComponent({
                 if (ratio > 3 ) {
                   tipContent.style.width = tipContentWidth * 3 + 'px'
                   tipContent.style.maxHeight = tipContentHeight / 3 + 'px'
-                  let out = o.isOutOfViewport(tipContent)
+                  out = o.isOutOfViewport(tipContent)
 
                   /* Try to catch if tip is going out the view */
                   if( out.left || out.right ) {
@@ -317,6 +339,34 @@ export default defineComponent({
                   }
 
                 }
+
+
+                /* if tip is out of view */
+                out = o.isOutOfViewport(tipContent)
+
+                if(out.right && !out.left) {
+                  o.tooltipPlacementValue = o.tooltipPlacementValue.replace('start', 'end')
+                }
+
+                if(!out.right && out.left) {
+                  o.tooltipPlacementValue = o.tooltipPlacementValue.replace('end', 'start')
+                }
+
+                if(out.top && !out.bottom) {
+                  o.tooltipPlacementValue = o.tooltipPlacementValue.replace('top', 'bottom')
+                }
+
+                if(!out.top && out.bottom) {
+                  o.tooltipPlacementValue = o.tooltipPlacementValue.replace('bottom', 'top')
+                }
+
+                if( (!out.right && out.left) || (out.top && out.bottom) ) {
+                  o.tooltipPlacementValue = 'fix'
+                }
+
+                /* recalc */
+                o.tooltipPlacementRecalc()
+
             }
           }, 5)
         }
@@ -348,40 +398,6 @@ export default defineComponent({
   
 })
 </script>
-
-<style>
-  /* Tweak for card labels */
-  .robo-details summary .robo-btn {
-      letter-spacing: 0;
-      pointer-events: none;
-      text-transform: none;
-  }
-  
-  .robo-card-label summary .robo-btn .robo-btn--part {
-    --padding-v: calc(var(--space) * 0.18);
-    --padding-g: calc(var(--space) * 0.5);
-  }
-
-  .robo-details[open] summary .robo-btn .robo-btn--part:nth-child(2n+1) {
-    background-color: var(--background-hover);
-    border-color: var(--border-hover);
-    color: var(--color-hover);
-  }
-
-  .robo-details[open] summary .robo-btn .robo-btn--part:nth-child(2n+1) .robo-loader {
-    --loader-color: var(--color-hover)
-  }
-
-  .robo-details[open] summary .robo-btn .robo-btn--part:nth-child(2n) {
-    background-color: var(--background-2-hover);
-    border-color: var(--border-2-hover);
-    color: var(--color-2-hover);
-  }
-
-  .robo-details[open] summary .robo-btn .robo-btn--part:nth-child(2n) .robo-loader {
-    --loader-color: var(--color-2-hover)
-  }
-</style>
 
 <style scoped>
     .robo-details {
@@ -534,6 +550,30 @@ export default defineComponent({
       top: 0;
       left: calc(100% + var(--tipGap));
     }
+
+    .robo-details--tooltip--fix .robo-details-content {
+      font-size: initial;
+      position: fixed;
+      top: auto;
+      bottom: 1px;
+      left: 0;
+      right: 0;
+      border-top: 2px solid var(--color-dark);
+      max-width: 100%;
+    }
+
+    /* @media screen and (max-width: 500px) {
+      .robo-details--tooltip .robo-details-content {
+        font-size: initial;
+        position: fixed;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        border-top: 2px solid var(--color-dark);
+        box-shadow: 0 -1px 4px rgba(0,0,0,.3);
+      }
+    } */
     /* - position */
 
 
@@ -636,7 +676,7 @@ export default defineComponent({
     /* - theme */
 
     /* + closing */
-    .robo-details--tooltip-closable .robo-details-content {
+    .robo-details--tooltip-closable > .robo-details-content {
       padding-right: calc(var(--tip-content-padding)*2 + 0.8rem);
     } 
 
@@ -679,9 +719,8 @@ export default defineComponent({
     }
     /* - ALIGN CONTENT */
 
-
     /* + POPUP */
-    
+
     .robo-details--popup .robo-details-content {
       --popup-content-padding: var(--space);
       --popup-content-width: 450px;
@@ -734,7 +773,39 @@ export default defineComponent({
 
 <style>
 .robo-details--tooltip-theme--dark.robo-details--tooltip .robo-details-content a {
-      color: var(--color-green);
-      text-decoration: underline;
-    }
+  color: var(--color-green);
+  text-decoration: underline;
+}
+
+/* Tweak for card labels */
+  .robo-details summary .robo-btn {
+      letter-spacing: 0;
+      pointer-events: none;
+      text-transform: none;
+  }
+  
+  .robo-card-label summary .robo-btn .robo-btn--part {
+    --padding-v: calc(var(--space) * 0.18);
+    --padding-g: calc(var(--space) * 0.5);
+  }
+
+  .robo-details[open] summary .robo-btn .robo-btn--part:nth-child(2n+1) {
+    background-color: var(--background-hover);
+    border-color: var(--border-hover);
+    color: var(--color-hover);
+  }
+
+  .robo-details[open] summary .robo-btn .robo-btn--part:nth-child(2n+1) .robo-loader {
+    --loader-color: var(--color-hover)
+  }
+
+  .robo-details[open] summary .robo-btn .robo-btn--part:nth-child(2n) {
+    background-color: var(--background-2-hover);
+    border-color: var(--border-2-hover);
+    color: var(--color-2-hover);
+  }
+
+  .robo-details[open] summary .robo-btn .robo-btn--part:nth-child(2n) .robo-loader {
+    --loader-color: var(--color-2-hover)
+  }
 </style>
