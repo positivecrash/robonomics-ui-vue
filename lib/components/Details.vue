@@ -8,7 +8,7 @@
     >
         <summary 
           class="robo-details-summary" 
-          aria-expanded="true/false" 
+          aria-expanded="false" 
           tabindex="0" 
           role="button"
           @click="doFixRatio">
@@ -30,6 +30,7 @@
             <robo-icon 
               v-if="summaryIcon && !summaryLoading"
               :icon="summaryIcon" 
+              :class="summaryButtonType ? 'robo-details-summary-type-' + summaryButtonType : null"
             />
 
             <robo-loader v-if="summaryLoading" />
@@ -64,6 +65,7 @@
 
             <robo-icon 
               @click="closeDetails"
+              tabindex="0"
               class="robo-details-content-close"
               icon="xmark"
               v-if="tooltip && tooltipCloseButton || popup"
@@ -166,6 +168,14 @@ export default defineComponent({
       default: null
     },
 
+    textStyle: {
+      type: String,
+      default: 'inherit',
+      validator: function (value) {
+        return ['inherit', 'initial'].includes(value)
+      }
+    },
+
     tooltip: {
       type: Boolean,
       default: false
@@ -236,7 +246,8 @@ export default defineComponent({
         [`robo-details--closeOutOfFocus`]: this.contentCloseOutOfFocus || this.tooltip,
         [`robo-details--offset`]: this.contentOffset,
         [`robo-details--content-align--${this.contentTextalign}`]: this.contentTextalign,
-        [`robo-details--loading`]: this.summaryLoading
+        [`robo-details--loading`]: this.summaryLoading,
+        [`robo-details--textStyle-${this.textStyle}`]: this.textStyle,
       }
 
       if (this.tooltip) {
@@ -285,14 +296,43 @@ export default defineComponent({
       return out;
     },
 
-    tooltipPlacementRecalc() {
+    tooltipPlacementRecalc(watch) {
       let self = this
-      setTimeout( function(){
-        let out = self.isOutOfViewport(self.$refs.content)
-        if(out.any) {
-          self.tooltipPlacementValue = 'fix'
-        }
-      }, 10)
+      let out
+
+      if(watch==='any') {
+
+        setTimeout( function(){
+          out = self.isOutOfViewport(self.$refs.content)
+          
+          if(watch==='top' && out.top) {
+            self.tooltipPlacementValue = 'fix'
+          }
+          
+          if(out.any) {
+            self.tooltipPlacementValue = 'fix'
+          }
+
+        }, 20)
+
+      } else {
+
+        setTimeout( function(){
+          out = self.isOutOfViewport(self.$refs.content)
+          
+          if( 
+            ( watch==='top' && out.top ) 
+            || ( watch==='bottom' && out.bottom ) 
+            || ( watch==='left' && out.left ) 
+            || ( watch==='right' && out.right ) 
+          ) {
+            self.tooltipPlacementValue = 'fix'
+          }
+
+        }, 10)
+
+      }
+
     },
 
     doFixRatio() {
@@ -346,26 +386,29 @@ export default defineComponent({
 
                 if(out.right && !out.left) {
                   o.tooltipPlacementValue = o.tooltipPlacementValue.replace('start', 'end')
+                  /* recalc */
+                  o.tooltipPlacementRecalc('left')
                 }
 
                 if(!out.right && out.left) {
                   o.tooltipPlacementValue = o.tooltipPlacementValue.replace('end', 'start')
+                  /* recalc */
+                  o.tooltipPlacementRecalc('right')
                 }
 
                 if(out.top && !out.bottom) {
                   o.tooltipPlacementValue = o.tooltipPlacementValue.replace('top', 'bottom')
+                  /* recalc */
+                  o.tooltipPlacementRecalc('bottom')
                 }
 
                 if(!out.top && out.bottom) {
                   o.tooltipPlacementValue = o.tooltipPlacementValue.replace('bottom', 'top')
+                  /* recalc */
+                  o.tooltipPlacementRecalc('top')
                 }
 
-                if( (!out.right && out.left) || (out.top && out.bottom) ) {
-                  o.tooltipPlacementValue = 'fix'
-                }
-
-                /* recalc */
-                o.tooltipPlacementRecalc()
+                o.tooltipPlacementRecalc('any')
 
             }
           }, 5)
@@ -393,6 +436,17 @@ export default defineComponent({
                     }
             })
         }
+
+        if(window.innerWidth < 500) {
+          this.tooltipPlacementValue = 'fix'
+        }
+
+        window.addEventListener("resize", function(e) {
+          if(window.innerWidth < 500) {
+            this.tooltipPlacementValue = 'fix'
+          }
+        })
+
 
     }
   
@@ -494,13 +548,22 @@ export default defineComponent({
 
     .robo-details--tooltip .robo-details-content {
       --tip-content-padding: calc(var(--space) * 0.5);
-      font-size: inherit;
       overflow: hidden;
       max-width: 450px;
       max-height: 450px;
       position: absolute;
       padding: var(--tip-content-padding);
       z-index: 1000;
+    }
+
+    .robo-details--textStyle-inherit .robo-details-content {
+      font-size: inherit;
+    }
+
+    .robo-details--textStyle-initial .robo-details-content {
+      font-size: initial;
+      text-transform: none;
+      letter-spacing: 0;
     }
 
     .robo-details-content-inside {
@@ -522,12 +585,14 @@ export default defineComponent({
     }
 
     .robo-details--tooltip--top-start .robo-details-content {
-      bottom: calc(100% + var(--tipGap));
+      bottom: 100%;
+      /* bottom: calc(100% + var(--tipGap)); */
       left: 0;
     }
 
     .robo-details--tooltip--top-end .robo-details-content {
-      bottom: calc(100% + var(--tipGap));
+      bottom: 100%;
+      /* bottom: calc(100% + var(--tipGap)); */
       right: 0;
     }
 
@@ -658,6 +723,11 @@ export default defineComponent({
       color: var(--color-light);
     }
 
+    .robo-details--tooltip-theme--dark.robo-details--tooltip .robo-details-content ::selection {
+        color: var(--color-dark);
+        background-color: var(--color-light); 
+    }
+
     /* .robo-details--tooltip-theme--dark.robo-details--tooltip .robo-details-content a {
       color: var(--color-green);
       text-decoration: underline;
@@ -673,6 +743,7 @@ export default defineComponent({
       background-color: var(--color-light);
       color: var(--color-dark);
     }
+
     /* - theme */
 
     /* + closing */
@@ -807,5 +878,9 @@ export default defineComponent({
 
   .robo-details[open] summary .robo-btn .robo-btn--part:nth-child(2n) .robo-loader {
     --loader-color: var(--color-2-hover)
+  }
+
+  .robo-details .robo-details-summary-type-alarm {
+    color: var(--color-red) !important
   }
 </style>

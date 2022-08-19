@@ -7,7 +7,7 @@
     :class="classes"
   >
 
-    <template v-if="!address">
+    <template v-if="!address && !isLocalAddress">
       <robo-account-polkadot-connect v-if="!extension" />
       <span v-if="extension">Turn on account in your extension</span>
     </template>
@@ -15,7 +15,8 @@
         <robo-grid  
           flex
           offset="x0"
-          gap="x0">
+          gap="x0"
+        >
           <img v-if="extensionShowIcon && !isLocalAddress" :src="extensionPic" class="extensionLogo" />
 
           <robo-select
@@ -33,48 +34,76 @@
           <robo-input 
             v-if="isLocalAddress && addressLocalAllowEdit"
             v-model="address"
+            :block="inline ? true : false"
+            type="text"
+            :tip="inputTip ? inputTip : null"
+            :label="inputLabel ? inputLabel : null"
           />
 
         </robo-grid>
 
         <robo-button 
-          v-if="!info && copy && !addressLocalAllowEdit" 
+          v-if="!info && copy && !isLocalAddress" 
           @click="clipboard"
           clean 
           :iconLeft="clipboardCopied ? 'check' : 'copy'"
         />
 
         <robo-details 
-            v-if="info"
-            summaryIcon='circle-info'
+            v-if="error === 'type'"
+            summaryIcon='circle-exclamation'
+            summaryText=''
+            summaryButtonSize='big'
+            summaryButtonType="alarm"
+            tooltip
+        >
+        Address should be {{addressType}} type
+        </robo-details>
+
+        <robo-details 
+            v-if="info && !addressLocal"
+            summaryIcon='circle-user'
             summaryText=''
             summaryButtonSize='big'
             tooltip
-            tooltipTheme='light'
         >
-          <template v-for="acc in accounts" :key="acc.id">
-            <div v-if="acc.address === address">
+ 
+            <div v-if="accountCurrent">
               <robo-grid  
+              class="robo-account-info-name robo-account-info-item"
               flex
-              offset="x0"
+              offset="x05"
               gap="x05">
 
                 <img 
-                  v-if="acc.avatar && acc.avatar != ''"
-                  :src="acc.avatar" 
+                  v-if="accountCurrent.avatar && accountCurrent.avatar != ''"
+                  :src="accountCurrent.avatar" 
                 />
 
-                <span>{{acc.name}}</span>
+                <b>{{accountCurrent.name}}</b>
               </robo-grid>
-              <div class="robo-formatview-address">
-                {{acc.address}}
-              </div>
-              <div>
-                <span>type:</span>
-                <span>{{acc.type}}</span>
-              </div>
+              
+              <robo-section offset="x05" class="robo-account-info-item">
+                <div class="robo-formatview-address">
+                  {{accountCurrent.address}}
+                </div>
+                <div>
+                  <robo-button 
+                    @click="clipboard"
+                    clean 
+                    :iconLeft="clipboardCopied ? 'check' : 'copy'"
+                    size="small"
+                    type="ok"
+                  >Copy to clipboard</robo-button>
+                </div>
+              </robo-section>
+
+              <robo-section offset="x05" class="robo-account-info-item">
+                <span>type: </span>
+                <span>{{accountCurrent.type}}</span>
+              </robo-section>
             </div>
-          </template>
+       
         </robo-details>
 
     </template>
@@ -108,6 +137,13 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
+    addressType: {
+      type: String,
+      default: null,
+      validator: function (value) {
+        return ['sr25519', 'ed25519'].indexOf(value) !== -1;
+      }
+    },
     chain: {
       type: String,
       default: null
@@ -132,6 +168,12 @@ export default defineComponent({
         type: Boolean,
         default: false
     },
+    inputLabel: {
+      type: String
+    },
+    inputTip: {
+      type: String
+    },
     selectable: {
       type: Boolean,
       default: false
@@ -147,17 +189,16 @@ export default defineComponent({
 
   data () {
       return {
-        address: this.addressLocal ?? (this.$store.getters['robonomicsUIvue/polkadot'].address ?? ''),
-        // address: encodeAddress(this.$store.getters['robonomicsUIvue/polkadot'].address, this.addressChain) ?? '',
-        extension: this.$store.getters['robonomicsUIvue/polkadot'].extension ?? '',
-        wallet: this.$store.getters['robonomicsUIvue/polkadot'].wallet ?? '',
         accounts: null,
-        clipboardCopied: false,
-        addressListFormatted: [],
+        address: this.addressLocal ?? (this.$store.getters['robonomicsUIvue/polkadot'].address ?? ''),
         addressList: [],
+        addressListFormatted: [],
+        clipboardCopied: false,
+        extension: this.$store.getters['robonomicsUIvue/polkadot'].extension ?? '',
         extensionsData: extensions,
-        isLocalFormat: this.chain ? true : false,
         isLocalAddress: this.addressLocal ? true : false,
+        isLocalFormat: this.chain ? true : false,
+        wallet: this.$store.getters['robonomicsUIvue/polkadot'].wallet ?? '',
       }
   },
   computed: {
@@ -165,7 +206,9 @@ export default defineComponent({
     classes() {
       return {
         [`robo-account`]: true,
-        [`robo-account--inline`]: this.inline
+        [`robo-account--inline`]: this.inline,
+        [`robo-account--local`]: this.isLocalAddress,
+        [`robo-account--error`]: this.error,
       };
     },
 
@@ -193,6 +236,20 @@ export default defineComponent({
         return '32'
       }
 
+    },
+
+    accountCurrent() {
+      if(this.accounts) {
+        return this.accounts.find(item => item.address === this.address)
+      }
+    },
+
+    error() {
+      if(this.addressType && this.accountCurrent && (this.addressType !== this.accountCurrent.type) && !this.addressLocal) {
+        return 'type'
+      } else {
+        return false
+      }
     }
   },
 
@@ -384,8 +441,6 @@ export default defineComponent({
       this.address = encodeAddress(this.addressLocal, this.addressChain)
     }
 
-
-
     /* + OTHER WATCHERS */
 
     this.$watch('address', (value) => {
@@ -467,6 +522,23 @@ export default defineComponent({
     .extensionLogo {
       width: 20px;
       margin-right: 3px;
+    }
+
+    .robo-account--local:not(.robo-account--inline) .robo-grid {
+      display: block;
+      width: 100%;
+    }
+
+    .robo-account-info-item:not(.robo-account-info-name) {
+      font-weight: normal;
+    }
+
+    .attention .robo-details-summary {
+      color: var(--color-red)
+    }
+
+    .robo-account--error {
+      color: var(--color-red)
     }
 </style>
 

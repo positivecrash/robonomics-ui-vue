@@ -15,6 +15,9 @@
             @blur="blurred"
             v-bind="$attrs"
             v-model="inputModel"
+            ref="input"
+            :aria-disabled="disabled ? true : null"
+            :tabindex="disabled ? -1 : 0"
 
             class="robo-input-control"
             :disabled = "disabled"
@@ -31,6 +34,19 @@
             type="text"
         />
 
+        <robo-button 
+          v-if="inputType === 'password'"
+          @click="showPassword"
+          class="showPasswordButton"
+
+          clean
+          :iconLeft="showPasswordPressed ? 'eye-slash' : 'eye'"
+
+          role="switch"
+          :aria-pressed="showPasswordPressed"
+          :aria-label="showPasswordPressed ? 'Hide' : 'Show'"
+        />
+
         <robo-details 
           v-if="tip" 
           
@@ -44,6 +60,7 @@
         </robo-details>
 
     </div>
+    
 </template>
 
 
@@ -54,6 +71,10 @@ export default defineComponent({
   name: 'RoboInput',
 
   props: {
+    block: {
+        type: Boolean,
+        default: false
+    },
     disabled: {
         type: Boolean,
         default: false
@@ -62,10 +83,6 @@ export default defineComponent({
         type: String,
         default: null
     },
-    // inputType: {
-    //     type: String,
-    //     default: 'text'
-    // },
     offset: {
       type: String,
       default: 'x2',
@@ -81,6 +98,10 @@ export default defineComponent({
         type: String,
         default: null
     },
+    repeat: {
+      type: Boolean,
+      default: false
+    },
     tip: {
         type: String,
         default: null
@@ -90,7 +111,8 @@ export default defineComponent({
   data() {
       return {
           focusedStatus: false,
-          inputType: this.$attrs.type
+          inputType: this.$attrs.type,
+          showPasswordPressed: false
       }
   },
 
@@ -103,8 +125,9 @@ export default defineComponent({
         [`robo-input--labeled`]: this.label,
         [`robo-input--focused`]: this.focusedStatus,
         [`robo-input--disabled`]: this.disabled,
-        [`robo-input--type-color`]: this.inputType === 'color',
         [`robo-input-offset-${this.offset}`]: this.offset,
+        [`robo-input-block`]: this.block,
+        [`robo-input--type-${this.inputType}`]: this.inputType,
       };
     },
 
@@ -123,7 +146,7 @@ export default defineComponent({
 
     labelSize() {
         return this.focusedStatus ? 'small' : 'tiny'
-    }
+    },
 
   },
 
@@ -135,6 +158,15 @@ export default defineComponent({
       blurred() {
         this.focusedStatus = false
       },
+      showPassword() {
+        this.showPasswordPressed = !this.showPasswordPressed
+
+        if(this.$refs.input.type === 'password') {
+          this.$refs.input.type = 'text'
+        } else {
+          this.$refs.input.type = 'password'
+        }
+      }
   }
 
 })
@@ -150,6 +182,10 @@ export default defineComponent({
         --label-active: var(--color-blue);
 
         position: relative;
+    }
+
+    .robo-input-block {
+      display: block;
     }
 
     .robo-input:not(:last-child) {
@@ -239,4 +275,12 @@ export default defineComponent({
     .robo-input-offset-x2 { --offset: var(--gap-layout); }
     .robo-input-offset-x4 { --offset: calc( var(--gap-layout) * 2); }
     /* - Offset */
+</style>
+
+<style>
+  .robo-input .showPasswordButton {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0.5rem;
+  }
 </style>

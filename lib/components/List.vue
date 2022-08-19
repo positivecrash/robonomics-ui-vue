@@ -16,7 +16,7 @@ export default defineComponent({
   props: {
     gap: {
       type: String,
-      default: 'x1',
+      default: 'x05',
       validator(value) {
         return ['x0', 'x05', 'x1', 'x2', 'x4'].includes(value)
       }

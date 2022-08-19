@@ -23,7 +23,8 @@
 	--color-body: var(--color-gray-light);
 
 	--input-bg: var(--color-card-background);
-	--input-text-color: var(--color-text);
+	--input-text-color: inherit;
+	/* --input-text-color: var(--color-text); */
 	--input-border-color: var(--color-text);
 	--input-border-width: 1px;
 	--input-padding-g: var(--space);
@@ -75,4 +76,17 @@ body {
 	word-wrap: break-word;
 	white-space: nowrap;
 	overflow-x: scroll;
+	-ms-overflow-style: none;  /* hide scrollbar IE and Edge */
+  	scrollbar-width: none;  /* hide scrollbar Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.robo-formatview-address::-webkit-scrollbar {
+	display: none;
+}
+
+/* highlight focus for all elements */
+*:focus {
+	outline-color: transparent;
+	box-shadow: 0 0 0 2px var(--color-blue-light);
 }

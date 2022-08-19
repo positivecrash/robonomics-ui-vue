@@ -36,7 +36,7 @@ export default defineComponent({
         type: Boolean,
         default: false
     },
-    gap: {
+    gap: { /* depricate */
         type: Boolean,
         default: false
     },
@@ -70,6 +70,13 @@ export default defineComponent({
         type: Boolean,
         default: false
     },
+    offset: {
+        type: String,
+        default: 'x0',
+        validator(value) {
+            return ['x0', 'x05', 'x1', 'x2', 'x4'].includes(value)
+        }
+    },
     size: {
       type: String,
       default: null,
@@ -81,7 +88,7 @@ export default defineComponent({
       type: String,
       default: null,
       validator: function (value) {
-        return ['bold', 'normal', 'light'].indexOf(value) !== -1;
+        return ['bold', 'normal', 'light', 'normal-italic', 'bold-italic'].indexOf(value) !== -1;
       }
     },
   },
@@ -100,16 +107,17 @@ export default defineComponent({
         [`robo-text`]: true,
         [`robo-text--${this.size}`]: this.size,
         [`robo-text--break`]: this.break,
-        [`robo-text--${this.weight}`]: this.weight,
+        [`robo-text--style-${this.weight}`]: this.weight,
         [`robo-text--inline`]: this.inline,
         [`robo-text--gap`]: this.gap,
         [`robo-text--highlight-${this.highlight}`]: this.highlight,
         [`robo-text--highlight-label-${this.highlightLabel}`]: this.highlightLabel,
         [`robo-text--highlight-label-closable`]: this.highlightLabelClose,
         [`robo-text--hyphen`]: this.hyphen,
+        [`robo-text--offset-${this.offset}`]: this.offset,
         [`open`]: this.highlightLabelCloseReopen,
       };
-    }
+    },
   },
 
   methods: {
@@ -134,8 +142,18 @@ export default defineComponent({
 </script>
 
 <style scoped>
+    .robo-text {
+      margin-bottom: var(--offset);
+    }
+
+    .robo-text--offset-x0 { --offset: 0; }
+    .robo-text--offset-x05 { --offset: calc(var(--gap-layout) * 0.5); }
+    .robo-text--offset-x1 { --offset: var(--gap-layout); }
+    .robo-text--offset-x2 { --offset: calc( var(--gap-layout) * 2); }
+    .robo-text--offset-x4 { --offset: calc( var(--gap-layout) * 4); }
+
     .robo-text--inline {
-        display: inline-block;
+        display: inline;
     }
 
     .robo-text--gap:not(:last-child) {
@@ -169,16 +187,25 @@ export default defineComponent({
     /* - SIZE */
 
     /* + WEIGHT */
-    .robo-text--bold {
+    .robo-text--style-bold {
         font-weight: bold;
     }
 
-    .robo-text--light {
+    .robo-text--style-light {
         font-weight: 300
     }
 
-    .robo-text--normal {
+    .robo-text--style-normal {
         font-weight: normal
+    }
+
+    .robo-text--style-normal-italic {
+        font-style: italic;
+    }
+
+    .robo-text--style-bold-italic {
+        font-style: italic;
+        font-weight: bold;
     }
     /* - WEIGHT */
 

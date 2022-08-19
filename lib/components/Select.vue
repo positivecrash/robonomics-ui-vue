@@ -1,5 +1,5 @@
 <template>
-    <div :class="classList">
+    <div :class="classList" tabindex="0">
 
       <select 
         :name="name" 
@@ -45,7 +45,7 @@ export default defineComponent({
       type: String
     },
     options: {
-      type: Object,
+      type: Array,
       default: null,
       required: true
     },

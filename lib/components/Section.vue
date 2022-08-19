@@ -1,5 +1,5 @@
 <template>
-    <section :class="classes">
+    <section :class="classes" :style="styles">
         <slot/>
     </section>
 </template>
@@ -11,6 +11,34 @@ export default defineComponent({
   name: 'RoboSection',
 
   props: {
+    backColor: {
+      type: String
+    },
+    backImage: {
+      type: String,
+      default: null
+    },
+    backPosition: {
+      type: String,
+      default: '100% 50%'
+    },
+    backRepeat: {
+      type: String,
+      default: 'no-repeat',
+      validator: function (value) {
+        return ['no-repeat', 'repeat-x', 'repeat-y', 'repeat', 'space'].indexOf(value) !== -1;
+      }
+    },
+    backSize: {
+      type: String,
+      default: 'auto',
+      validator: function (value) {
+        return ['contain', 'cover', 'auto'].indexOf(value) !== -1;
+      }
+    },
+    textColor: {
+      type: String
+    },
     offset: {
         type: String,
         default: 'x2',
@@ -24,9 +52,40 @@ export default defineComponent({
     classes() {
       return {
         [`robo-section`]: true,
-        [`robo-section-offset-${this.offset}`]: this.offset
+        [`robo-section-offset-${this.offset}`]: this.offset,
+        [`robo-section--backimage`]: this.backImage,
+        [`robo-section--colored`]: this.backColor,
       };
     },
+    styles() {
+      var s = '';
+
+      if (this.backImage) {
+        s += 'background-image: url(' + this.backImage + ');'
+
+        if (this.backPosition) {
+          s += ' background-position:' + this.backPosition + ';'
+        }
+
+        if (this.backRepeat) {
+          s += ' background-repeat:' + this.backRepeat + ';'
+        }
+
+        if (this.backSize) {
+          s += ' background-size:' + this.backSize + ';'
+        }
+      }
+
+      if (this.backColor) {
+        s += ' background-color:' + this.backColor + ';'
+      }
+
+      if (this.textColor) {
+        s += ' color:' + this.textColor + ';'
+      }
+
+      return s
+    }
   }
 })
 </script>
@@ -45,4 +104,8 @@ export default defineComponent({
     .robo-section-offset-x1 { --offset: var(--gap-layout); }
     .robo-section-offset-x2 { --offset: calc( var(--gap-layout) * 2); }
     .robo-section-offset-x4 { --offset: calc( var(--gap-layout) * 4); }
+
+    .robo-section--colored {
+      padding: var(--gap-layout);
+    }
 </style>

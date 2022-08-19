@@ -1,5 +1,5 @@
 <template>
-    <div :class="classList" tabindex="-1">
+    <div :class="classList">
       <robo-button 
         @click="toggleCollapse" 
         class="robo-grid-item-toggler" 

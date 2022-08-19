@@ -19,7 +19,7 @@ export default defineComponent({
       default: null,
       required: true,
       validator: function (value) {
-        return ['success', 'info', 'warning', 'error'].indexOf(value) !== -1;
+        return ['success', 'info', 'warning', 'error', 'none'].indexOf(value) !== -1;
       }
     },
     gap: {

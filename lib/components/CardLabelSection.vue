@@ -1,7 +1,6 @@
 <template>
     <div
         :class="classList"
-        tabindex="0"
     >
 
         <div 

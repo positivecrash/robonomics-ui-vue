@@ -21,6 +21,7 @@ export default defineComponent({
 
 <style scoped>
     li {
+        --list-gap: calc(var(--gap-text) * 2);
         margin-bottom: var(--list-gap);
         position: relative;
         padding-left: var(--gap-text);
@@ -57,7 +58,7 @@ export default defineComponent({
     }
 
     .robo-list-fullline li:before {
-      height: 100%;
+      height: calc(100% - 0.4rem);
     }
 
     .robo-list--theme-line-gorizontal li:first-child{
