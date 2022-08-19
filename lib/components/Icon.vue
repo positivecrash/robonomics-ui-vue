@@ -53,7 +53,7 @@ export default defineComponent({
     display: inline-block;
     line-height: 1;
   }
-  .robo-icon--size-small { font-size: calc(var(--font-size) * 0.5)}
+  .robo-icon--size-small { font-size: calc(var(--font-size) * 0.7)}
   .robo-icon--size-normal { font-size: inherit}
   .robo-icon--size-big { font-size: calc(var(--font-size) * 2)}
   .robo-icon--size-huge { font-size: calc(var(--font-size) * 4)}
