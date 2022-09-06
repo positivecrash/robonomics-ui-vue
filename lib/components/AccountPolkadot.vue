@@ -23,7 +23,8 @@
               v-if="selectable && !isLocalAddress"
               :values="addressList"
               :options="addressListFormatted"
-              v-model="address"
+              v-bind="$attrs"
+              v-model="vmodelAddress"
               clean
           />
           <span 
@@ -33,7 +34,8 @@
           />
           <robo-input 
             v-if="isLocalAddress && addressLocalAllowEdit"
-            v-model="address"
+            v-bind="$attrs"
+            v-model="vmodelAddress"
             :block="inline ? true : false"
             type="text"
             :tip="inputTip ? inputTip : null"
@@ -61,7 +63,7 @@
         </robo-details>
 
         <robo-details 
-            v-if="info && !addressLocal"
+            v-if="info && !isLocalAddress"
             summaryIcon='circle-user'
             summaryText=''
             summaryButtonSize='big'
@@ -182,21 +184,25 @@ export default defineComponent({
         type: Boolean,
         default: false
     },
+
+    vmodelAddressInput: {
+      type: String
+    }
   
   },
 
-  emits: ['beforeInjected', 'afterInjected', 'onAddressChange'],
+  emits: ['beforeInjected', 'afterInjected', 'onAddressChange' ,'update:vmodelAddressInput'],
 
   data () {
       return {
         accounts: null,
-        address: this.addressLocal ?? (this.$store.getters['robonomicsUIvue/polkadot'].address ?? ''),
+        address: this.addressLocal !== null ? this.addressLocal : (this.$store.getters['robonomicsUIvue/polkadot'].address ?? ''),
         addressList: [],
         addressListFormatted: [],
         clipboardCopied: false,
         extension: this.$store.getters['robonomicsUIvue/polkadot'].extension ?? '',
         extensionsData: extensions,
-        isLocalAddress: this.addressLocal ? true : false,
+        isLocalAddress: this.addressLocal !== null ? true : false,
         isLocalFormat: this.chain ? true : false,
         wallet: this.$store.getters['robonomicsUIvue/polkadot'].wallet ?? '',
       }
@@ -249,6 +255,24 @@ export default defineComponent({
         return 'type'
       } else {
         return false
+      }
+    },
+
+    vmodelAddress: {
+      get() {
+        if(this.vmodelAddressInput) {
+          this.vmodelAddressInput
+        } else {
+          if(!this.address){
+            console.warn('[robonomics-ui-vue3 warn]: `robo-account-polkadot` required address missing')
+          } else {
+            return this.address
+          }
+        }
+        
+      },
+      set(value) {
+        this.$emit('update:address', value)
       }
     }
   },
@@ -438,7 +462,14 @@ export default defineComponent({
 
     } else {
       /* this.isLocalAddress true */
-      this.address = encodeAddress(this.addressLocal, this.addressChain)
+      if(!!this.addressLocal) {
+        // check if addressLocal is not empty string
+        this.address = encodeAddress(this.addressLocal, this.addressChain)
+      } else {
+        console.log('addressLocal is empty string') //!!
+        // this.address = this.addressLocal
+        this.address = null
+      }
     }
 
     /* + OTHER WATCHERS */
