@@ -23,8 +23,7 @@
               v-if="selectable && !isLocalAddress"
               :values="addressList"
               :options="addressListFormatted"
-              v-bind="$attrs"
-              v-model="vmodelAddress"
+              v-model="address"
               clean
           />
           <span 
@@ -261,7 +260,7 @@ export default defineComponent({
     vmodelAddress: {
       get() {
         if(this.vmodelAddressInput) {
-          this.vmodelAddressInput
+          return this.vmodelAddressInput
         } else {
           if(!this.address){
             console.warn('[robonomics-ui-vue3 warn]: `robo-account-polkadot` required address missing')
@@ -466,7 +465,7 @@ export default defineComponent({
         // check if addressLocal is not empty string
         this.address = encodeAddress(this.addressLocal, this.addressChain)
       } else {
-        console.log('addressLocal is empty string') //!!
+        //console.warn('[robonomics-ui-vue3 warn]: addressLocal is empty string')
         // this.address = this.addressLocal
         this.address = null
       }
