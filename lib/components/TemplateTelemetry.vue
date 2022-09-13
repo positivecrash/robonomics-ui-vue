@@ -1,5 +1,10 @@
 <template>
 
+<!-- <robo-grid flex>
+    <robo-card-title size="3">Your Telemetry</robo-card-title>
+    <robo-button outlined size="small">Save json</robo-button>
+</robo-grid> -->
+
 <robo-grid columnsRepeat="3" mediaMobile="transfer" offset="x0">
     <robo-card v-for="( item, i ) in dataObject" :key="i">
 
@@ -9,16 +14,32 @@
 
                 <robo-grid flex offset="x0" gap="x05" valign="center">
                     <robo-icon :icon="getIcon(key)" />
-                    <robo-text offset="x0" size="small" weight="bold">{{ cleanEntityName(key) }}</robo-text>
+                    <robo-grid flex offset="x0" gap="x05" class="telemetry-state">
+                        <robo-text weight="bold" uppercase>{{entity.state == 'None' ? '–' : entity.state}}</robo-text>
+                        <robo-text v-if="entity.units != 'None'" weight="bold" uppercase>{{entity.units}}</robo-text>  
+                    </robo-grid>
                 </robo-grid>
 
-                <robo-grid flex offset="x0" gap="x05">
-                    <robo-text>{{entity.state == 'None' ? '–' : entity.state}}</robo-text>
-                    <robo-text v-if="entity.units != 'None'">{{entity.units}}</robo-text>
-                </robo-grid>
+                <robo-text offset="x05" size="small">
+                    {{ cleanEntityName(key, item.name) }}
+                </robo-text>
+
+                <robo-details 
+                    v-if="entity.history && entity.history.length > 0"
+                    summaryText="View history" 
+                    :contentCloseOutOfFocus="false"
+                >
+                    <template v-for="(entity_prop, key, entity_prop_i) in entity.history" :key="entity_prop_i">
+                        <robo-text offset="x1" size="small">
+                            <robo-text offset="x0" v-for="(item, key) in entity_prop" :key="key">
+                                {{key}} - {{item}}
+                            </robo-text>
+                        </robo-text>
+                    </template>
+                </robo-details>
                 
                 <template v-for="(entity_prop, key, entity_prop_i) in entity" :key="entity_prop_i">
-                    <robo-text v-if="key != 'state' && key != 'units'" offset="x05">
+                    <robo-text v-if="key != 'state' && key != 'units' && key != 'history'" offset="x05">
                         {{entity_prop}}
                     </robo-text>
                 </template>
@@ -52,11 +73,20 @@ export default defineComponent({
             }
         })
 
-        const cleanEntityName = (entity) => {
-            let string = entity.split('.')[1]
-            let stringParts = string.split("_")
-            stringParts.shift()
-            return stringParts.join(' ')
+        const cleanEntityName = (entity, toRemove) => {
+            let entityParts = entity.split(/[-_.]+/)
+            console.log('entityParts', entityParts)
+            // let stringParts = string.split("_")
+            // stringParts.replace(toRemove, '')
+            // console.log('stringParts removed', stringParts)
+            // stringParts.shift()
+            // return stringParts.join(' ')
+
+            let result = entityParts.filter(function(el){ 
+                return el !== toRemove
+            })
+
+            return result.join(' ')
         }
 
         const getIcon = (entity) => {
@@ -101,4 +131,12 @@ export default defineComponent({
 </script>
 
 <style scoped>
+    .robo-card {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .telemetry-state {
+        text-transform: uppercase;
+    }
 </style>

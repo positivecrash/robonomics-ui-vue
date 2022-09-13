@@ -84,6 +84,10 @@ export default defineComponent({
         return ['tiny', 'small', 'medium', 'large'].indexOf(value) !== -1;
       }
     },
+    uppercase: {
+      type: Boolean,
+      default: false
+    },
     weight: {
       type: String,
       default: null,
@@ -116,6 +120,7 @@ export default defineComponent({
         [`robo-text--hyphen`]: this.hyphen,
         [`robo-text--offset-${this.offset}`]: this.offset,
         [`open`]: this.highlightLabelCloseReopen,
+        [`robo-text--uppercase`]: this.uppercase
       };
     },
   },
@@ -292,6 +297,7 @@ export default defineComponent({
     /* - HIGHLIGHT LABEL REMOVE */
 
     .robo-text--break { word-break: break-all; }
+    .robo-text--uppercase { text-transform: uppercase; }
 </style>
 
 <style>
