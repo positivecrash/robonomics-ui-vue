@@ -200,6 +200,12 @@ export default defineComponent({
           grid-template-columns: 1fr !important;
         }
 
+        .robo-grid--flex.robo-grid--mobile-transfer {
+          /* flex-wrap: wrap */
+          display: grid;
+          grid-template-columns: 1fr;
+        }
+
         .robo-grid-template-columns--left-center-right.robo-grid--mobile-transfer {
           grid-template-columns: auto;
         }

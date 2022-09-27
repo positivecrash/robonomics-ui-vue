@@ -1,6 +1,5 @@
 <template>
-    <details
-      v-if="$slots.default && (summaryText || summaryIcon)"  
+    <details 
       :class="classes" 
       tabindex="0"
       ref="details"
@@ -43,6 +42,8 @@
               class="robo-details-summary-switchicon" 
             />
           </div>
+
+          <slot name="summary"></slot>
 
         </summary>
 
@@ -88,6 +89,11 @@ export default defineComponent({
   name: 'RoboDetails',
 
   props: {
+
+    block: {
+      type: Boolean,
+      default: false
+    },
 
     contentCloseOutOfFocus: {
       type: Boolean,
@@ -242,6 +248,7 @@ export default defineComponent({
     classes() {
       let classes = {
         [`robo-details`]: true,
+        [`robo-details--block`]: this.block,
         [`robo-details--${this.type}`]: this.type,
         [`robo-details--closeOutOfFocus`]: this.contentCloseOutOfFocus || this.tooltip,
         [`robo-details--offset`]: this.contentOffset,
@@ -839,6 +846,10 @@ export default defineComponent({
       margin-bottom: var(--gap-text);
     }
     /* - POPUP */
+
+    .robo-details--block, .robo-details--block summary { 
+      display: block;
+    }
 
 </style>
 

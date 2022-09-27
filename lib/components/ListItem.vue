@@ -21,7 +21,7 @@ export default defineComponent({
 
 <style scoped>
     li {
-        --list-gap: calc(var(--gap-text) * 2);
+        /* --list-gap: calc(var(--gap-text) * 2); */
         margin-bottom: var(--list-gap);
         position: relative;
         padding-left: var(--gap-text);

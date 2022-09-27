@@ -70,6 +70,10 @@ export default defineComponent({
         type: Boolean,
         default: false
     },
+    nowrap: {
+      type: Boolean,
+      default: false
+    },
     offset: {
         type: String,
         default: 'x0',
@@ -119,6 +123,7 @@ export default defineComponent({
         [`robo-text--highlight-label-closable`]: this.highlightLabelClose,
         [`robo-text--hyphen`]: this.hyphen,
         [`robo-text--offset-${this.offset}`]: this.offset,
+        [`robo-text--nowrap`]: this.nowrap,
         [`open`]: this.highlightLabelCloseReopen,
         [`robo-text--uppercase`]: this.uppercase
       };
@@ -298,6 +303,7 @@ export default defineComponent({
 
     .robo-text--break { word-break: break-all; }
     .robo-text--uppercase { text-transform: uppercase; }
+    .robo-text--nowrap { white-space: nowrap; }
 </style>
 
 <style>

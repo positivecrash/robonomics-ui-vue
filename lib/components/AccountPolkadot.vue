@@ -44,7 +44,7 @@
         </robo-grid>
 
         <robo-button 
-          v-if="!info && copy && !isLocalAddress" 
+          v-if="!infoShow && copy" 
           @click="clipboard"
           clean 
           :iconLeft="clipboardCopied ? 'check' : 'copy'"
@@ -62,7 +62,7 @@
         </robo-details>
 
         <robo-details 
-            v-if="info && !isLocalAddress"
+            v-if="infoShow && !isLocalAddress"
             summaryIcon='circle-user'
             summaryText=''
             summaryButtonSize='big'
@@ -203,7 +203,7 @@ export default defineComponent({
         extensionsData: extensions,
         isLocalAddress: this.addressLocal !== null ? true : false,
         isLocalFormat: this.chain ? true : false,
-        wallet: this.$store.getters['robonomicsUIvue/polkadot'].wallet ?? '',
+        wallet: this.$store.getters['robonomicsUIvue/polkadot'].wallet ?? ''
       }
   },
   computed: {
@@ -252,6 +252,14 @@ export default defineComponent({
     error() {
       if(this.addressType && this.accountCurrent && (this.addressType !== this.accountCurrent.type) && !this.addressLocal) {
         return 'type'
+      } else {
+        return false
+      }
+    },
+
+    infoShow() {
+      if(!this.isLocalAddress) {
+        return this.info
       } else {
         return false
       }
