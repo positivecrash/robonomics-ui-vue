@@ -6,7 +6,13 @@
     >
         <robo-progress v-if="loading || progress" :progress="progress" />
 
-        <slot/>
+        <div class="robo-card-widgeticon">
+          <slot name="widgeticon" />
+        </div>
+
+        <div class="robo-card-content">
+          <slot/>
+        </div>
 
         <robo-button 
           v-if="allowExpand" 
@@ -36,7 +42,7 @@ export default defineComponent({
       type: String,
       default: 'light',
       validator: function (value) {
-        return ['light', 'dark', 'lightblue'].indexOf(value) !== -1;
+        return ['light', 'dark', 'lightblue', 'opacitylight'].indexOf(value) !== -1;
       }
     },
     backImage: {
@@ -61,6 +67,10 @@ export default defineComponent({
         return ['contain', 'cover', 'auto'].indexOf(value) !== -1;
       }
     },
+    fixedButton: {
+      type: Boolean,
+      default: false
+    },
     disabled: {
       type: Boolean,
       default: false
@@ -69,7 +79,11 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
-    outlined: {
+    outline: {
+      type: Boolean,
+      default: false
+    },
+    pale: {
       type: Boolean,
       default: false
     },
@@ -81,6 +95,14 @@ export default defineComponent({
       type: Number,
       default: null
     },
+    simplefont: {
+      type: Boolean,
+      default: false
+    },
+    widget: {
+      type: Boolean,
+      default: false
+    }
   },
 
   data() {
@@ -95,12 +117,16 @@ export default defineComponent({
         [`robo-card`]: true,
         [`robo-card--expandable`]: this.allowExpand,
         [`robo-card--solid`]: !this.outlined,
-        [`robo-card--outlined`]: this.outlined,
+        [`robo-card--outline`]: this.outline,
         [`robo-card--disabled`]: this.disabled,
         [`robo-card--backimage`]: this.backImage,
         [`robo-card--backcolor-${this.backColor}`]: this.backColor,
         [`robo-card--paddings`]: this.paddings,
+        [`robo-card--fixedButton`]: this.fixedButton,
+        [`robo-card--pale`]: this.pale,
         [`expand`]: this.expand,
+        [`robo-card--widget`]: this.widget,
+        [`robo-card--simplefont`]: this.simplefont,
       };
     },
     styles() {
@@ -141,18 +167,21 @@ export default defineComponent({
 
     .robo-card {
       --background: transparent;
-      --color: var(--color-dark);
+      --color: var(--color-card-background-dark);
 
         background-color: var(--background);
         color: var(--color);
         position: relative;
-        padding: var(--card-padding);
         border-radius: var(--border-radius);
     }
 
-    .robo-card:not(.robo-card--paddings) {
-      --card-padding: 0;
+    .robo-card-content {
+      padding: var(--card-padding);
     }
+
+    /* .robo-card:not(.robo-card--paddings) {
+      --card-padding: 0;
+    } */
 
     .robo-card .robo-progress {
       position: absolute;
@@ -161,24 +190,39 @@ export default defineComponent({
       width: 100%;
     }
 
-    .robo-card--backcolor-light:not(.robo-card--outlined) {
-      --background: var(--color-light);
+    .robo-card--backcolor-light:not(.robo-card--outline) {
+      --background: var(--color-card-background-light);
     }
 
-    .robo-card--backcolor-dark:not(.robo-card--outlined) {
-      --background: var(--color-dark);
-      --color: var(--color-light);
+    .robo-card--backcolor-opacitylight {
+      --background: var(--robo-color-light-100-4);
     }
 
-    .robo-card--backcolor-lightblue:not(.robo-card--outlined) {
-      --background: var(--color-bluegreen-light);
+    .robo-card--backcolor-dark:not(.robo-card--outline) {
+      --background: var(--color-card-background-dark);
+      --color: var(--color-card-background-light);
     }
 
-    .robo-card--outlined.robo-card {
+    .robo-card--backcolor-lightblue:not(.robo-card--outline) {
+      --background: var(--color-card-background-lightblue);
+    }
+
+    .robo-card--outline.robo-card {
         --color-card-background: var(--color-body);
         --card-border-color: var(--color-text);
-        --card-padding: var(--space);
         border: 1px solid var(--card-border-color);
+    }
+
+    .robo-card--pale {
+      --color-card-background-light: var(--color-card-background-light-70);
+      --color-card-background-dark: var(--color-card-background-dark-70);
+    }
+
+    @media (prefers-color-scheme: dark){
+      .robo-card--pale {
+        --color-card-background-light: var(--color-card-background-dark-70);
+        --color-card-background-dark: var(--color-card-background-light-70);
+      }
     }
 
     .robo-card--labeled {
@@ -200,6 +244,24 @@ export default defineComponent({
     }
 
     /* - Card expand */
+
+    .robo-card.robo-card--widget {
+      --card-padding: 10px;
+      --background: var(--robo-color-light-100-4);
+      display: grid;
+      grid-template-columns: 56px auto;
+    }
+
+    .robo-card-widgeticon {
+      background-color: var(--robo-color-input);
+    }
+    .robo-card.robo-card--widget .robo-card-content {
+      align-self: center;
+    }
+
+    .robo-card--simplefont {
+      font-family: var(--font-family-text);
+    }
 
 </style>
 
@@ -236,4 +298,24 @@ export default defineComponent({
 
     /* - Card expand */
 
+    .robo-card--fixedButton > .robo-card-content {
+      position: relative;
+      padding-bottom: calc(var(--robo-space) * 4) !important;
+    }
+    
+    .robo-card--fixedButton  > .robo-card-content > .robo-button {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+    }
+
+
+    .robo-card-widgeticon > * {
+      display: grid !important;
+      align-content: center;
+      justify-content: center;
+      height: 100%;
+    }
 </style>

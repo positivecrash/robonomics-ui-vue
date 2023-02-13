@@ -18,22 +18,7 @@
               <robo-icon :icon="collapseIcon" />
             </span>
             <span v-if="collapseText">{{collapseText}}</span>
-            <!-- <robo-button 
-              class="robo-grid-item-close"
-              type="dark"
-              @click="toggleCollapse"
-            >
-              [x] Close
-            </robo-button> -->
             <robo-icon class="robo-grid-item-close" icon="circle-xmark" size="big" @click="toggleCollapse" />
-            <!-- <robo-button 
-              class="robo-grid-item-closeToggle"
-              block 
-              type="dark"
-              @click="toggleCollapse"
-            >
-              [x] Close
-            </robo-button> -->
           </div>
 
           <div class="robo-grid-item-content-inside">
@@ -64,6 +49,15 @@ export default defineComponent({
       validator(value) {
         return ['left', 'center', 'right', 'stretch'].includes(value)
       }
+    },
+    back: {
+      type: Boolean,
+      default: false
+    },
+
+    borderbottom: {
+      type: Boolean,
+      default: false
     },
     collapseIcon: {
       type: String,
@@ -112,6 +106,8 @@ export default defineComponent({
         [`robo-grid-item--align-${this.align}`]: this.align,
         [`robo-grid-item--${this.collapseClass}`]: this.collapseClass,
         [`robo-grid-item--sticky-${this.sticky}`]: this.sticky,
+        [`robo-grid-item--borderbottom`]: this.borderbottom,
+        [`robo-grid-item--back`]: this.back,
       };
     }
   },
@@ -154,31 +150,7 @@ export default defineComponent({
           display: none;
         }
     }
-
-    /* .robo-grid-item-closeToggle {
-      font-weight: bold;
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      background-color: var(--color-dark);
-      color: var(--color-light);
-      width: 3.5rem;
-      white-space: nowrap;
-      display: none;
-    }
-
-    .robo-grid-item--mobile-collapse-left .robo-grid-item-closeToggle {
-      right: 0;
-    }
-
-    .robo-grid-item--mobile-collapse-right .robo-grid-item-closeToggle {
-      left: 0;
-    }
-
-    .robo-grid-item-closeToggle .robo-btn--part {
-      transform: rotate(-90deg);
-      transform-origin: 0 0;
-    } */
+    
 </style>
 
 <style scoped>
@@ -384,5 +356,21 @@ export default defineComponent({
     }
 
     /* - Slide actions */
+
+    .robo-grid-item--borderbottom {
+      border-bottom: 1px dotted var(--robo-color-dark-80);
+      padding-bottom: 5px;
+    }
+
+    .robo-grid-item--back {
+      background-color: var(--robo-color-light-100-4);
+      padding: 10px;
+    }
+
+    @media (prefers-color-scheme: dark){
+        .robo-grid-item--back {
+            background-color: var(--robo-color-light-100-2);
+        }
+    }
 
 </style>

@@ -1,292 +1,358 @@
 <template>
-    <div :class="classList" :style="style">
+    <div :class="classes">
       <slot/>
     </div>
 </template>
 
 <script>
-import { defineComponent } from 'vue'
+  export default { name: 'RoboGrid' }
+</script>
 
-export default defineComponent({
-  name: 'RoboGrid',
+<script setup>
+import { defineProps, computed } from 'vue'
 
-  props: {
-    
-    align: {
-      type: String,
-      default: 'stretch',
-      validator(value) {
-        return ['left', 'center', 'right', 'stretch', 'fit-content', 'space-between'].includes(value)
-      }
-    },
+const props = defineProps({
+    // 'left-center', 'left-center-right', 'center-right' or integer number
     columns: {
-      type: String,
+      type: [Number, String],
       default: null
     },
-    columnsRepeat: {
-      type: [Number, String],
-      default: null,
-      validator(value) {
-        return [1,2,3,4,5,6,7,8,9,10,11,12].includes(value) || ['1','2','3','4','5','6','7','8','9','10','11','12'].includes(value)
-      }
+
+    flexfluid: {
+      type: Boolean,
+      default: false
     },
-    columnsTemplate: {
+
+    minColumnWidth: {
       type: String,
-      default: null,
-      validator(value) {
-        return ['left-center', 'left-center-right'].includes(value)
-      }
+      default: 'auto'
     },
-    /* embed - deprecated */
-    embed: {
-      type: Boolean,
-      default: false
+
+    maxColumnWidth: {
+      type: String,
+      default: 'auto'
     },
-    flex: {
-      type: Boolean,
-      default: false
+
+    minRowHeight: {
+      type: String,
+      default: 'auto'
     },
+
+    maxRowHeight: {
+      type: String,
+      default: 'auto'
+    },
+
     gap: {
       type: String,
       default: 'x2',
       validator(value) {
-        return ['x0', 'x05', 'x1', 'x2', 'x4'].includes(value)
+        return ['x0', 'x025', 'x05', 'x1', 'x2', 'x4'].includes(value)
       }
     },
+
+    galign: {
+      type: String,
+      default: 'stretch',
+      validator(value) {
+        return ['start', 'end', 'center', 'stretch'].includes(value)
+      }
+    },
+
     offset: {
       type: String,
       default: 'x2',
       validator(value) {
-        return ['x0', 'x05', 'x1', 'x2', 'x4'].includes(value)
+        return ['x0', 'x025', 'x05', 'x1', 'x2', 'x4'].includes(value)
       }
     },
-    mediaMobile: {
-      type: String,
-      default: 'none',
-      validator(value) {
-        return ['transfer', 'no-cols', 'none'].includes(value)
-      }
-    },
+
     rows: {
-      type: String,
+      type: [Number, String],
       default: null
     },
-    screen: {
-      type: Boolean,
-      default: false
+
+    type: {
+      type: String,
+      default: 'grid',
+      validator(value) {
+        return ['grid', 'flex', 'masonry'].includes(value)
+      }
     },
+
     valign: {
       type: String,
       default: 'stretch',
       validator(value) {
-        return ['top', 'center', 'bottom', 'stretch'].includes(value)
+        return ['start', 'end', 'center', 'stretch'].includes(value)
       }
-    },
-  },
+    }
+})
 
-  computed: {
-    classList() {
-      return {
-        [`robo-grid`]: true,
-        [`robo-grid-columns-${this.columnsRepeat}`]: this.columnsRepeat,
-        [`robo-grid-gap-${this.gap}`]: this.gap,
-        [`robo-grid-offset-${this.offset}`]: this.offset,
-        [`robo-grid-template-columns--${this.columnsTemplate}`]: this.columnsTemplate,
-        [`robo-grid--mobile-${this.mediaMobile}`]: this.mediaMobile,
-        [`robo-grid-screen`]: this.screen,
-        [`robo-grid--valign-${this.valign}`]: this.valign,
-        [`robo-grid--align-${this.align}`]: this.align,
-        [`robo-grid--embed`]: this.embed,
-        [`robo-grid--flex`]: this.flex,
-        [`robo-grid--grid`]: !this.flex,
-      };
-    },
-    style() {
-      let string = '';
 
-      if(this.columns) {
-        string += 'grid-template-columns:'+ this.columns +';'
+/* + methods for styles v-bind */
+
+let getColumns = () => {
+
+  if(props.columns) {
+    const columns = props.columns
+
+    if( !isNaN(parseFloat(columns)) && isFinite(columns) && (props.type !== 'flex' ) ) {
+      if(props.type === 'masonry') {
+        return columns
+      } else {
+        return `repeat(${columns}, 1fr)`
+      }
+    } else {
+      return columns
+    }
+    
+  } else {
+    if(props.minColumnWidth || props.maxColumnWidth) {
+      let min = 'auto'
+      let max = '1fr'
+
+      if(props.minColumnWidth) {
+        min = `min(100%, ${props.minColumnWidth})`
       }
 
-      if(this.rows) {
-        string += 'grid-template-rows:'+ this.rows +';'
+      if(props.maxColumnWidth) {
+        max = `${props.maxColumnWidth}`
+        // max = `min(100%, ${props.maxColumnWidth})`
       }
 
-      return string
+      return `repeat(auto-fit, minmax(${min}, ${max} ))`
     }
   }
 
+}
+
+let getRows = () => {
+  
+  if(props.rows) {
+    const columns = props.rows
+
+    if( !isNaN(parseFloat(columns)) && isFinite(columns) && (props.type !== 'flex' ) ) {
+      if(props.type === 'masonry') {
+        return columns
+      } else {
+        return `repeat(${columns}, 1fr)`
+      }
+    }
+    
+  } else {
+    if(props.minRowHeight || props.maxRowHeight) {
+      let min = 'auto'
+      let max = '1fr'
+
+      if(props.minRowHeight) {
+        min = `min(100%, ${props.minRowHeight})`
+      }
+
+      if(props.maxRowHeight) {
+        max = `${props.maxRowHeight}`
+        // max = `min(100%, ${props.maxRowHeight})`
+      }
+
+      return `repeat(auto-fit, minmax(${min}, ${max} ))`
+    }
+  }
+
+}
+
+let calcGap = gap => 
+  ({
+    'x0': 'none',
+    'x025': 'calc(var(--gap-layout) * 0.25)',
+    'x05': 'calc(var(--gap-layout) * 0.5)',
+    'x1': 'var(--gap-layout)',
+    'x2': 'calc(var(--gap-layout) * 2)',
+    'x4': 'calc(var(--gap-layout) * 4)'
+  }[gap] ?? 'none')
+
+
+let getDisplay = type => 
+({
+  'masonry': 'block',
+  'grid': 'grid',
+  'flex': 'flex'
+}[type] ?? 'none')
+
+
+let getGalign = align => {
+
+  if(props.type == 'flex') {
+    return ({
+      'start': 'flex-start',
+      'end': 'flex-end',
+      'center': 'center',
+      'stretch': 'space-between'
+    }[align] ?? 'none')
+  } else {
+    return align
+  }
+}
+
+let getValign = align => {
+
+  if(props.type == 'flex') {
+    return ({
+      'start': 'flex-start',
+      'end': 'flex-end',
+      'center': 'center',
+      'stretch': 'stretch'
+    }[align] ?? 'none')
+  } else {
+    return align
+  }
+}
+
+let masonryCalc = max => {
+  if(props.columns > max) {
+    return max
+  } else {
+    return props.columns
+  }
+}
+
+/* - methods for styles v-bind */
+
+/* + for styles v-bind */
+const columnsFromData = computed( () => {
+  if(props.rows) {
+    return 'auto'
+  } else {
+    return getColumns()
+  }
 })
+
+const rowsFromData = computed( () => {
+  if(props.columns) {
+    return 'auto'
+  } else {
+    return getRows()
+  }
+})
+
+const gapFromData = computed( () => {
+  return calcGap(props.gap)
+})
+
+const offsetFromData = computed( () => {
+  return calcGap(props.offset)
+})
+
+const displayFromData = computed( () => {
+  return getDisplay(props.type)
+})
+
+const galignFromData = computed( () => {
+  return getGalign(props.galign)
+})
+
+const valignFromData = computed( () => {
+  return getValign(props.valign)
+})
+/* - for styles v-bind */
+
+
+
+const classes = computed( () => {
+    return {
+      [`robo-grid`]: true,
+      [`robo-grid-type--${props.type}`]: props.type,
+      [`robo-grid-flexfluid`]: props.flexfluid,
+    }
+})
+
 </script>
+
+
+
+
+<style>
+  /* + TYPE MASONRY (waiting for grid-template-rows: masonry; so this is temporary solution )*/
+  .robo-grid-type--masonry > * {
+    --grid-masonry-gap: v-bind(gapFromData);
+
+    display: inline-block;
+    width: 100%;
+    margin-bottom: var(--grid-masonry-gap);
+    box-sizing: border-box;
+  }
+  /* - TYPE MASONRY */
+
+  .robo-grid-type--flex[class *= 'robo-grid-columns--'] > * {
+    flex-grow: 1;
+    flex-basis: calc( 100% / var(--grid-columns) - var(--gap)/2 * (var(--grid-columns) - 1));
+  }
+</style>
 
 <style scoped>
 
     .robo-grid {
-        --gap: var(--gap-layout);
-        --offset: var(--gap-layout);
+        --gap: v-bind(gapFromData);
+        --offset: v-bind(offsetFromData);
+        --grid-columns: v-bind(columnsFromData);
+        --grid-rows: v-bind(rowsFromData);
+        --grid-display: v-bind(displayFromData);
+        --grid-galign: v-bind(galignFromData);
+        --grid-valign: v-bind(valignFromData);
 
-        display: grid;
+        display: var(--grid-display);
         padding-top: var(--offset);
         padding-bottom: var(--offset);
-        gap: var(--gap);
+    }
+
+    .robo-grid-type--grid, .robo-grid-type--flex {
+      gap: var(--gap);
+    }
+
+    .robo-grid-type--grid {
+      grid-template-columns: var(--grid-columns);
+      grid-template-rows: var(--grid-rows);
+    }
+
+    .robo-grid-type--masonry {
+        column-count: var(--grid-columns);
+        column-gap: var(--gap);
     }
 
     .robo-grid:last-child { padding-bottom: 0; }
 
-    .robo-grid--embed {
-      padding-top: 0;
-      padding-bottom: 0;
+    .robo-grid-flexfluid {
+      flex-wrap: wrap;
     }
 
-    .robo-layout-section--dark .robo-grid {
-      padding-top: calc(var(--gap) * 0.25);
-      padding-bottom: calc(var(--gap) * 0.25);
+    /* + GALIGN (for type = grid & flex) */
+    .robo-grid-type--grid {
+      justify-items: var(--grid-galign);
+      align-items: var(--grid-valign);
     }
 
-    .robo-grid-columns-1 { grid-template-columns: repeat(1, 1fr); }
-    .robo-grid-columns-2 { grid-template-columns: repeat(2, 1fr); }
-    .robo-grid-columns-3 { grid-template-columns: repeat(3, 1fr); }
-    .robo-grid-columns-4 { grid-template-columns: repeat(4, 1fr); }
-    .robo-grid-columns-5 { grid-template-columns: repeat(5, 1fr); }
-    .robo-grid-columns-6 { grid-template-columns: repeat(6, 1fr); }
-    .robo-grid-columns-7 { grid-template-columns: repeat(7, 1fr); }
-    .robo-grid-columns-8 { grid-template-columns: repeat(8, 1fr); }
-    .robo-grid-columns-9 { grid-template-columns: repeat(9, 1fr); }
-    .robo-grid-columns-10 { grid-template-columns: repeat(10, 1fr); }
-    .robo-grid-columns-11 { grid-template-columns: repeat(11, 1fr); }
-    .robo-grid-columns-12 { grid-template-columns: repeat(12, 1fr); }
-
-    .robo-grid-gap-x0 { --gap: 0; }
-    .robo-grid-gap-x05 { --gap: calc(var(--gap-layout) * 0.5); }
-    .robo-grid-gap-x1 { --gap: var(--gap-layout); }
-    .robo-grid-gap-x2 { --gap: calc( var(--gap-layout) * 2); }
-    .robo-grid-gap-x4 { --gap: calc( var(--gap-layout) * 4); }
-
-    .robo-grid-offset-x0 { --offset: 0; }
-    .robo-grid-offset-x05 { --offset: calc(var(--gap-layout) * 0.5); }
-    .robo-grid-offset-x1 { --offset: var(--gap-layout); }
-    .robo-grid-offset-x2 { --offset: calc( var(--gap-layout) * 2); }
-    .robo-grid-offset-x4 { --offset: calc( var(--gap-layout) * 4); }
-
-    .robo-grid-template-columns--left-center {
-      grid-template-columns: var(--aside-size-left) auto;
+    .robo-grid-type--flex {
+      align-items: var(--grid-valign);
+      justify-content: var(--grid-galign);
     }
+    /* - GALIGN (for type = grid & flex) */
 
-    .robo-grid-template-columns--left-center-right {
-      grid-template-columns: var(--aside-size-left) auto var(--aside-size-right);
+
+    @media screen and (max-width: 1600px) {
+       .robo-grid-type--masonry {
+        --grid-columns: v-bind(masonryCalc(3))
+       }
     }
-
-    .robo-grid-screen {
-        min-height: 100vh;
-    }
-
-    @media screen and (max-width: 1200px) {
-      .robo-grid-columns-2:not(.robo-grid--mobile-none), 
-      .robo-grid-columns-3:not(.robo-grid--mobile-none), 
-      .robo-grid-columns-4:not(.robo-grid--mobile-none), 
-      .robo-grid-columns-5:not(.robo-grid--mobile-none), 
-      .robo-grid-columns-6:not(.robo-grid--mobile-none), 
-      .robo-grid-columns-7:not(.robo-grid--mobile-none), 
-      .robo-grid-columns-8:not(.robo-grid--mobile-none), 
-      .robo-grid-columns-9:not(.robo-grid--mobile-none), 
-      .robo-grid-columns-10:not(.robo-grid--mobile-none), 
-      .robo-grid-columns-11:not(.robo-grid--mobile-none), 
-      .robo-grid-columns-12:not(.robo-grid--mobile-none) 
-      { grid-template-columns: repeat(1, 1fr) !important; }
-    }
-
-    @media screen and (max-width: 1000px) {
-        .robo-grid--mobile-transfer {
-          grid-template-columns: 1fr !important;
-        }
-
-        .robo-grid--flex.robo-grid--mobile-transfer {
-          /* flex-wrap: wrap */
-          display: grid;
-          grid-template-columns: 1fr;
-        }
-
-        .robo-grid-template-columns--left-center-right.robo-grid--mobile-transfer {
-          grid-template-columns: auto;
-        }
-
-        .robo-grid-template-columns--left-center-right.robo-grid--mobile-none {
-          grid-template-columns: min-content auto min-content;
-        }
+    
+    @media screen and (max-width: 1100px) {
+       .robo-grid-type--masonry {
+        --grid-columns: v-bind(masonryCalc(2))
+       }
     }
 
     @media screen and (max-width: 700px) {
-      .robo-grid {
-        --gap: calc(var(--gap-layout) * 0.5);
-      }
-
-      .robo-grid-gap-x0 { --gap: 0; }
-      .robo-grid-gap-x05 { --gap: calc(var(--gap-layout) * 0.25); }
-      .robo-grid-gap-x1 { --gap: calc(var(--gap-layout) * 0.5); }
-      .robo-grid-gap-x2 { --gap: var(--gap-layout); }
-      .robo-grid-gap-x4 { --gap: calc( var(--gap-layout) * 2); }
-
-      .robo-grid-offset-x0 { --offset: 0; }
-      .robo-grid-offset-x05 { --offset: calc(var(--gap-layout) * 0.25); }
-      .robo-grid-offset-x1 { --offset: calc(var(--gap-layout) * 0.5); }
-      .robo-grid-offset-x2 { --offset: var(--gap-layout); }
-      .robo-grid-offset-x4 { --offset: calc( var(--gap-layout) * 2); }
-
-      .robo-grid-template-columns--left-center.robo-grid--mobile-transfer {
-        grid-template-columns: auto;
-      }
-
-      .robo-grid-template-columns--left-center.robo-grid--mobile-no-cols {
-        grid-template-columns: max-content auto;
-      }
-
-      .robo-grid-template-columns--left-center-right.robo-grid--mobile-no-cols {
-        grid-template-columns: max-content auto max-content;
-      }
+       .robo-grid-type--masonry {
+        --grid-columns: v-bind(masonryCalc(1))
+       }
     }
 
-    /* + VALIGN */
-    .robo-grid--flex .robo-grid--valign-top { align-items: flex-start; }
-    .robo-grid--grid .robo-grid--valign-top { align-items: start; }
-
-    .robo-grid--valign-center { align-items: center; }
-
-    .robo-grid--flex .robo-grid--valign-bottom { align-items: flex-end; }
-    .robo-grid--grid .robo-grid--valign-bottom { align-items: end; }
-
-    .robo-grid--valign-stretch { align-items: stretch; }
-    /* - VALIGN */
-
-    /* + ALIGN */
-    .robo-grid--flex .robo-grid--align-left { justify-content: flex-start; }
-    .robo-grid--grid .robo-grid--align-left { justify-content: start; }
-
-    .robo-grid--align-center { justify-content: center; }
-
-    .robo-grid--flex .robo-grid--align-right { justify-content: flex-end; }
-    .robo-grid--grid .robo-grid--align-right { justify-content: end; }
-
-    .robo-grid--grid .robo-grid--align-stretch { justify-content: stretch; }
-
-    .robo-grid--align-space-between { justify-content: space-between; }
-    /* - ALIGN */
-
-
-    .robo-grid--align-fit-content.robo-grid-columns-1 { grid-template-columns: repeat(1, max-content); }
-    .robo-grid--align-fit-content.robo-grid-columns-2 { grid-template-columns: repeat(2, max-content); }
-    .robo-grid--align-fit-content.robo-grid-columns-3 { grid-template-columns: repeat(3, max-content); }
-    .robo-grid--align-fit-content.robo-grid-columns-4 { grid-template-columns: repeat(4, max-content); }
-    .robo-grid--align-fit-content.robo-grid-columns-5 { grid-template-columns: repeat(5, max-content); }
-    .robo-grid--align-fit-content.robo-grid-columns-6 { grid-template-columns: repeat(6, max-content); }
-    .robo-grid--align-fit-content.robo-grid-columns-7 { grid-template-columns: repeat(7, max-content); }
-    .robo-grid--align-fit-content.robo-grid-columns-8 { grid-template-columns: repeat(8, max-content); }
-    .robo-grid--align-fit-content.robo-grid-columns-9 { grid-template-columns: repeat(9, max-content); }
-    .robo-grid--align-fit-content.robo-grid-columns-10 { grid-template-columns: repeat(10, max-content); }
-    .robo-grid--align-fit-content.robo-grid-columns-11 { grid-template-columns: repeat(11, max-content); }
-    .robo-grid--align-fit-content.robo-grid-columns-12 { grid-template-columns: repeat(12, max-content); }
-
-
-    .robo-grid--flex {
-      display: flex;
-    }
 </style>

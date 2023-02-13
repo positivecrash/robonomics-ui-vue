@@ -1,49 +1,18 @@
 <template>
-    <div :class="classList">
+    <div class="robo-layout">
         <slot/>
     </div>
 </template>
 
 <script>
-import { defineComponent } from 'vue'
-
-export default defineComponent({
-  name: 'RoboLayout',
-
-   props: {
-    screen: {
-      type: Boolean,
-      default: false
-    },
-    footer: {
-      type: Boolean,
-      default: false
-    }
-  },
-
-  computed: {
-    classList() {
-      return {
-        [`robo-layout`]: true,
-        [`robo-layout-screen`]: this.screen,
-        [`robo-layout-footer`]: this.footer
-      };
-    },
-  }
-
-})
+  export default { name: 'RoboLayout' }
 </script>
 
 <style scoped>
     .robo-layout {
-        position: relative;
-    }
-
-    .robo-layout-screen {
-        min-height: 100vh;
-    }
-
-    .robo-layout-footer {
-        padding-bottom: calc(var(--space) * 6)
+      display: grid;
+      grid-template-rows: auto 1fr;
+      min-height: 100svh;
+      position: relative;
     }
 </style>

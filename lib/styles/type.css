@@ -26,11 +26,11 @@ body *::selection {
 }
 
 a {
-    color: var(--color-link);
+    color: var(--robo-color-link);
     text-decoration: none;
     transition: all 0.3s ease-in-out;
 }
 
 a:hover {
-    color: var(--color-link-hover)
+    color: var(--robo-color-link-hover)
 }

@@ -38,24 +38,20 @@
           v-if="inputType === 'password'"
           @click="showPassword"
           class="showPasswordButton"
-
           clean
-          :iconLeft="showPasswordPressed ? 'eye-slash' : 'eye'"
-
           role="switch"
           :aria-pressed="showPasswordPressed"
           :aria-label="showPasswordPressed ? 'Hide' : 'Show'"
-        />
-
-        <robo-details 
-          v-if="tip" 
-          
-          summaryButton
-          summaryButtonSize = 'small'
-          summaryText = 'i'
-          tooltip
-          tooltipPlacement = 'bottom-end'
         >
+          <robo-icon v-if="showPasswordPressed" icon="eye-slash" />
+          <robo-icon v-else icon="eye" />
+        </robo-button>
+
+        <robo-details v-if="tip" type="tooltip" tooltip-placement='bottom-end'>
+          <template #summary>
+            <robo-button size="small">i</robo-button>
+          </template>
+          
           <div v-html="tip" />
         </robo-details>
 
@@ -78,6 +74,10 @@ export default defineComponent({
     disabled: {
         type: Boolean,
         default: false
+    },
+    error: {
+      type: Boolean,
+      default: false
     },
     label: {
         type: String,
@@ -128,6 +128,7 @@ export default defineComponent({
         [`robo-input-offset-${this.offset}`]: this.offset,
         [`robo-input-block`]: this.block,
         [`robo-input--type-${this.inputType}`]: this.inputType,
+        [`robo-input--error`]: this.error,
       };
     },
 
@@ -174,22 +175,18 @@ export default defineComponent({
 
 <style scoped>
     .robo-input {
-        --background: var(--color-light);
-        --border: var(--color-dark);
-        --border-active: var(--color-blue);
-        --color: var(--color-dark);
-        --label: var(--color-dark);
-        --label-active: var(--color-blue);
+        --background: var(--robo-color-input);
+        --border: var(--robo-color-inputborder);
+        --color: var(--robo-color-inputcolor);
+        --label: var(--robo-color-inputcolor);
+        --border-active: var(--robo-color-inputcoloractive);
+        --label-active: var(--robo-color-inputcoloractive);
 
         position: relative;
     }
 
     .robo-input-block {
       display: block;
-    }
-
-    .robo-input:not(:last-child) {
-      margin-bottom: var(--offset);
     }
 
     .robo-input input{
@@ -239,13 +236,10 @@ export default defineComponent({
 
     /* + disabled */
 
-    /* .robo-input--disabled .robo-input-label {
-        color: var(--color-gray)
-    } */
-
-    .robo-input--disabled input {
-        border-color: var(--color-gray);
-        color: var(--color-dark);
+    .robo-input--disabled {
+        --border: var(--color-gray);
+        --color: var(--color-dark);
+        --label: var(--color-dark);
         opacity: 0.6;
     }
     /* - disabled */
@@ -275,6 +269,11 @@ export default defineComponent({
     .robo-input-offset-x2 { --offset: var(--gap-layout); }
     .robo-input-offset-x4 { --offset: calc( var(--gap-layout) * 2); }
     /* - Offset */
+
+    .robo-input--error {
+      --border: var(--robo-color-red);
+      --color: var(--robo-color-red);
+    }
 </style>
 
 <style>

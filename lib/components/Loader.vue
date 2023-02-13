@@ -70,19 +70,16 @@ export default defineComponent({
 
 <style scoped>
   .robo-loader {
-    --loader-color: var(--color-text);
+    --loader-color: currentColor;
 
     display: inline-block;
     vertical-align: middle;
-    width: calc(var(--space) * 1.5);
+    width: 23px;
+    max-height: 100%;
+    color: var(--loader-color);
   }
 
-  .robo-loader--stroke {
-    stroke: var(--loader-color);
-    fill: none;
-  }
-
-  .robo-loader--fill {
+  .robo-loader svg path {
     fill: var(--loader-color);
     stroke: none;
   }

@@ -28,6 +28,14 @@ export default defineComponent({
   name: 'RoboText',
 
   props: {
+    align: {
+      type: String,
+      default: null,
+      validator(value) {
+          return ['left', 'center', 'right', 'hyphen'].includes(value)
+      }
+    },
+
     break: {
         type: Boolean,
         default: false
@@ -40,11 +48,18 @@ export default defineComponent({
         type: Boolean,
         default: false
     },
+    color: {
+      type: String,
+      default: null,
+      validator: function (value) {
+        return ['ok', 'error', 'link', 'attention'].indexOf(value) !== -1;
+      }
+    },
     highlight: {
       type: String,
       default: null,
       validator: function (value) {
-        return ['success', 'error', 'link'].indexOf(value) !== -1;
+        return ['ok', 'error', 'link', 'attention'].indexOf(value) !== -1;
       }
     },
     highlightLabel: {
@@ -76,16 +91,27 @@ export default defineComponent({
     },
     offset: {
         type: String,
-        default: 'x0',
+        default: null,
         validator(value) {
-            return ['x0', 'x05', 'x1', 'x2', 'x4'].includes(value)
+            return ['x0', 'x025', 'x05', 'x1', 'x2', 'x4'].includes(value)
         }
+    },
+    paragraphs: {
+      type: Boolean,
+      default: false
     },
     size: {
       type: String,
       default: null,
       validator: function (value) {
         return ['tiny', 'small', 'medium', 'large'].indexOf(value) !== -1;
+      }
+    },
+    title: {
+      type: String,
+      default: null,
+      validator(value) {
+          return ['1', '2', '3', '4', '5'].includes(value)
       }
     },
     uppercase: {
@@ -110,22 +136,38 @@ export default defineComponent({
   emits: ['onClose'],
 
   computed: {
+    calcOffset() {
+      if(this.title && !this.offset) {
+        return 'x1'
+      } else {
+        if(this.offset) { 
+          return this.offset;
+        } else {
+          return 'x0'
+        }
+      }
+    },
+
     classList() {
       return {
         [`robo-text`]: true,
+        [`robo-text--align-${this.align}`]: this.align,
         [`robo-text--${this.size}`]: this.size,
         [`robo-text--break`]: this.break,
         [`robo-text--style-${this.weight}`]: this.weight,
         [`robo-text--inline`]: this.inline,
         [`robo-text--gap`]: this.gap,
+        [`robo-text--color-${this.color}`]: this.color,
         [`robo-text--highlight-${this.highlight}`]: this.highlight,
         [`robo-text--highlight-label-${this.highlightLabel}`]: this.highlightLabel,
         [`robo-text--highlight-label-closable`]: this.highlightLabelClose,
         [`robo-text--hyphen`]: this.hyphen,
-        [`robo-text--offset-${this.offset}`]: this.offset,
+        [`robo-text--offset-${this.calcOffset}`]: true,
         [`robo-text--nowrap`]: this.nowrap,
         [`open`]: this.highlightLabelCloseReopen,
-        [`robo-text--uppercase`]: this.uppercase
+        [`robo-text--uppercase`]: this.uppercase,
+        [`robo-text--title-${this.title}`]: this.title,
+        [`robo-text--paragraphs`]: this.paragraphs,
       };
     },
   },
@@ -136,11 +178,9 @@ export default defineComponent({
       this.$refs.text.classList.add('hide')
       this.$emit('onClose')
     },
-
     clipboard() {
         navigator.clipboard.writeText(this.$refs.text.innerText)
         this.clipboardCopied = true;
-
         const o = this
         setTimeout(function(){
             o.clipboardCopied = false;
@@ -148,8 +188,15 @@ export default defineComponent({
     },
   }
 
+
 })
 </script>
+
+<style>
+  .robo-text--paragraphs p:not(:last-child) {
+    margin-bottom: var(--robo-space);
+  }
+</style>
 
 <style scoped>
     .robo-text {
@@ -157,6 +204,7 @@ export default defineComponent({
     }
 
     .robo-text--offset-x0 { --offset: 0; }
+    .robo-text--offset-x025 { --offset: calc(var(--gap-layout) * 0.25); }
     .robo-text--offset-x05 { --offset: calc(var(--gap-layout) * 0.5); }
     .robo-text--offset-x1 { --offset: var(--gap-layout); }
     .robo-text--offset-x2 { --offset: calc( var(--gap-layout) * 2); }
@@ -170,17 +218,25 @@ export default defineComponent({
         margin-bottom: var(--space);
     }
 
-    .robo-text--hyphen {
+
+    /* + align */
+    .robo-text--align-left { text-align: left; }
+    .robo-text--align-center { text-align: center; }
+    .robo-text--align-right { text-align: right; }
+
+    .robo-text--align-hyphen, .robo-text--hyphen 
+    {
       text-align: justify !important;
       -webkit-hyphens: auto;
       -moz-hyphens: auto;
       -ms-hyphens: auto;
       hyphens: auto;
     }
+    /* - align */
 
     /* + SIZE */
     .robo-text--tiny {
-        font-size: calc(var(--font-size) * 0.6);
+        font-size: calc(var(--font-size) * 0.7);
     }
 
     .robo-text--small {
@@ -221,7 +277,13 @@ export default defineComponent({
 
 
     /* + HIGHLIGHT */
-    .robo-text--highlight-success {
+    .robo-text--highlight-attention {
+      --input-text-color: var(--color-orange);
+      --color-text: var(--color-orange);
+      color: var(--color-orange)
+    }
+
+    .robo-text--highlight-ok {
       --input-text-color: var(--color-green);
       --color-text: var(--color-green);
       color: var(--color-green)
@@ -270,6 +332,8 @@ export default defineComponent({
         to {
             opacity: 0;
             visibility: hidden;
+            height: 0;
+            padding: 0;
         }
     }
 
@@ -277,6 +341,7 @@ export default defineComponent({
         to {
             opacity: 1;
             visibility: visible;
+            height: auto;
         }
     }
 
@@ -304,6 +369,17 @@ export default defineComponent({
     .robo-text--break { word-break: break-all; }
     .robo-text--uppercase { text-transform: uppercase; }
     .robo-text--nowrap { white-space: nowrap; }
+
+    *[class *= 'robo-text--title-'] {
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .robo-text--title-5 { font-size: calc(var(--robo-fontsize)); }
+    .robo-text--title-4 { font-size: calc(var(--robo-fontsize) * 1.1); }
+    .robo-text--title-3 { font-size: calc(var(--robo-fontsize) * 1.2); }
+    .robo-text--title-2 { font-size: calc(var(--robo-fontsize) * 1.3); }
+    .robo-text--title-1 { font-size: calc(var(--robo-fontsize) * 1.4); }
 </style>
 
 <style>

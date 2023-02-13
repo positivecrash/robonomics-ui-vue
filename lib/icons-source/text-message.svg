@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50" height="50" viewBox="0 0 50 50">
+  <defs>
+    <clipPath id="clip-text-message">
+      <rect width="50" height="50"/>
+    </clipPath>
+  </defs>
+  <g id="text-message" clip-path="url(#clip-text-message)">
+    <rect width="50" height="50" fill="#fff"/>
+    <path id="Контур_36" data-name="Контур 36" d="M43.753,0H6.253A6.256,6.256,0,0,0,0,6.25V34.375a6.256,6.256,0,0,0,6.25,6.25h9.375v7.812a1.555,1.555,0,0,0,.86,1.4,1.578,1.578,0,0,0,1.64-.147l12.08-9.062H43.753A6.255,6.255,0,0,0,50,34.375V6.25A6.255,6.255,0,0,0,43.753,0ZM31.541,15.477h-5V29.142H23.4V15.477H18.466V12.926H31.541Z" transform="translate(-0.003 1)"/>
+  </g>
+</svg>

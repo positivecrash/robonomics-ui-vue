@@ -11,9 +11,24 @@ export default defineComponent({
   name: 'RoboLayoutSection',
 
   props: {
-    dark: {
+    selfcenter: {
+      type: Boolean,
+      default: true
+    },
+    vcenter: {
       type: Boolean,
       default: false
+    },
+    gcenter: {
+      type: Boolean,
+      default: false
+    },
+    width: {
+      type: String,
+      default: 'wide',
+      validator(value) {
+        return ['wide', 'narrow'].includes(value)
+      }
     }
   },
 
@@ -21,7 +36,10 @@ export default defineComponent({
     classList() {
       return {
         [`robo-layout-section`]: true,
-        [`robo-layout-section--dark`]: this.dark
+        [`robo-layout-section--vcenter`]: this.vcenter,
+        [`robo-layout-section--gcenter`]: this.gcenter,
+        [`robo-layout-section--${this.width}`]: this.width,
+        [`robo-layout-section--selfcenter`]: this.selfcenter,
       };
     },
   }
@@ -31,18 +49,27 @@ export default defineComponent({
 
 <style scoped>
     .robo-layout-section {
+        --section-width: var(--layout-maxwidth);
         position: relative;
-        max-width: var(--layout-maxwidth);
-        padding-left: var(--gap-layout);
-        padding-right: var(--gap-layout);
+        max-width: var(--section-width);
+        width: 100%;
+        padding: calc(var(--robo-layout-padding) * 2) var(--robo-layout-padding);
     }
 
-    .robo-layout-section--dark {
-      background-color: var(--color-dark);
+    .robo-layout-section--vcenter {
+      align-self: center;
+    }
 
-      --color-text: var(--color-light);
-      --color-link: var(--color-green);
-      --color-link-hover: var(--color-light);
+    .robo-layout-section--gcenter {
+      justify-self: center;
+      text-align: center;
     }
     
+    .robo-layout-section--narrow {
+      --section-width: 600px;
+    }
+
+    .robo-layout-section--selfcenter {
+      margin: 0 auto
+    }
 </style>

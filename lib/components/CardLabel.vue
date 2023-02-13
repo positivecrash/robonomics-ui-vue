@@ -12,10 +12,23 @@ import { defineComponent } from 'vue'
 export default defineComponent({
   name: 'RoboCardLabel',
 
+  props: {
+    block: {
+      type: Boolean,
+      default: false
+    },
+    inside: {
+      type: Boolean,
+      default: false
+    }
+  },
+
   computed: {
     classList() {
       return {
-        [`robo-card-label`]: true
+        [`robo-card-label`]: true,
+        [`robo-card-label-block`]: this.block,
+        [`robo-card-label-inside`]: this.inside,
       };
     }
   }
@@ -45,5 +58,18 @@ export default defineComponent({
   .robo-card--outlined .robo-card-label {
     border: 1px solid var(--card-border-color);
     background-color: var(--color-card-background);
+  }
+
+  .robo-card-label-block {
+    right: calc(var(--card-label-height) * 0.5 * (-1));
+  }
+
+  .robo-card .robo-card-label-inside {
+    top: 0;
+    left: 0;
+  }
+
+  .robo-card .robo-card-label-inside.robo-card-label-block {
+    right: 0;
   }
 </style>

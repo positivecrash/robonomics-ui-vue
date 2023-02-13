@@ -1,0 +1,1 @@
+<template><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 50 50"><g id="a" class="a"><path d="M44.846,51.846a3.846,3.846,0,0,0-7.692,0V69.154H19.846a3.846,3.846,0,1,0,0,7.692H37.154V94.154a3.846,3.846,0,1,0,7.692,0V76.846H62.154a3.846,3.846,0,0,0,0-7.692H44.846Z" transform="translate(-16 -48)"/></g></svg></template>

@@ -1,12 +1,13 @@
 :root {
 	--font-size: 1.2rem;
     --font-family: 'Roboto Mono', Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
+    --font-family-text: "Roboto",-apple-system,BlinkMacSystemFont,avenir next,avenir,segoe ui,helvetica neue,helvetica,Ubuntu,roboto,noto,arial,sans-serif;
 	
 	--space: 1rem;
 
-	--color-dark: #000000;
-	--color-light: #ffffff;
-	--color-blue: #3333CE;
+	--color-dark: hsl(0, 0%, 10%); /* deprecated, use --robo-color-dark */
+	--color-light: #ffffff; /* deprecated, use --robo-color-light */
+	--color-blue: #368EFF;
 	--color-blue-light: #9898fa;
 	/* --color-bluegreen-light: #8fe9ee; */
 	--color-bluegreen-light: #dcfffc;
@@ -16,10 +17,15 @@
 	--color-gray: #AEADB4;
 	--color-gray-light: #EBEAF0;
 
+	--color-card-background-light: #ffffff;
+	--color-card-background-light-70: hsla(0, 0%, 100%, 70%);
+	--color-card-background-dark: #242424;
+	--color-card-background-dark-70: hsla(0, 0%, 14%, 70%);
+	--color-card-background-lightblue: var(--color-bluegreen-light);
+
 	--color-text: var(--color-dark);
 	--color-link: var(--color-blue);
 	--color-link-hover: var(--color-green);
-	--color-card-background: var(--color-light);
 	--color-body: var(--color-gray-light);
 
 	--input-bg: var(--color-card-background);
@@ -29,7 +35,6 @@
 	--input-border-width: 1px;
 	--input-padding-g: var(--space);
 	--input-padding-v: var(--space);
-	--select-tog-size: 1rem;
 
 	--card-padding: calc(var(--space) * 2);
 
@@ -48,7 +53,9 @@
 	--gap-layout: calc( var(--space) * 2);
 	--gap-text: calc( var(--space) * 2);
 	
-	--border-radius: 6px;
+	--border-radius: 0px;
+
+	color-scheme: light dark;
 }
 
 html, body, #app {
@@ -56,10 +63,23 @@ html, body, #app {
     position: relative;
 }
 
-
 body {
 	background-color: var(--color-body);
 }
+
+@media (prefers-color-scheme: dark){
+	:root {
+		--color-dark: #ffffff;
+		--color-light: #000000;
+		--color-blue: #368EFF;
+		--color-gray-light: #131313;
+
+		--color-card-background-light: #242424;
+		--color-card-background-dark: #ffffff;
+	}
+}
+
+
 
 .robo-overlay {
 	position: fixed;
@@ -67,26 +87,65 @@ body {
 	left: 0;
 	right: 0;
 	bottom: 0;
-	z-index: 1;
+	z-index: 1000;
 	background: rgba(0, 0, 0, 0.4);
 	backdrop-filter: blur(2px);
 }
 
-.robo-formatview-address {
-	word-wrap: break-word;
-	white-space: nowrap;
-	overflow-x: scroll;
-	-ms-overflow-style: none;  /* hide scrollbar IE and Edge */
-  	scrollbar-width: none;  /* hide scrollbar Firefox */
+
+/* for outside rewriting */
+:root {
+	--robo-space: 1rem;
+	--robo-fontsize: var(--robo-space);
+	--robo-layout-padding: calc(var(--robo-space) * 2);
+
+	--robo-color-dark: hsl(0, 0%, 10%);
+	--robo-color-dark-90: hsl(0, 0%, 10%);
+	--robo-color-dark-85: hsl(0, 0%, 15%);
+	--robo-color-dark-80: hsl(0, 0%, 20%);
+
+	--robo-color-light: hsl(100, 100%, 100%);
+	--robo-color-light-100-4: hsla(100, 100%, 100%, 40%);
+	--robo-color-light-100-2: hsla(100, 100%, 100%, 20%);
+	--robo-color-light-95: hsl(100, 0%, 95%);
+	--robo-color-light-90: hsl(100, 0%, 90%);
+	--robo-color-light-80: hsl(100, 0%, 80%);
+
+	--robo-color-blue: hsl(214, 98%, 50%);
+	--robo-color-blue-120: hsl(214, 98%, 30%);
+	--robo-color-blue-110: hsl(214, 98%, 40%);
+	--robo-color-blue-105: hsl(214, 98%, 45%);
+	--robo-color-blue-90: hsl(214, 98%, 60%);
+	--robo-color-blue-80: hsl(214, 98%, 70%);
+	--robo-color-blue-80-5: hsla(214, 98%, 70%, 0.5);
+
+	--robo-color-green: hsl(83, 100%, 38%);
+	--robo-color-green-120: hsl(83, 100%, 18%);
+	--robo-color-green-110: hsl(83, 100%, 28%);
+	--robo-color-green-105: hsl(83, 100%, 33%);
+
+	--robo-color-orange: hsl(39, 100%, 50%);
+
+	--robo-color-red: hsl(0, 61%, 50%);
+
+	--robo-color-link: var(--robo-color-blue);
+	--robo-color-link-hover: var(--robo-color-blue-120);
+
+	--robo-input-padding: calc(var(--robo-space)*0.5);
+	--robo-input-fontsize: var(--robo-fontsize);
+
+	--robo-color-input: var(--robo-color-light);
+	--robo-color-inputcolor: var(--robo-color-dark-80);
+	--robo-color-inputborder: var(--robo-color-dark-80);
+	--robo-color-inputcoloractive: var(--robo-color-blue);
 }
 
-/* Hide scrollbar for Chrome, Safari and Opera */
-.robo-formatview-address::-webkit-scrollbar {
-	display: none;
-}
+@media (prefers-color-scheme: dark){
+	:root {
+		--robo-color-blue: var(--robo-color-blue-90);
 
-/* highlight focus for all elements */
-*:focus {
-	outline-color: transparent;
-	box-shadow: 0 0 0 2px var(--color-blue-light);
+		--robo-color-input: var(--robo-color-dark-80);
+		--robo-color-inputcolor: var(--robo-color-light);
+		--robo-color-inputborder: var(--robo-color-light);
+	}
 }

@@ -1,45 +1,64 @@
 <template>
     <robo-select
-        :options="chainsNames"
-        :values = "chainPrefixes"
-        v-model="chainSelected"
-        clean
+        :values="Object.values(chains)"
+        :options="Object.keys(chains)"
+        :size="props.size"
+        v-model="activeChain"
+        :clean="clean"
     />
 </template>
 
 <script>
-import { defineComponent } from 'vue'
-import chains from '../polkadotChains'
+  export default { name: 'RoboAccountPolkadotChain' }
+</script>
 
-export default defineComponent({
-  name: 'RoboAccountPolkadotChain',
+<script setup>
+  import { defineProps, ref, onMounted, watch, computed } from 'vue'
 
-  data() {
-      return {
-          chains: chains,
-          chainSelected: this.$store.getters['robonomicsUIvue/polkadot'].chain ? this.$store.getters['robonomicsUIvue/polkadot'].chain : '32'
-      }
-  },
+  import { useStore } from 'vuex'
+  const store = useStore()
+  const polkadotstore = computed( () => {
+    return store.state.robonomicsUIvue.polkadot
+  })
 
-  computed: {
-      chainsNames() {
-        let chains = []
-        //   return Object.keys(this.chains)
-        Object.keys(this.chains).forEach((key) => {
-            chains.push(`${key} chain`)
-        })
+  import chains from '../polkadot/chains'
 
-        return chains
-      },
-      chainPrefixes(){
-          return Object.values(this.chains)
-      }
-  },
+  const props = defineProps({
+    chain: {
+      type: String,
+      default: null
+    },
+    clean: {
+      type: Boolean,
+      default: false
+    },
+    size: {
+    type: String,
+    default: 'small',
+        validator(value) {
+        return ['small', 'medium', 'large'].includes(value)
+        }
+    },
+  })
 
-  watch: {
-      "chainSelected": function(value) {
-          this.$store.commit("robonomicsUIvue/setPolkadotChain", value)
-      }
+  let getActiveChain = () => {
+
+    if( props.chain && Object.values(chains).indexOf(props.chain) > -1 ) {
+      return props.chain
+    } else {
+      // return store.getters['polkadot/chain'] ?? '32'
+      return polkadotstore.chain ?? '32'
+    }
+
   }
-})
+
+  let activeChain = ref(getActiveChain())
+
+  onMounted(async () => {
+    watch(activeChain, async (value) => {
+        store.commit('polkadot/setChain', value)
+    })
+  })
+
+  
 </script>

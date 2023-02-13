@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50" height="50" viewBox="0 0 50 50">
+  <defs>
+    <clipPath id="clip-camera">
+      <rect width="50" height="50"/>
+    </clipPath>
+  </defs>
+  <g id="camera" clip-path="url(#clip-camera)">
+    <rect width="50" height="50" fill="#fff"/>
+    <path id="Контур_32" data-name="Контур 32" d="M0,69.556A5.561,5.561,0,0,1,5.556,64H27.778a5.561,5.561,0,0,1,5.556,5.556V91.778a5.561,5.561,0,0,1-5.556,5.556H5.556A5.561,5.561,0,0,1,0,91.778Zm48.533-2.448A2.78,2.78,0,0,1,50,69.556V91.778a2.779,2.779,0,0,1-4.323,2.309l-8.333-5.556-1.233-.825V73.627l1.233-.825,8.333-5.556a2.788,2.788,0,0,1,2.856-.139Z" transform="translate(0 -56)"/>
+  </g>
+</svg>

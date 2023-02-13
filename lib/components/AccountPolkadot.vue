@@ -1,157 +1,103 @@
 <template>
 
-  <robo-grid 
-    flex
-    offset="x0"
-    gap="x05"
-    :class="classes"
-  >
+  <robo-details type="tooltip" toggler :class="classes" :closeOutOfFocus="false">
 
-    <template v-if="!address && !isLocalAddress">
-      <robo-account-polkadot-connect v-if="!extension" />
-      <span v-if="extension">Turn on account in your extension</span>
-    </template>
-    <template v-else>
-        <robo-grid  
-          flex
-          offset="x0"
-          gap="x0"
-        >
-          <img v-if="extensionShowIcon && !isLocalAddress" :src="extensionPic" class="extensionLogo" />
+    <template #summary>
 
-          <robo-select
-              v-if="selectable && !isLocalAddress"
-              :values="addressList"
-              :options="addressListFormatted"
-              v-model="address"
-              clean
-          />
-          <span 
-            v-if="!selectable && !addressLocalAllowEdit" 
-            v-html="short ? shortAddress(address) : address" 
-            class="robo-formatview-address"
-          />
-          <robo-input 
-            v-if="isLocalAddress && addressLocalAllowEdit"
-            v-bind="$attrs"
-            v-model="vmodelAddress"
-            :block="inline ? true : false"
-            type="text"
-            :tip="inputTip ? inputTip : null"
-            :label="inputLabel ? inputLabel : null"
-          />
+      <robo-grid v-if="activeAddress" type="flex" offset="0" gap="x025" galign="start">
+        <img v-if="extensionShowIcon && activeExtensionImg" :src="activeExtensionImg" class="robo-account-polkadot-extensionLogo" />
+        <span v-if="activeAccount" v-html="accountTitle" class="robo-account-polkadot-title" />
+        <span v-else>{{shortenAddress(activeAddress)}}</span>
+      </robo-grid>
 
-        </robo-grid>
-
-        <robo-button 
-          v-if="!infoShow && copy" 
-          @click="clipboard"
-          clean 
-          :iconLeft="clipboardCopied ? 'check' : 'copy'"
-        />
-
-        <robo-details 
-            v-if="error === 'type'"
-            summaryIcon='circle-exclamation'
-            summaryText=''
-            summaryButtonSize='big'
-            summaryButtonType="alarm"
-            tooltip
-        >
-        Address should be {{addressType}} type
-        </robo-details>
-
-        <robo-details 
-            v-if="infoShow && !isLocalAddress"
-            summaryIcon='circle-user'
-            summaryText=''
-            summaryButtonSize='big'
-            tooltip
-        >
- 
-            <div v-if="accountCurrent">
-              <robo-grid  
-              class="robo-account-info-name robo-account-info-item"
-              flex
-              offset="x05"
-              gap="x05">
-
-                <img 
-                  v-if="accountCurrent.avatar && accountCurrent.avatar != ''"
-                  :src="accountCurrent.avatar" 
-                />
-
-                <b>{{accountCurrent.name}}</b>
-              </robo-grid>
-              
-              <robo-section offset="x05" class="robo-account-info-item">
-                <div class="robo-formatview-address">
-                  {{accountCurrent.address}}
-                </div>
-                <div>
-                  <robo-button 
-                    @click="clipboard"
-                    clean 
-                    :iconLeft="clipboardCopied ? 'check' : 'copy'"
-                    size="small"
-                    type="ok"
-                  >Copy to clipboard</robo-button>
-                </div>
-              </robo-section>
-
-              <robo-section offset="x05" class="robo-account-info-item">
-                <span>type: </span>
-                <span>{{accountCurrent.type}}</span>
-              </robo-section>
-            </div>
-       
-        </robo-details>
+      <template v-if="!activeAddress">
+        Connect <template v-if="type">{{type}}</template> account
+      </template>
 
     </template>
 
-    <robo-account-polkadot-connect
-      v-if="extensionAllowShift && extension && !isLocalAddress"
-      summaryIcon='right-left'
-      summaryText=''
-      popup
-    />
+    <section v-if="(activeExtension || activeAddress)" class="robo-account-polkadot-info-section">
 
-  </robo-grid>
+      <robo-status type="warning" textRight="Account not found" v-if="activeExtension && !activeAddress" />
+      
+      <template v-if="activeAddress">
+        <robo-text class="lines" size="small">
+          <robo-grid type="flex" offset="x0" gap="x025" galign="start" valign="center">
+            <span v-html="shortenAddress(activeAddress)"/>
+            <robo-copy :text="activeAddress" />
+          </robo-grid>
+
+          <robo-grid v-if="balanceXRT" type="flex" offset="x0" gap="x025" galign="start" valign="center">
+            <span>Balance:</span>
+            <span>{{balanceXRT}} XRT</span>
+          </robo-grid>
+
+          <robo-grid v-if="activeAccount" type="flex" offset="x0" gap="x025" galign="start" valign="center">
+            <span>Type:</span>
+            <span>{{activeAccount?.type}}</span>
+          </robo-grid>
+
+          <robo-grid v-if="activeAccount" type="flex" offset="x0" gap="x025" galign="start" valign="center">
+            <span>Format:</span>
+            <robo-account-polkadot-chain clean />
+          </robo-grid>
+
+          <!-- <template v-if="rwsLink">
+            <robo-grid type="flex" offset="x0" gap="x025" galign="start" valign="center">
+              <span>RWS:</span>
+              <robo-link :router="rwsLink">
+                <robo-template-rws-state />
+              </robo-link>
+            </robo-grid>
+          </template> -->
+
+        </robo-text>
+      </template>
+    </section>
+
+    <section v-if="(accounts?.length > 1) && activeAddress && selectable" class="robo-account-polkadot-info-section">
+      <h4>Connect another account</h4>
+      <robo-select
+          :values="getAvailableAddresses()"
+          :options="getAvailableNames()"
+          v-model="activeAddress"
+          block
+          size="small"
+      />
+    </section>
+
+    <section v-if="extensionAllowShift" class="robo-account-polkadot-info-section">
+      <h4 v-if="activeWallet">Shift extension</h4>
+
+      <robo-grid type="grid" offset="x0" gap="x05" columns="4">
+        <template v-for="item in extensions" :key="item.id">
+          <robo-account-polkadot-extension :wallet="item.wallet" />
+        </template>
+      </robo-grid>
+      
+    </section>
+  </robo-details>
+
+  <robo-text size="small" highlight="error" v-if="typeerror">Here you need another type of account. Your account is {{activeAccount?.type}}, you need {{props.type}}</robo-text>
 
 </template>
 
 <script>
-import { defineComponent } from 'vue'
-import { encodeAddress } from "@polkadot/util-crypto"
-import extensions from '../polkadotExtensions'
-import chains from '../polkadotChains'
+  export default { name: 'RoboAccountPolkadot' }
+</script>
 
-export default defineComponent({
-  name: 'RoboAccountPolkadot',
+<script setup>
+  import { defineProps, defineEmits, computed, ref, onMounted, watch } from 'vue'
+  import { encodeAddress } from "@polkadot/util-crypto"
 
-  props: {
-    addressLocal: {
-      type: String,
-      default: null
-    },
-    addressLocalAllowEdit: {
-      type: Boolean,
-      default: false
-    },
-    addressType: {
-      type: String,
-      default: null,
-      validator: function (value) {
-        return ['sr25519', 'ed25519'].indexOf(value) !== -1;
-      }
-    },
+  import { useStore } from 'vuex'
+  const store = useStore()
+
+  const props = defineProps({
+
     chain: {
       type: String,
       default: null
-    },
-    copy: {
-        type: Boolean,
-        default: true
     },
     extensionAllowShift: {
       type: Boolean,
@@ -161,21 +107,19 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
-    info: {
-        type: Boolean,
-        default: true
-    },
     inline: {
         type: Boolean,
         default: false
     },
-    inputLabel: {
-      type: String
-    },
-    inputTip: {
-      type: String
-    },
     selectable: {
+      type: Boolean,
+      default: false
+    },
+    selectstyle: {
+      type: Boolean,
+      default: false
+    },
+    selectblock: {
       type: Boolean,
       default: false
     },
@@ -183,392 +127,297 @@ export default defineComponent({
         type: Boolean,
         default: false
     },
+    showAccountsAs: {
+      type: String,
+      default: 'name',
+      validator: function (value) {
+        return ['name', 'address'].indexOf(value) !== -1;
+      }
+    },
+    // addressType
+    type: {
+      type: String,
+      default: null,
+      validator: function (value) {
+        return ['sr25519', 'ed25519'].indexOf(value) !== -1;
+      }
+    },
+  })
 
-    vmodelAddressInput: {
-      type: String
+  const emit = defineEmits(['beforeInjected', 'afterInjected', 'onAddressChange' ,'update:modelValue'])
+
+  const classes = computed( () => {
+    return {
+      [`robo-account-polkadot`]: true,
+      [`robo-polkadot-account--inline`]: props.inline,
+      [`robo-polkadot-account--selectstyle`]: props.selectstyle,
+      [`robo-polkadot-account--selectblock`]: props.selectblock,
+      // [`robo-account--error`]: typeerror.value
     }
-  
-  },
+  })
 
-  emits: ['beforeInjected', 'afterInjected', 'onAddressChange' ,'update:vmodelAddressInput'],
+  /* + data */
+  import extensions from '../polkadot/extensions'
+  import chains from '../polkadot/chains'
 
-  data () {
-      return {
-        accounts: null,
-        address: this.addressLocal !== null ? this.addressLocal : (this.$store.getters['robonomicsUIvue/polkadot'].address ?? ''),
-        addressList: [],
-        addressListFormatted: [],
-        clipboardCopied: false,
-        extension: this.$store.getters['robonomicsUIvue/polkadot'].extension ?? '',
-        extensionsData: extensions,
-        isLocalAddress: this.addressLocal !== null ? true : false,
-        isLocalFormat: this.chain ? true : false,
-        wallet: this.$store.getters['robonomicsUIvue/polkadot'].wallet ?? ''
-      }
-  },
-  computed: {
-    
-    classes() {
-      return {
-        [`robo-account`]: true,
-        [`robo-account--inline`]: this.inline,
-        [`robo-account--local`]: this.isLocalAddress,
-        [`robo-account--error`]: this.error,
-      };
-    },
+  let accounts = ref(null)
+  let activeAccount = ref(null)
+  /* - data */
 
-    extensionData() {
-      // return this.extensionsData.find(ext => ext.extension === this.extension)
-      return this.extensionsData.find(ext => ext.wallet === this.wallet)
-    },
-
-    extensionPic() {
-      if(this.extensionData){
-        return new URL(`../images/${this.extensionData.picture}`, import.meta.url)
-      }
-    },
-
-    addressChain() {
-     
-      if( this.chain && Object.values(chains).indexOf(this.chain) > -1 ) {
-        // if chain set from props
-        return this.chain
-      } else if ( this.$store.getters['robonomicsUIvue/polkadot'].chain ) {
-        // if chain set in vuex (this should be so anyway!)
-        return this.$store.getters['robonomicsUIvue/polkadot'].chain
-      } else {
-        // fullish errors protecting fallback
-        return '32'
-      }
-
-    },
-
-    accountCurrent() {
-      if(this.accounts) {
-        return this.accounts.find(item => item.address === this.address)
-      }
-    },
-
-    error() {
-      if(this.addressType && this.accountCurrent && (this.addressType !== this.accountCurrent.type) && !this.addressLocal) {
-        return 'type'
-      } else {
-        return false
-      }
-    },
-
-    infoShow() {
-      if(!this.isLocalAddress) {
-        return this.info
-      } else {
-        return false
-      }
-    },
-
-    vmodelAddress: {
-      get() {
-        if(this.vmodelAddressInput) {
-          return this.vmodelAddressInput
-        } else {
-          if(!this.address){
-            console.warn('[robonomics-ui-vue3 warn]: `robo-account-polkadot` required address missing')
-          } else {
-            return this.address
-          }
-        }
-        
-      },
-      set(value) {
-        this.$emit('update:address', value)
-      }
-    }
-  },
-
-  methods: {
-    shortAddress(address) {
-      const addressArray = address.split('')
-      const result = addressArray.slice(0, 4) + "..." + addressArray.slice(-4)
-      return result.replace(/,/g, '')
-    },
-
-    clipboard() {
-        navigator.clipboard.writeText(this.address)
-        this.clipboardCopied = true;
-
-        const o = this
-        setTimeout(function(){
-            o.clipboardCopied = false;
-        }, 1500);
-    },
-
-    setAddressListFormatted(accounts) {
-      let 
-        result = [],
-        accountBufer
-
-      if(accounts) {
-
-        Object.keys(accounts).map(key => {
-  
-          if( !this.isLocalFormat ) {
-            accountBufer = accounts[key].address
-          } else {
-            accountBufer = encodeAddress(accounts[key].address, this.addressChain)
-          }
-
-          if(this.short) {
-            accountBufer = this.shortAddress(accountBufer)
-          }
-
-          result.push(accountBufer)
-
-        })
-
-      }
-
-      return result
-    },
-
-    setAddressList(accounts) {
-      let result = []
-
-      if(accounts) {
-
-       if( !this.isLocalFormat ) {
-        Object.keys(accounts).map(key => {
-          result.push(accounts[key].address)
-        })
-       } else {
-        Object.keys(accounts).map(key => {
-          result.push(encodeAddress(accounts[key].address, this.addressChain))
-        })
-       }
-        
-      }
-
-      return result
-    },
-
-    isAddressInAccounts(address, accounts) {
-      if( address &&  accounts.length > 0) {
-
-        // if no address found in accounts
-        if ( accounts.filter(account => account.address === address).length == 0 ) {
-          
-          const addressEncoded = encodeAddress(address, this.$store.getters['robonomicsUIvue/polkadot'].chain)
-          
-          if( accounts.filter(account => account.address === addressEncoded).length == 0 ) {
-            this.$store.commit('robonomicsUIvue/setPolkadotAddress', addressEncoded)
-          }
-          else {
-            // set first address in the accounts list
-            this.$store.commit('robonomicsUIvue/setPolkadotAddress', accounts[0].address)
-          }
-          
-        }
-      }
-    }
-  },
-
-  async mounted() {
-
-    if( !this.isLocalAddress ) {
-
-      // if we have address already encode it
-      if( this.address != '' && this.isLocalFormat ) {
-        this.address = encodeAddress(this.address, this.addressChain)
-      }
-
-      try {
-
-        // if we have address already encode it
-        if( this.address != '' && this.isLocalFormat ) {
-          this.address = encodeAddress(this.address, this.addressChain)
-        }
-
-        this.$emit('beforeInjected')
-        await this.$store.dispatch("robonomicsUIvue/waitWeb3Injected")
-        // this.$store.commit('robonomicsUIvue/initExtensionObject')
-        // this.$emit('afterInjected')
-
-        // get list of accounts if there is extension
-        this.accounts = await this.$store.dispatch("robonomicsUIvue/getPolkadotAccounts", this.addressChain)
-
-        // this need to be after getPolkadotAccounts, so there is an object initialization there
-        this.$emit('afterInjected')
-
-        if(this.accounts.length > 0){
-    
-            if(this.address == '') {
-              
-              // set active address if there is extension & accounts but no active address
-              this.$store.commit('robonomicsUIvue/setPolkadotAddress', this.accounts[0].address)
-
-            } else {
-
-              // check if active address is still avalaibale
-              this.isAddressInAccounts(this.address, this.accounts)
-
-            }
-
-            this.addressListFormatted = this.setAddressListFormatted(this.accounts)
-            this.addressList = this.setAddressList(this.accounts)
-
-        } else {
-          this.$store.commit('robonomicsUIvue/setPolkadotAddress', '')
-          this.$emit('afterInjected')
-        }
-
-      } catch {
-        this.$store.commit('robonomicsUIvue/setPolkadotExtension', '')
-        this.$store.commit('robonomicsUIvue/setPolkadotAddress', '')
-      }
+  /* Note: Extensions != wallets: Nova wallet e.g. detected as polkadot-js extension */
 
 
-      /* + WATCHERS */
+  /* + Init all nessesary variables */
 
-      this.$watch('$store.state.robonomicsUIvue.polkadot.address', (value) => {
-        if( !this.isLocalFormat ) {
-          this.address = value
-        } else {
-          this.address = encodeAddress(value, this.addressChain)
-        }
-      })
+  const activeExtension = computed( () => {
+    // return store.getters['polkadot/extension'] ?? ''
+    return store.state.robonomicsUIvue.polkadot.extension ?? ''
+  })
 
-      this.$watch('$store.state.robonomicsUIvue.polkadot.extension', async (value) => {
-        this.extension = value
-        this.wallet = this.$store.state.robonomicsUIvue.polkadot.wallet
-        this.accounts = await this.$store.dispatch("robonomicsUIvue/getPolkadotAccounts")
-      })
+  const activeWallet = computed( () => {
+    return store.state.robonomicsUIvue.polkadot.wallet ?? ''
+  })
 
-      this.$watch('$store.state.robonomicsUIvue.polkadot.chain', async () => {
-        if( !this.isLocalFormat ) {
-          this.accounts = await this.$store.dispatch("robonomicsUIvue/getPolkadotAccounts")
-        }
-      })
-
-      this.$watch('accounts', (value) => {
-        if(value.length > 0) {
-          this.addressListFormatted = this.setAddressListFormatted(value)
-          this.addressList = this.setAddressList(value)
-          this.isAddressInAccounts(this.address, value)
-        } else {
-          this.$store.commit('robonomicsUIvue/setPolkadotAddress', '')
-        }
-      })
-
-      this.$watch('extension', async () => {
-        this.accounts = await this.$store.dispatch("robonomicsUIvue/getPolkadotAccounts")
-      })
-
-      this.$watch('short', () => {
-        this.addressListFormatted = this.setAddressListFormatted(this.accounts)
-      })
-
-      /* - WATCHERS */
-
+  const activeExtensionImg = computed( () => {
+    const wallet = store.state.robonomicsUIvue.polkadot.wallet
+    const data = extensions.find(ext => ext.wallet === wallet)
+    if(data) {
+      return new URL(`../polkadot/extensions/${data.picture}`, import.meta.url)
     } else {
-      /* this.isLocalAddress true */
-      if(!!this.addressLocal) {
-        // check if addressLocal is not empty string
-        this.address = encodeAddress(this.addressLocal, this.addressChain)
-      } else {
-        //console.warn('[robonomics-ui-vue3 warn]: addressLocal is empty string')
-        // this.address = this.addressLocal
-        this.address = null
-      }
+      return null
     }
+  })
+  
+  /* balanceXRT needs to be rewritten with getting balance here */
+  const balanceXRT = computed( () => {
+    return store.state.robonomicsUIvue.polkadot.balanceXRT
+  })
+  
+  let getActiveChain = () => {
 
-    /* + OTHER WATCHERS */
-
-    this.$watch('address', (value) => {
-      if( !this.isLocalAddress ) {
-        if( !this.isLocalFormat ) {
-          this.$store.commit('robonomicsUIvue/setPolkadotAddress', value)
-        }
-      }
-      else {
-        if( !this.isLocalFormat ) {
-          this.address = value
-        } else {
-          this.address = encodeAddress(value, this.addressChain)
-        }
-      }
-
-      this.$emit('onAddressChange')
-          
-    })
-
-    this.$watch('chain', (value) => {
-      
-      if(Object.values(chains).indexOf(value) > -1) {
-        this.address = encodeAddress(this.address, value)
-        this.isLocalFormat = true
-      }
-
-      if(!this.isLocalAddress) {
-        this.addressListFormatted = this.setAddressListFormatted(this.accounts)
-        this.addressList = this.setAddressList(this.accounts)
-      }
-
-    })
-
-    this.$watch('addressLocal', (value) => {
-      if (value) {
-        this.isLocalAddress = true
-        this.address = encodeAddress(this.addressLocal, this.addressChain)
-      }
-    })
-
-    /* - OTHER WATCHERS */
+    if( props.chain && Object.values(chains).indexOf(props.chain) > -1 ) {
+      return props.chain
+    } else {
+      return store.state.robonomicsUIvue.polkadot.chain ?? '32'
+    }
 
   }
-  
-  // async mounted() {
-  //     await this.onLoad(100)
 
-  //   const { ethereum } = window;
-  //   if(ethereum) {
-  //     console.log('ethereum.isMetaMask', ethereum.isMetaMask)
+  let activeChain = ref(getActiveChain())
 
-  //     try {
-  //       // Will open the MetaMask UI
-  //       // You should disable this button while the request is pending!
-  //       await ethereum.request({ method: 'eth_requestAccounts' })
-  //       const accounts = await ethereum.request({ method: 'eth_accounts' })
-  //       if(accounts) {
-  //         console.log(accounts[0])
-  //       }
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
+  let activeAddress = ref(store.state.robonomicsUIvue.polkadot.address ?? '')
+  /* - Init all nessesary variables */
 
-  //   } else {
-  //     console.log('ethereum.isMetaMask no ext')
-  //   }
+
+
+  /* + Active account */
+  const accountTitle = computed( () => {
+    if(props.showAccountsAs === 'name') {
+      return activeAccount.value.name
+    }
+
+    if(props.showAccountsAs === 'address') {
+      return activeAccount.value.address
+    }
+  })
+  /* - Active account */
+
+  /* + All account tools */
+  let getActiveAccount = () => {
+    if(accounts.value != null && activeAddress.value) {
+      return accounts.value.find(item => item.address === activeAddress.value)
+    }
+  }
+
+  let activeAddressRecalculate = (address, accounts) => {
+    if(accounts.length > 0) {
+      if(address === '') {
+        return accounts[0].address
+      } else {
+        const activeAddressEncoded = encodeAddress(address, activeChain.value)
+        if( accounts.filter(account => account.address === activeAddressEncoded).length == 0 ) {
+          return accounts[0].address
+        }
+        else {
+          return activeAddressEncoded
+        }
+      }
+    } else {
+      return ''
+    }
+  }
+
+  let shortenAddress = address => {
+    const addressArray = address.split('')
+    const result = addressArray.slice(0, 4) + "..." + addressArray.slice(-4)
+    return result.replace(/,/g, '')
+  }
+
+  let getAvailableAddresses = (view = 'normal') => {
+    let result = []
+    let bufer = ''
+
+    if(accounts.value && activeChain.value) {
+      Object.keys(accounts.value).map(key => {
+        bufer = encodeAddress(accounts.value[key].address, activeChain.value)
+
+        if (view === 'short') {
+          bufer = shortenAddress(bufer)
+        }
+
+        result.push(bufer)
+      })
+    }
+
+    return result
+  }
+
+  let getAvailableNames = () => {
+    let result = []
+
+    if(accounts.value) {
+      Object.keys(accounts.value).map(key => {
+        result.push(accounts.value[key].name)
+      })
+    }
+
+    return result
+  }
+
+  let reset = () => {
+    /* need add store reset */
+    console.log('RESET FIRED')
+    activeAddress.value = ''
+    accounts.value = null
+    activeAccount.value = null
+    activeExtension.value = null
+    activeWallet.value = null
+    activeChain.value = null
+  }
+  /* - All account tools */
+
+  /* + Type error */
+  const typeerror = computed( () => {
+    if(props.type && activeAccount.value && activeAccount.value?.type !== props.type) {
+      return true
+    } else {
+      return false
+    }
+  })
+  /* - Type error */
+
+  onMounted(async () => {
+
+    try {
+
+      /* + Get list of available accounts from extension */
+      emit('beforeInjected')
+      await store.dispatch('polkadot/waitWeb3Injected')
+      accounts.value = await store.dispatch('polkadot/getAccounts', activeChain.value)
+      emit('afterInjected')
+      /* - Get list of available accounts from extension */
+
+      activeAddress.value = activeAddressRecalculate(activeAddress.value, accounts.value)
+      activeAccount.value = getActiveAccount()
+
+    } catch {
+      // reset()
+    }
+
+    watch(() => store.state.robonomicsUIvue.polkadot.address, value => {
+      activeAddress.value = encodeAddress(value, activeChain.value)
+    })
+
+    watch(() => store.state.robonomicsUIvue.polkadot.extension, async (value) => {
+      activeExtension.value = value
+      activeWallet.value = store.state.robonomicsUIvue.polkadot.wallet
+      accounts.value = await store.dispatch('polkadot/getAccounts')
+    })
+
+    watch(() => store.state.robonomicsUIvue.polkadot.chain, async (value) => {
+      activeChain.value = value
+    })
+
+    watch(accounts, value => {
+      activeAddress.value = activeAddressRecalculate(activeAddress.value, value)
+      activeAccount.value = getActiveAccount()
+    })
+
+
+    watch(activeAddress, value => {
+
+      store.commit('polkadot/setAddress', value)
+      activeAccount.value = getActiveAccount()
+
+      emit('onAddressChange')
+          
+    })
+
+    watch(activeChain, async (value) => {
+
+      store.commit("polkadot/setChain", value)
+      activeChain.value = value
+      accounts.value = await store.dispatch("polkadot/getAccounts")
       
-  // }
+      if(Object.values(chains).indexOf(value) > -1) {
+        activeAddress.value = encodeAddress(activeAddress.value, value)
+      }
 
-})
+      activeAddress.value = activeAddressRecalculate(activeAddress.value, accounts.value)
+
+    })
+    
+  })
+
 </script>
 
+
+<style>
+  /* for outside rewriting */
+  :root {
+    --robo-account-polkadot-extension-logo: 1.2rem;
+  }
+
+  .robo-polkadot-account--selectstyle .robo-details-summary {
+    background-color: var(--robo-color-input);
+    border: 1px solid var(--robo-color-inputborder);
+    color: var(----robo-color-inputcolor);
+    padding: var(--input-padding-v) var(--input-padding-g);
+  }
+
+  .robo-polkadot-account--selectstyle.robo-account--error .robo-details-summary {
+    --robo-color-inputborder: var(--robo-color-red)
+  }
+
+  .robo-polkadot-account--selectblock.robo-details, .robo-polkadot-account--selectblock .robo-details-summary {
+    display: block !important;
+  }
+</style>
+
+
 <style scoped>
-    .robo-account--inline {
+
+    .robo-account-polkadot--inline {
         display: inline-flex !important;
     }
 
-    .extensionLogo {
-      width: 20px;
-      margin-right: 3px;
+    .robo-account-polkadot-extensionLogo {
+      display: inline-block;
+      width: var(--robo-account-polkadot-extension-logo);
     }
 
-    .robo-account--local:not(.robo-account--inline) .robo-grid {
-      display: block;
-      width: 100%;
+    .robo-account-polkadot-title {
+      text-transform: uppercase;
     }
 
-    .robo-account-info-item:not(.robo-account-info-name) {
-      font-weight: normal;
+    .robo-account-polkadot-info-section:not(:first-child) {
+      margin-top: calc(var(--space)*2);
+    }
+
+    .robo-account-polkadot-info-section h4 {
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+      white-space: nowrap;
     }
 
     .attention .robo-details-summary {
@@ -578,10 +427,10 @@ export default defineComponent({
     .robo-account--error {
       color: var(--color-red)
     }
-</style>
 
-<style>
-    .robo-details--popup[open] .robo-details-content {
-        font-size: calc(var(--font-size)*.8) !important;
+    .lines > *:not(:last-child) {
+      border-bottom: 1px dotted var(--robo-color-dark);
+      margin-bottom: 4px;
+      padding-bottom: 4px;
     }
 </style>
