@@ -10,8 +10,8 @@
     
     <div class="robo-details-content" ref="content">
       <h3 class="robo-details-popup-title" v-if="popupTitle">{{popupTitle}}</h3>
-      <div class="robo-details-content-inside"><slot/></div>
       <robo-icon class="robo-details-content-close" @click="closeDetails" tabindex="0" icon="xmark" v-if="props.type === 'tooltip' && tooltipCloseButton || props.type === 'popup'" />
+      <div class="robo-details-content-inside"><slot/></div>
     </div>
 
     <div 
@@ -323,7 +323,7 @@ onMounted(() => {
 <style>
   /* for outside rewriting */
   :root {
-    --robo-details-content-padding: 0.7rem;
+    --robo-details-content-padding: 20px;
     --robo-details-popup-background: var(--robo-color-light);
     --robo-details-popup-color: var(--robo-color-dark);
     --robo-details-popup-content-offset: 3rem;
@@ -380,9 +380,9 @@ onMounted(() => {
     vertical-align: middle;
   }
 
-  details:not([open]):hover summary {
+  /* details:not([open]):hover summary {
     opacity: 0.8;
-  }
+  } */
 
   .robo-details-summary-toggler {
     font-size: 40% !important;
@@ -392,15 +392,17 @@ onMounted(() => {
   /* + content */
   .robo-details-content {
     background-color: var(--robo-details-tooltip-background);
-    color: var(--robo-details-tooltip-color);
     border: 1px solid var(--robo-details-tooltip-border-color);
-    padding: var(--robo-details-content-padding);
+    color: var(--robo-details-tooltip-color);
+    max-height: calc(100vh - var(--robo-details-popup-content-offset)*2);
+    /* padding: var(--robo-details-content-padding); */
+    overflow: auto;
   }
 
   .robo-details-content-inside {
-    max-height: inherit;
+    max-height: 100%;
     overflow: auto;
-    padding: var(--robo-details-content-padding);
+    padding: var(--robo-details-content-padding) calc(var(--robo-details-content-padding) * 2) var(--robo-details-content-padding) var(--robo-details-content-padding);
     position: relative;
   }
   /* - content */
@@ -413,14 +415,19 @@ onMounted(() => {
 
   .robo-details-content-close {
     cursor: pointer;
-    position: absolute;
+    /* position: absolute;
     right: var(--robo-details-content-padding);
+    top: var(--robo-details-content-padding); */
+    position: sticky;
     top: var(--robo-details-content-padding);
+    right: var(--robo-details-content-padding);
+    float: right;
+    z-index: 10;
   }
 
-  .robo-details--tooltip-closable > .robo-details-content {
+  /* .robo-details--tooltip-closable > .robo-details-content {
     padding-right: calc(var(--robo-details-content-padding) * 2 + 0.2rem) !important;
-  }
+  } */
   /* - actions */
 
   /* + tooltip */
@@ -431,7 +438,6 @@ onMounted(() => {
     max-height: var(--robo-details-tooltip-maxheight);
     min-width: var(--robo-details-tooltip-minwidth);
     max-width: var(--robo-details-tooltip-maxwidth);
-    overflow: hidden;
     position: absolute;
     text-transform: none;
     z-index: 1000;
@@ -565,7 +571,6 @@ onMounted(() => {
     color: var(--robo-details-popup-color);
     left: calc(50% - var(--robo-details-popup-maxwidth)/2);
     opacity: 0;
-    overflow: auto;
     padding: var(--robo-details-content-padding);
     position: fixed;
     top: var(--robo-details-popup-content-offset);

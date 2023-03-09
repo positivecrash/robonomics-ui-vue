@@ -123,6 +123,10 @@ const selected = computed({
     line-height: 1;
   }
 
+  .robo-select {
+    --border: var(--robo-color-inputborderdisabled);
+  }
+
   .robo-select--block {
     display: block;
   }
@@ -132,7 +136,7 @@ const selected = computed({
     appearance: none;
     border: 0;
     box-sizing: border-box;
-    color: var(--robo-select-color);
+    color: var(--color);
     display: block;
     font-family: inherit;
     font-size: inherit;
@@ -154,9 +158,9 @@ const selected = computed({
     padding-top: var(--input-padding-v);
   }
 
-  .robo-select.robo-select--clean, .robo-select.robo-select--clean select {
+  /* .robo-select.robo-select--clean, .robo-select.robo-select--clean select {
     --color: var(--robo-color-link)
-  }
+  } */
 
   .robo-icon {
     font-size: 60%;
@@ -168,7 +172,8 @@ const selected = computed({
 
   .robo-select--disabled, .robo-select--disabled select,
   .robo-select--single, .robo-select--single select {
-    cursor: not-allowed
+    cursor: not-allowed;
+    opacity: var(--robo-opacity-inputdisabled);
   }
 
   .robo-select--single select {

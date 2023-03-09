@@ -20,13 +20,15 @@
                 </robo-grid-item>
 
                 <robo-grid-item>
-                    <robo-input 
+                    <robo-address-polkadot 
+                        v-model:address="addressModel" 
+                        chain="32" 
                         label="User address (ed25519)"
-                        v-model="addressModel"
                         :error="addressModelError"
                         @click="reset('addressModelError')"
                         :disabled="edit"
                     />
+
                     <robo-text size="small" v-if="!edit">
                         <robo-link href="https://wiki.robonomics.network/docs/sub-activate/#create-owner-and-controller-accounts">How to create account</robo-link>
                     </robo-text>
@@ -55,9 +57,20 @@
                     
                 </robo-grid-item>
 
-                <robo-grid-item v-if="message">
+                <!-- <robo-grid-item v-if="message">
                     <robo-text :highlight="status ? status : null">
                         {{message}}
+                    </robo-text>
+                </robo-grid-item> -->
+
+                <robo-grid-item v-if="message">
+                    <robo-text :highlight="status ? status : null" v-html="message" />
+                </robo-grid-item>
+
+                <robo-grid-item v-if="status === 'error' && statustype">
+                    <robo-text highlight="error">
+                        <template v-if="statustype === 'missdata'">Oops! Looks like you missed filling in some required fields. Please fill in all required fields and try again.</template>
+                        <template v-if="statustype === 'duplicated'">The user you are trying to add is already in your <robo-link :router="store.state.robonomicsUIvue.rws.links.users">RWS</robo-link></template>
                     </robo-text>
                 </robo-grid-item>
 
@@ -100,8 +113,7 @@ const props = defineProps({
 
 const emit = defineEmits([
     'update:address', 'update:name',
-    'beforeUserSetup', 'onUserSetup', 'afterUserSetup',
-    'beforeUserEdit', 'onUserEdit', 'afterUserEdit'
+    'onUserSetup', 'onUserEdit'
 ])
 
 
@@ -112,6 +124,7 @@ const rws = computed( () => {
 /* - get rws */
 
 
+/* + models */
 let rwsactiveModel = ref(null)
 if(props.edit && props.owner) {
     rwsactiveModel.value = props.owner
@@ -124,11 +137,6 @@ if(props.edit && props.owner) {
         })
     })
 }
-/* - get rws */
-
-
-
-let processing = ref(false)
 
 const addressModel = computed({
     get: () => {
@@ -148,26 +156,33 @@ const nameModel = computed({
     }
 })
 
-
 let addressModelError = ref(false)
 let nameModelError = ref(false)
+/* - models */
 
+/* + process */
+let processing = ref(false)
 let status = ref(null) // ok, error
+let statustype = ref(null) // duplicated, missdata
 let message = ref(null) // string
+
+const pending = computed(() => {
+    let summary = {}
+    summary.address = addressModel.value
+    summary.name = nameModel.value
+    return summary
+})
 
 let userStatus = (statusFromApp, messageFromApp) => {
     if(statusFromApp) { status.value = statusFromApp }
     if(messageFromApp) { message.value = messageFromApp }
 
     if(status.value  === 'ok') {
-        let user = {}
-        user.address = addressModel.value
-        user.name = nameModel.value
 
         if(props.edit) {
-            store.dispatch('rws/editUser', { rws: rwsactiveModel, user: user })
+            store.dispatch('rws/editUser', { rws: rwsactiveModel, user: pending.value })
         } else {
-            store.dispatch('rws/addUser', { rws: rwsactiveModel, user: user })
+            store.dispatch('rws/addUser', { rws: rwsactiveModel, user: pending.value })
         }
     }
 }
@@ -188,6 +203,7 @@ const buttontext = computed( () => {
 
 let reset = (model) => {
    message.value = null
+   statustype.value = null
    status.value = null
    
    if(model === 'addressModelError' ) { addressModelError.value = false }
@@ -198,24 +214,42 @@ let reset = (model) => {
 let adduser = () => {
 
     if(!addressModel.value || !nameModel.value) {
+        status.value='error'
+        statustype.value = 'missdata'
         if(!addressModel.value) { addressModelError.value = true }
         if(!nameModel.value) { nameModelError.value = true }
         return
     }
 
-    processing.value = true
+    /* If user in this rws exists, don't do anything except showing error */
+    store.dispatch('rws/userexistance', { rws: rwsactiveModel, user: pending.value }).then( result => {
+        if(result < 0) {
+            processing = true
 
-    if(props.edit) {
-        emit('beforeUserEdit')
-        emit('onUserEdit')
-        emit('afterUserEdit', (status, message) => userStatus(status, message))
-    } else {
-        emit('beforeUserSetup')
-        emit('onUserSetup')
-        emit('afterUserSetup', (status, message) => userStatus(status, message))
-    }
+            if(props.edit) {
+                emit('onUserEdit', (status, message) => userStatus(status, message))
+            } else {
+                emit('onUserSetup', (status, message) => userStatus(status, message))
+            }
 
-    processing.value = false
+            processing = false
+        } else {
+            status.value = 'error'
+            statustype.value = 'duplicated'
+        }
+    })
+
+    // processing.value = true
+
+    // if(props.edit) {
+    //     emit('onUserEdit', (status, message) => userStatus(status, message))
+    // } else {
+    //     emit('onUserSetup', (status, message) => userStatus(status, message))
+    // }
+
+    // processing.value = false
 }
+
+/* - process */
 
 </script>

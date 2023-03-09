@@ -125,9 +125,7 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
 
-const emit = defineEmits([
-    'beforeUpdate', 'onUpdate', 'afterUpdate'
-])
+const emit = defineEmits(['onUpdate'])
 
 const props = defineProps({
     config: {
@@ -176,11 +174,7 @@ let updateStatus = (statusFromApp, messageFromApp) => {
 
 let updateInfo = () => {
   updating.value = true
-
-  emit('beforeUpdate')
-  emit('onUpdate')
-  emit('afterUpdate', (status, message) => updateStatus(status, message))
-
+  emit('onUpdate', (status, message) => updateStatus(status, message))
   updating.value = false
 }
 /* - Update */

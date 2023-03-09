@@ -97,12 +97,14 @@ body {
 :root {
 	--robo-space: 1rem;
 	--robo-fontsize: var(--robo-space);
+	--robo-lineheight: 1.2;
 	--robo-layout-padding: calc(var(--robo-space) * 2);
 
 	--robo-color-dark: hsl(0, 0%, 10%);
 	--robo-color-dark-90: hsl(0, 0%, 10%);
 	--robo-color-dark-85: hsl(0, 0%, 15%);
 	--robo-color-dark-80: hsl(0, 0%, 20%);
+	--robo-color-dark-30: hsl(0, 0%, 70%);
 
 	--robo-color-light: hsl(100, 100%, 100%);
 	--robo-color-light-100-4: hsla(100, 100%, 100%, 40%);
@@ -131,13 +133,15 @@ body {
 	--robo-color-link: var(--robo-color-blue);
 	--robo-color-link-hover: var(--robo-color-blue-120);
 
-	--robo-input-padding: calc(var(--robo-space)*0.5);
+	--robo-input-padding: var(--robo-space);
 	--robo-input-fontsize: var(--robo-fontsize);
 
 	--robo-color-input: var(--robo-color-light);
 	--robo-color-inputcolor: var(--robo-color-dark-80);
 	--robo-color-inputborder: var(--robo-color-dark-80);
+	--robo-color-inputborderdisabled: var(--robo-color-dark-30);
 	--robo-color-inputcoloractive: var(--robo-color-blue);
+	--robo-opacity-inputdisabled: 0.6;
 }
 
 @media (prefers-color-scheme: dark){

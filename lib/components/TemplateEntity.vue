@@ -1,11 +1,13 @@
 <template>
     <component 
-        :is="EntityInfo"
+        :is="whatCard"
         :class="classes"
         :icon="icon"
         :name="name"
         :status="status"
-        :view="view"
+
+        :card="card"
+        :entity="entity"
     />
 </template>
 
@@ -14,19 +16,14 @@
 </script>
 
 <script setup>
-import { defineProps, defineEmits, computed, ref, onMounted  } from 'vue'
+import { defineProps, computed, ref, onMounted  } from 'vue'
 import entityStatuses from '../entities/statuses'
 import entitiyTypes from '../entities/types'
 import {getEntityType} from '../entities/utils'
-import {EntityInfo} from '../entities/cards'
 
 const props = defineProps({
     card: {
-        type: String,
-        required: true
-    },
-    devices: {
-        type: Object
+        type: String
     },
     entity: {
         type: Object
@@ -129,29 +126,28 @@ const getStatus = (settings) => {
 const status =  getStatus(settings.value)
 /* - STATUS */
 
-const checkType = (type) => {
-    if(Array.isArray(entity.type)) {
-        return entity.type.every((element) => type.includes(element))
-    }
+// const checkType = (type) => {
+//     if(Array.isArray(entity.type)) {
+//         return entity.type.every((element) => type.includes(element))
+//     }
 
-    if(typeof entity.type === 'string') {
-        return type.every((element) => entity.type === element)
-    }
-}
+//     if(typeof entity.type === 'string') {
+//         return type.every((element) => entity.type === element)
+//     }
+// }
 
-/* + VIEW */
-const getView = () => {
-    if(props.card === 'glance') {
-        return 'card'
-    } else {
-        return 'line'
-    }
-}
+/* + determine card component */
+import {EntityInfo, EntityLight} from '../entities/cards'
 
-const view =  getView()
-/* - VIEW */
+const whatCard = computed(() => {
+    return ({
+      'light': EntityLight
+    }[entity.type] ?? EntityInfo)
+})
+/* - determine card component */
 
 onMounted(() => {
+    // console.log('props.card', props.card)
     // console.log('settings', settings)
     // console.log('entity', entity)
     // console.log('entityStatuses', entityStatuses)

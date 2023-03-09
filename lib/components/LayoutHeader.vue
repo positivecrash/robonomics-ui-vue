@@ -30,7 +30,16 @@
             <robo-icon icon="bars"/>
           </template>
 
-          <robo-grid :columns="navigation.length" offset="x0" gap="x1">
+          <robo-grid :columns="navigation.length + 1" offset="x0" gap="x1">
+            <nav>
+              <h4>Smart home</h4>
+              <div><router-link :to="store.state.robonomicsUIvue.rws.links.activate">Activation</router-link></div>
+              <div><router-link :to="store.state.robonomicsUIvue.rws.links.list">RWS Setups</router-link></div>
+              <div v-if="role"><router-link :to="store.state.robonomicsUIvue.rws.links.list">HA setup</router-link></div>
+              <div v-if="role === 'owner'"><router-link :to="store.state.robonomicsUIvue.rws.links.users">Users</router-link></div>
+              <div><router-link :to="store.state.robonomicsUIvue.rws.links.devices">Devices</router-link></div>
+            </nav>
+
             <nav v-for="item in navigation" :key="item.id">
               <h4 v-if="item.title">{{item.title}}</h4>
 
@@ -90,8 +99,13 @@
     }
   })
 
-  // import { useStore } from 'vuex'
-  // const store = useStore()
+  import { useStore } from 'vuex'
+  const store = useStore()
+  import { checkRole } from '../tools'
+
+  const role = computed( () => {
+    return checkRole(store.state.robonomicsUIvue.polkadot.address, store.state.robonomicsUIvue.rws.active)
+  })
 
   // onMounted( ()=> {
   //   console.log('.env header', process.env.VUE_APP_ROBONOMICS_UI_KEY)

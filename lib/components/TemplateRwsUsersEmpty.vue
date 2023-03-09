@@ -1,6 +1,6 @@
 <template>
 
-  <div class="robo-users-empty">
+  <robo-section class="robo-users-empty">
     <template v-if="rws?.length < 1">
       <robo-image :src="getImage('boy-notfound.png')" max="220px"/>
       <robo-text size="medium" offset="x05">First you need RWS setup</robo-text>
@@ -18,7 +18,7 @@
       :router="store.state.robonomicsUIvue.rws.links.useractivate" 
       iconleft="rss">+ Add user</robo-button>
     </template>
-  </div>
+  </robo-section>
 
 </template>
 

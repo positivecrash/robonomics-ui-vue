@@ -34,7 +34,7 @@
 </script>
 
 <script setup>
-import { computed, ref, onMounted } from 'vue'
+import { computed } from 'vue'
 
 const props = defineProps({
     config: {

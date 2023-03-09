@@ -1,7 +1,9 @@
 <template>
     <robo-grid class="robo-rws-list-item" columns="1" offset="x0" gap="x05">
         <robo-grid :columns="columnsSize" offset="x0" gap="x05" valign="center">
-            <robo-text title="3" offset="x0">{{nameModel}}</robo-text>
+            <robo-text title="3" offset="x0" break>
+                <robo-icon icon="user" :color="roleColor" v-if="role" /> {{nameModel}}
+            </robo-text>
             <robo-details type="popup">
                 <template #summary>
                     <robo-button><robo-icon icon="pencil" /></robo-button>
@@ -14,9 +16,7 @@
                     v-model:address="addressModel"
                     v-model:name="nameModel"
 
-                    @before-user-edit="props.beforeEdit"
                     @on-user-edit="props.onEdit"
-                    @after-user-edit="props.afterEdit"
                 />
             </robo-details>
 
@@ -42,7 +42,7 @@ const store = useStore()
 
 const emit = defineEmits([
     'update:address', 'update:name',
-    'beforeUserDelete', 'onUserDelete', 'afterUserDelete'
+    'onUserDelete'
 ])
 
 const props = defineProps({
@@ -62,13 +62,7 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
-    beforeEdit: {
-        type: Function
-    },
     onEdit: {
-        type: Function
-    },
-    afterEdit: {
         type: Function
     },
 })
@@ -120,12 +114,24 @@ let userDelete = (statusFromApp, messageFromApp) => {
 }
 
 let deleteItem = () => {
-    emit('beforeUserDelete')
-    emit('onUserDelete')
-    emit('afterUserDelete', (status, message) => userDelete(status, message))
+    emit('onUserDelete', (status, message) => userDelete(status, message))
 }
 
 /* - DELETE */
+
+/* + Role */
+import { checkRole } from '../tools'
+
+const role = computed( () => {
+    return checkRole(addressModel.value, store.state.robonomicsUIvue.rws.active)
+})
+
+const roleColor = computed( () => {
+    return ({
+      'owner': 'var(--robo-color-orange)'
+    }[role.value] ?? 'inherit')
+})
+/* - Role */
 </script>
 
 <style scoped>

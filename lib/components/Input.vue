@@ -47,7 +47,7 @@
           <robo-icon v-else icon="eye" />
         </robo-button>
 
-        <robo-details v-if="tip" type="tooltip" tooltip-placement='bottom-end'>
+        <robo-details v-if="tip" type="tooltip" tooltip-placement="bottom-end">
           <template #summary>
             <robo-button size="small">i</robo-button>
           </template>
@@ -196,7 +196,7 @@ export default defineComponent({
         font-family: inherit;
         font-size: inherit;
         font-weight: bold;
-        padding: var(--space);
+        padding: var(--robo-input-padding);
         transition: 0.2s all ease;
         width: 100%;
     }
@@ -237,10 +237,10 @@ export default defineComponent({
     /* + disabled */
 
     .robo-input--disabled {
-        --border: var(--color-gray);
+        --border: var(--robo-color-inputborderdisabled);
         --color: var(--color-dark);
         --label: var(--color-dark);
-        opacity: 0.6;
+        opacity: var(--robo-opacity-inputdisabled);
     }
     /* - disabled */
 
@@ -281,5 +281,10 @@ export default defineComponent({
     position: absolute;
     bottom: 0.5rem;
     right: 0.5rem;
+  }
+
+  .robo-details--tooltip .robo-button {
+    --robo-button-padding: calc(var(--robo-input-padding) * .4);
+    text-transform: lowercase;
   }
 </style>

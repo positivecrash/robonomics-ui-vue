@@ -44,6 +44,13 @@ export default defineComponent({
         type: Boolean,
         default: false
     },
+    galign: {
+      type: String,
+      default: null,
+      validator(value) {
+          return ['left', 'center', 'right', 'hyphen'].includes(value)
+      }
+    },
     gap: { /* depricate */
         type: Boolean,
         default: false
@@ -152,6 +159,7 @@ export default defineComponent({
       return {
         [`robo-text`]: true,
         [`robo-text--align-${this.align}`]: this.align,
+        [`robo-text--galign-${this.galign}`]: this.galign,
         [`robo-text--${this.size}`]: this.size,
         [`robo-text--break`]: this.break,
         [`robo-text--style-${this.weight}`]: this.weight,
@@ -233,6 +241,13 @@ export default defineComponent({
       hyphens: auto;
     }
     /* - align */
+
+    /* + galign */
+    .robo-text[class *= 'robo-text--galign'] { display: flex; }
+    .robo-text--galign-left { align-content: start; }
+    .robo-text--galign-center { align-content: center; }
+    .robo-text--galign-right { align-content: end; }
+    /* - galign */
 
     /* + SIZE */
     .robo-text--tiny {

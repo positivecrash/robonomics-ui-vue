@@ -2,11 +2,11 @@
     <robo-grid class="robo-rws-list-item" columns="1" offset="x0" gap="x05">
         <robo-grid :columns="columnsSize" offset="x0" gap="x05" valign="center">
             <robo-grid type="flex" offset="x0" galign="start" gap="x05">
-                <robo-text v-if="isActive" :highlight="isActiveColor">
-                    <robo-icon icon="circle-check" v-if="isActive > 0" />
-                    <robo-icon icon="circle-exclamation" v-if="isActive < 1" />
+                <robo-text :highlight="isActiveColor" galign="center">
+                    <robo-icon icon="circle-check" v-if="isActive > 5" />
+                    <robo-icon icon="clock" v-else />
                 </robo-text>
-                <robo-text title="3" offset="x0">
+                <robo-text title="3" offset="x0" break>
                     {{nameModel}}
                 </robo-text>
             </robo-grid>
@@ -24,9 +24,7 @@
                     v-model:name="nameModel"
                     v-model:enddate="props.enddate"
 
-                    @before-rws-edit="props.beforeEdit"
                     @on-rws-edit="props.onEdit"
-                    @after-rws-edit="props.afterEdit"
                 />
             </robo-details>
 
@@ -52,7 +50,7 @@ const store = useStore()
 
 const emit = defineEmits([
     'update:owner', 'update:controller', 'update:scontroller', 'update:name',
-    'beforeRwsDelete', 'onRwsDelete', 'afterRwsDelete'
+    'onRwsDelete'
 ])
 
 const props = defineProps({
@@ -80,15 +78,9 @@ const props = defineProps({
         type: Boolean,
         default: false
     },
-    beforeEdit: {
-        type: Function
-    },
     onEdit: {
         type: Function
-    },
-    afterEdit: {
-        type: Function
-    },
+    }
 })
 
 const ownerModel = computed({
@@ -127,27 +119,19 @@ const nameModel = computed({
     }
 })
 
+
+/* + Check and set status for date */
+import { checkStatus, setStatusView } from '../tools'
+
 const isActive = computed( () => {
-    if(props.enddate) {
-        const now = new Date()
-        const end = new Date(props.enddate)
-        return Math.round((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-    }
+    return checkStatus(props.enddate)
 })
 
 const isActiveColor = computed( () => {
-    if(isActive > 5) {
-        return 'ok'
-    }
-
-    if(isActive > 1 && isActive < 5) {
-        return 'attention'
-    }
-
-    if(isActive < 0) {
-        return 'error'
-    }
+    return setStatusView(isActive.value)
 })
+/* - Check and set status for date */
+
 
 /* + DELETE */
 
@@ -178,9 +162,7 @@ let rwsDelete = (statusFromApp, messageFromApp) => {
 }
 
 let deleteItem = () => {
-    emit('beforeRwsDelete')
-    emit('onRwsDelete')
-    emit('afterRwsDelete', (status, message) => rwsDelete(status, message))
+    emit('onRwsDelete', (status, message) => rwsDelete(status, message))
 }
 
 /* - DELETE */

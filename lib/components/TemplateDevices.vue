@@ -56,7 +56,7 @@
 </script>
 
 <script setup>
-import { defineProps, computed, ref, onMounted, inject } from 'vue'
+import { defineProps, computed, ref, onMounted } from 'vue'
 import entitiyTypes from '../entities/types'
 import {getEntityType} from '../entities/utils'
 
@@ -108,8 +108,8 @@ if(props.telemetry) {
         /* Get entities from Home Assistant */
         const configHass = parseProps(props.config)
 
-        if(configHass.hasOwnProperty('dashboard') && configHass.dashboard.hasOwnProperty('views') ) {
-            entitiesAsHass = configHass.dashboard.views
+        if(configHass.hasOwnProperty('dashboard') && configHass?.dashboard.hasOwnProperty('views') ) {
+            entitiesAsHass = configHass?.dashboard.views
         }
 
         let services = ref(parseProps(props.config?.services)) //test
@@ -188,16 +188,9 @@ const viewSelected = computed( () => {
     return store.state.robonomicsUIvue.rws.devices.view
 })
 
-// import CryptoJS from 'crypto-js'
-
-// onMounted( () => {
-//     // const key = inject('keydata')
-//     // console.log('key inject', key)
-//     // const test = CryptoJS.AES.encrypt("be be be", key).toString()
-//     // const test2 = CryptoJS.AES.decrypt(test, key).toString(CryptoJS.enc.Utf8)
-//     // console.log('test', test, test2)
-//     // store.dispatch('rws/saveData', { name: 'testdata', value: '[test: "test", test: "test"]', stringify: true })
-// })
+onMounted(() => {
+    console.log('props.config', props.config)
+}) 
 
 </script>
 
