@@ -222,7 +222,10 @@ const pending = computed(() => {
 })
 
 let rwsStatus = (statusFromApp, messageFromApp) => {
-    if(statusFromApp) { status.value = statusFromApp }
+    if(statusFromApp) { 
+        status.value = statusFromApp
+        processing.value = false
+    }
     if(messageFromApp) { message.value = messageFromApp }
 
     if(status.value  === 'ok') {
@@ -283,7 +286,6 @@ let addRWS = () => {
                 emit('onRwsSetup', (status, message) => rwsStatus(status, message))
             }
 
-            processing = false
         } else {
             status.value = 'error'
             statustype.value = 'duplicated'

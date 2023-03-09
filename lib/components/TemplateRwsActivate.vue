@@ -99,22 +99,19 @@ let processing = ref(false)
 let status = ref(null) // ok, error
 let message = ref(null) // string
 
-const emit = defineEmits([
-    'beforeRwsActivate', 'onRwsActivate', 'afterRwsActivate'
-])
+const emit = defineEmits(['onRwsActivate'])
 
 let activateRWS = () => {
     processing.value = true
 
-    emit('beforeRwsActivate')
-    emit('onRwsActivate')
-    emit('afterRwsActivate', (status, message) => rwsStatus(status, message))
-
-    processing.value = false
+    emit('onRwsActivate', (status, message) => rwsStatus(status, message))
 }
 
 let rwsStatus = (statusFromApp, messageFromApp) => {
-    if(statusFromApp) { status.value = statusFromApp }
+    if(statusFromApp) { 
+        status.value = statusFromApp 
+        processing.value = false
+    }
     if(messageFromApp) { message.value = messageFromApp }
 
     if(status.value  === 'ok') {

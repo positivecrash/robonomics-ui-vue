@@ -174,7 +174,10 @@ const pending = computed(() => {
 })
 
 let userStatus = (statusFromApp, messageFromApp) => {
-    if(statusFromApp) { status.value = statusFromApp }
+    if(statusFromApp) { 
+        status.value = statusFromApp
+        processing = false
+    }
     if(messageFromApp) { message.value = messageFromApp }
 
     if(status.value  === 'ok') {
@@ -232,7 +235,6 @@ let adduser = () => {
                 emit('onUserSetup', (status, message) => userStatus(status, message))
             }
 
-            processing = false
         } else {
             status.value = 'error'
             statustype.value = 'duplicated'
