@@ -135,7 +135,7 @@
   /* for outside rewriting */
   :root {
     --robo-button-fontsize: var(--robo-input-fontsize);
-    --robo-button-padding: var(--robo-input-padding);
+    --robo-button-padding: calc(var(--robo-input-padding) * 1.5);
 
     --robo-button-background: var(--robo-color-blue);
     --robo-button-color: var(--robo-color-light);

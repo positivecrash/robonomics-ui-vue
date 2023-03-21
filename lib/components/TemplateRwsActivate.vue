@@ -1,64 +1,66 @@
 <template>
 
-    <robo-grid offset="x1" gap="x05" columns="1">
+    <robo-section offset="x0" width="narrow">
+        <robo-grid offset="x0" gap="x05" columns="1">
 
-        <robo-grid-item>
-            <robo-account-polkadot
-                extensionAllowShift
-                extensionShowIcon
-                selectable
-                selectstyle
-                selectblock
-                type="ed25519"
-            />
-            <robo-text size="small">
-                <robo-link href="https://wiki.robonomics.network/docs/sub-activate/#create-owner-and-controller-accounts">How to create ed25519 account</robo-link>
-            </robo-text>
-        </robo-grid-item>
+            <robo-grid-item>
+                <robo-account-polkadot
+                    extensionAllowShift
+                    extensionShowIcon
+                    selectable
+                    selectstyle
+                    selectblock
+                    type="ed25519"
+                />
+                <robo-text size="small">
+                    <robo-link href="https://wiki.robonomics.network/docs/sub-activate/#create-owner-and-controller-accounts">How to create ed25519 account</robo-link>
+                </robo-text>
+            </robo-grid-item>
 
-        <robo-grid-item back>
-            <robo-text size="small">
-                Price from: <b>~ {{priceRound}} XRT </b> 
+            <robo-grid-item back>
+                <robo-text size="small">
+                    Price from: <b>~ {{priceRound}} XRT </b> 
 
-                <robo-details linkstyle>
-                    <template #summary>Where to buy XRT</template>
-                    <robo-grid offset="x0" gap="x05">
-                        <robo-link href="https://app.solarbeam.io/exchange/swap">Solarbeam</robo-link>
-                        <robo-link href="https://trade.kraken.com/markets/kraken/xrt/usd">Kraken</robo-link>
-                    </robo-grid>
-                </robo-details>
-            </robo-text>
-        </robo-grid-item>
+                    <robo-details linkstyle>
+                        <template #summary>Where to buy XRT</template>
+                        <robo-grid offset="x0" gap="x05">
+                            <robo-link href="https://app.solarbeam.io/exchange/swap">Solarbeam</robo-link>
+                            <robo-link href="https://trade.kraken.com/markets/kraken/xrt/usd">Kraken</robo-link>
+                        </robo-grid>
+                    </robo-details>
+                </robo-text>
+            </robo-grid-item>
 
-        <robo-grid-item back>
-            <robo-text size="small">Activation time <b>~ {{activationtime}} min</b></robo-text>
-        </robo-grid-item>
+            <robo-grid-item back>
+                <robo-text size="small">Activation time <b>~ {{activationtime}} min</b></robo-text>
+            </robo-grid-item>
 
-        <robo-grid-item back>
-            <robo-text size="small">Available subscriptions: <b>{{available}}</b></robo-text>
-        </robo-grid-item>
-    </robo-grid>
+            <robo-grid-item back>
+                <robo-text size="small">Available subscriptions: <b>{{available}}</b></robo-text>
+            </robo-grid-item>
+        </robo-grid>
+    </robo-section>
 
-    <robo-section info>
-        <robo-text size="small" paragraphs weight="normal-italic">
-            <p>Robonomics smart home intergration allows you to interact with smart devices and robots. Interaction is carried out by transactions within Robonomics parachain instead of centralized cloud services.</p>
-            <p>The Robonomics RWS subscription guarantees the ability to send transactions stably every block. It is a good choice if you want to receive data from devices and manage them remotely.</p>
+    <robo-section offset="x1" width="narrow">
+        <robo-button 
+            @click.prevent="activateRWS()"
+            :disabled="processing"
+            :loading="processing"
+            :type="status ? status : 'primary'"
+            block
+        >
+            {{buttontext}}
+        </robo-button>
+        
+        <robo-text v-if="message" :highlight="status ? status : null">
+            {{message}}
         </robo-text>
     </robo-section>
 
-    <robo-button 
-        @click.prevent="activateRWS()"
-        :disabled="processing"
-        :loading="processing"
-        :type="status ? status : 'primary'"
-        block
-    >
-        {{buttontext}}
-    </robo-button>
-
-    <robo-text v-if="message" :highlight="status ? status : null">
-        {{message}}
-    </robo-text>
+    <robo-section mark="info" marktitle="What is RWS" width="narrow">
+        <p>Robonomics smart home intergration allows you to interact with smart devices and robots. Interaction is carried out by transactions within Robonomics parachain instead of centralized cloud services.</p>
+        <p>The Robonomics RWS subscription guarantees the ability to send transactions stably every block. It is a good choice if you want to receive data from devices and manage them remotely.</p>
+    </robo-section>
 
 </template>
 

@@ -1,5 +1,6 @@
 <template>
     <div :class="classList" ref="text">
+
         <slot/>
 
         <robo-icon 
@@ -176,6 +177,7 @@ export default defineComponent({
         [`robo-text--uppercase`]: this.uppercase,
         [`robo-text--title-${this.title}`]: this.title,
         [`robo-text--paragraphs`]: this.paragraphs,
+        [`robo-text--mark-${this.mark}`]: this.mark,
       };
     },
   },
@@ -385,7 +387,7 @@ export default defineComponent({
     .robo-text--uppercase { text-transform: uppercase; }
     .robo-text--nowrap { white-space: nowrap; }
 
-    *[class *= 'robo-text--title-'] {
+    .robo-text[class *= 'robo-text--title-'] {
       font-weight: bold;
       text-transform: uppercase;
     }

@@ -12,8 +12,14 @@
 import { defineProps, computed } from 'vue'
 
 const props = defineProps({
-    // 'left-center', 'left-center-right', 'center-right' or integer number
+    
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    
     columns: {
+      // 'left-center', 'left-center-right', 'center-right' or integer number
       type: [Number, String],
       default: null
     },
@@ -262,6 +268,7 @@ const classes = computed( () => {
       [`robo-grid`]: true,
       [`robo-grid-type--${props.type}`]: props.type,
       [`robo-grid-flexfluid`]: props.flexfluid,
+      [`robo-grid-disabled`]: props.disabled,
     }
 })
 
@@ -353,6 +360,12 @@ const classes = computed( () => {
        .robo-grid-type--masonry {
         --grid-columns: v-bind(masonryCalc(1))
        }
+    }
+
+    .robo-grid-disabled {
+      pointer-events: none;
+      opacity: 0.5;
+      filter: grayscale(1);
     }
 
 </style>

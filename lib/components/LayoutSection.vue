@@ -27,7 +27,7 @@ export default defineComponent({
       type: String,
       default: 'wide',
       validator(value) {
-        return ['wide', 'narrow'].includes(value)
+        return ['wide', 'middle', 'narrow'].includes(value)
       }
     }
   },
@@ -53,7 +53,11 @@ export default defineComponent({
         position: relative;
         max-width: var(--section-width);
         width: 100%;
-        padding: calc(var(--robo-layout-padding) * 2) var(--robo-layout-padding);
+        padding: calc(var(--robo-layout-padding) * 2) var(--robo-layout-padding) 0;
+    }
+
+    .robo-layout-section:last-child {
+      padding-bottom: calc(var(--robo-layout-padding) * 2)
     }
 
     .robo-layout-section--vcenter {
@@ -67,6 +71,10 @@ export default defineComponent({
     
     .robo-layout-section--narrow {
       --section-width: 600px;
+    }
+
+    .robo-layout-section--middle {
+      --section-width: 1000px;
     }
 
     .robo-layout-section--selfcenter {

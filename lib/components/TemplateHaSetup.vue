@@ -1,39 +1,24 @@
 <template>
-    
-    <robo-section offset="x0" width="narrow">
-        <form>
-        <robo-grid offset="x0" gap="x1" columns="1">
+    <robo-text offset="x1">
+        <p>If you already have an RWS subscription or have been added as a user to an RWS subscription, you can create a password here to access your local Home Assistant account. <robo-link href="https://wiki.robonomics.network/docs/global-administration#granting-access-to-user">More on Wiki</robo-link></p>
+    </robo-text>
+
+    <form>
+        <robo-grid offset="x1" gap="x1" columns="1">
 
             <robo-grid-item>
-                <robo-text v-if="props.edit && ownerModel && enddateModel" weight="bold" title="3">
-                    RWS <robo-text :highlight="isActiveColor" inline>{{nameModel}}</robo-text> active till: {{getDate}}
-                </robo-text>
-                
-                <robo-address-polkadot 
-                    v-model:address="ownerModel" 
-                    chain="32" 
-                    label="Owner address (ed25519)"
-                    :disabled="props.edit ? true : false"
-                    :error="ownerModelError"
-                    @click="reset('ownerModelError')"
-                    @change="emit('ownerChanged')"
-                />
+                <robo-text title="3" offset="x0">User credits</robo-text>
+            </robo-grid-item>
 
-                <robo-text size="small" v-if="!props.edit && !getDate">
-                    Don't have owner address? <robo-link :router="rwsLink">Activate RWS subscription</robo-link>
-                </robo-text>
-
-                <robo-text size="small" v-if="!props.edit && getDate">
-                    Active till: {{getDate}}
-                </robo-text>
-
+            <robo-grid-item>
+                <robo-template-rws-activeselect size="small" block label="Choose RWS" />
             </robo-grid-item>
 
             <robo-grid-item>
                 <robo-address-polkadot 
                     v-model:address="controllerModel" 
                     chain="32" 
-                    label="Controller address (ed25519)"
+                    label="User address"
                     :error="controllerModelError"
                     @click="reset('controllerModelError')"
                 />
@@ -41,7 +26,7 @@
 
             <robo-grid-item>
                 <robo-input 
-                    :label="`${controllerLabel} seed (12 words)`"
+                    label="User seed (12 words)"
                     v-model="scontrollerModel"
                     type="password"
                     :error="scontrollerModelError"
@@ -51,25 +36,6 @@
             </robo-grid-item>
 
             <robo-grid-item>
-                <robo-input 
-                    label="Name of dashboard"
-                    v-model="nameModel"
-                    :error="nameModelError"
-                    @click="reset('nameModelError')"
-                    tip="You can change it later"
-                />
-            </robo-grid-item>
-
-            <robo-input 
-                v-if="ownerModel && enddateModel"
-                disabled
-                hidden
-                label="Active till"
-                v-model="enddateModel"
-            />
-
-            <robo-grid-item>
-
                 <robo-button 
                 @click.prevent="addRWS()"
                 :disabled="processing"
@@ -77,7 +43,43 @@
                 :type="buttonstatus"
                 block
                 >
-                {{buttontext}}
+                Check
+                </robo-button>
+            </robo-grid-item>
+        </robo-grid>
+
+
+        <robo-grid offset="x1" gap="x1" columns="1" disabled>
+
+            <robo-grid-item>
+                <robo-text title="3" offset="x0">Create / restore password</robo-text>
+            </robo-grid-item>
+
+            <robo-grid-item>
+                <robo-input
+                    label="New password"
+                    v-model="scontrollerModel"
+                    type="password"
+                />
+            </robo-grid-item>
+
+            <robo-grid-item>
+                <robo-input
+                    label="Repeat password"
+                    v-model="scontrollerModel"
+                    type="password"
+                />
+            </robo-grid-item>
+
+            <robo-grid-item>
+                <robo-button 
+                @click.prevent="addRWS()"
+                :disabled="processing"
+                :loading="processing"
+                :type="buttonstatus"
+                block
+                >
+                Submit
                 </robo-button>
             </robo-grid-item>
 
@@ -91,14 +93,13 @@
                     <template v-if="statustype === 'duplicated'">The RWS you are trying to add is already in your <robo-link :router="store.state.robonomicsUIvue.rws.links.list">list</robo-link></template>
                 </robo-text>
             </robo-grid-item>
-       
-            </robo-grid>
-        </form>
-    </robo-section>
+
+        </robo-grid>
+    </form>
 </template>
 
 <script>
-  export default { name: 'RoboTemplateRwsSetup' }
+  export default { name: 'RoboTemplateHaSetup' }
 </script>
 
 <script setup>

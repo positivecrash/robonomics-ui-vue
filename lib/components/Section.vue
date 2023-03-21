@@ -1,10 +1,17 @@
 <template>
     <section :class="classes" :style="styles">
-      <div v-if="info" class="info-side">
-        <b>i</b>
-        <img :src="getImage('boy-info.png')" />
+      <div v-if="mark" class="section-image">
+        <p v-if="marktitle">{{marktitle}}</p>
+        <img v-if="mark === 'info'" :src="getImage('boy-info.png')" />
+        <img v-if="mark === 'question'" :src="getImage('boy-question.png')" />
       </div>
-      <slot/>
+      <div class="section-content" v-if="mark">
+        <robo-text size="small" paragraphs weight="normal-italic">
+          <slot/>
+        </robo-text>
+      </div>
+
+      <slot v-if="!mark" />
     </section>
 </template>
 
@@ -43,9 +50,17 @@ const props = defineProps({
       }
     },
 
-    info: {
-      type: Boolean,
-      default: false
+    mark: {
+      type: String,
+      default: null,
+      validator: function (value) {
+        return ['info', 'question'].indexOf(value) !== -1;
+      }
+    },
+
+    marktitle: {
+      type: String,
+      default: null
     },
 
     textColor: {
@@ -58,6 +73,13 @@ const props = defineProps({
             return ['x0', 'x05', 'x1', 'x2', 'x4'].includes(value)
         }
     },
+    width: {
+      type: String,
+      default: 'wide',
+      validator(value) {
+        return ['wide', 'middle', 'narrow'].includes(value)
+      }
+    }
 })
 
 const classes = computed(() => {
@@ -66,7 +88,8 @@ const classes = computed(() => {
     [`robo-section-offset-${props.offset}`]: props.offset,
     [`robo-section--backimage`]: props.backImage,
     [`robo-section--colored`]: props.backColor,
-    [`robo-section--info`]: props.info,
+    [`robo-section--mark-${props.mark}`]: props.mark,
+    [`robo-section-width--${props.width}`]: props.width,
   }
 })
 
@@ -105,9 +128,15 @@ const styles = computed (() => {
 <style scoped>
     .robo-section {
         --offset: var(--gap-layout);
-        margin-top: var(--offset);
-        margin-bottom: var(--offset);
+        margin: var(--offset) auto;
+
+        --section-width: var(--layout-maxwidth);
+        max-width: var(--section-width);
+        width: 100%;
     }
+
+    .robo-section:first-child { margin-top: 0; }
+    .robo-section:last-child { margin-bottom: 0; }
 
     .robo-section-offset-x0 { --offset: 0; }
     .robo-section-offset-x05 { --offset: calc(var(--gap-layout) * 0.5); }
@@ -119,51 +148,67 @@ const styles = computed (() => {
       padding: var(--gap-layout);
     }
 
+    .robo-section-width--narrow {
+      --section-width: 600px;
+    }
 
-    /* + Info */
+    .robo-section-width--middle {
+      --section-width: 1000px;
+    }
 
-    .robo-section--info {
+
+    /* + MARK (info, question) */
+
+    .robo-section[class *= 'robo-section--mark-'] {
       display: grid;
       gap: 30px;
-      grid-template-columns: 90px auto;
+      grid-template-columns: 1fr 5fr;
+      /* align-items: end; */
+      align-items: stretch;
+      border: 1px solid var(--robo-color-dark);
+      padding: calc(var(--robo-space) * 1.5);
     }
 
-    .info-side {
-      background-color: var(--robo-color-light-100-4);
-      padding-bottom: 100px;
-      position: relative;
-      text-align: center;
+    .robo-section[class *= 'robo-section--mark-'] .section-image img {
+      max-width: 100%
     }
 
-    .info-side b {
-      color: var(--robo-color-blue);
-      font-size: 40px;
-    }
-    
-    .info-side img {
-      bottom: 0;
-      max-width: 86px;
-      position: absolute;
-      right: -10px;
-      width: 100%;
+    .section-image {
+      display: grid;
     }
 
-    @media screen and (max-width: 500px) {
-      .robo-section--info {
-        gap: 10px;
+    .section-image img {
+      align-self: end;
+    }
+
+    .section-image p {
+        font-size: 90%;
+        font-weight: bold;
+        line-height: 1.2;
+        margin-bottom: 10px;
+    }
+
+    /* .robo-section[class *= 'robo-section--mark-'] .section-content {
+      border: 1px solid var(--robo-color-dark);
+      padding: calc(var(--robo-space) * 1.5);
+    } */
+
+    @media screen and (max-width: 640px) {
+      .robo-section[class *= 'robo-section--mark-'] {
+        grid-template-columns: 1fr 2fr;
+      }
+    }
+
+    @media screen and (max-width: 400px) {
+      .robo-section[class *= 'robo-section--mark-'] {
         grid-template-columns: 1fr;
-        grid-template-rows: 90px auto;
+        gap: 0;
       }
 
-      .info-side {
-        align-content: center;
-        display: grid;
-        padding-bottom: 0;
-        padding-left: 20px;
-        padding-right: 100px;
-        text-align: left;
+      .robo-section[class *= 'robo-section--mark-'] .section-image img {
+        max-width: 80px;
       }
     }
 
-    /* - Info */
+    /* - MARK (info, question) */
 </style>

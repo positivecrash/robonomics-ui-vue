@@ -12,7 +12,7 @@
             </robo-grid>
             <robo-details type="popup">
                 <template #summary>
-                    <robo-button><robo-icon icon="pencil" /></robo-button>
+                    <robo-button size="small"><robo-icon icon="pencil" /></robo-button>
                 </template>
 
                 <robo-template-rws-setup 
@@ -28,7 +28,7 @@
                 />
             </robo-details>
 
-            <robo-button @blur="requestedDelete = false" @click.prevent="requestedDelete ? deleteItem() : requestedDelete = true" :type="requestedDelete ? 'error' : 'primary'">
+            <robo-button size="small" @blur="requestedDelete = false" @click.prevent="requestedDelete ? deleteItem() : requestedDelete = true" :type="requestedDelete ? 'error' : 'primary'">
                 <robo-icon icon="xmark" />
                 <span v-if="requestedDelete">Delete this?</span>
             </robo-button>

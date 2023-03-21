@@ -198,7 +198,11 @@ const selected = computed({
   }
 
   .robo-select--labeled {
-    padding-top: calc(var(--space) * .5);
+    padding-top: var(--space);
+  }
+
+  .robo-select--labeled select {
+    --input-padding-g: var(--space);
   }
 
 </style>
