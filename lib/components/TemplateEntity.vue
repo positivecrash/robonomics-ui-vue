@@ -16,7 +16,7 @@
 </script>
 
 <script setup>
-import { defineProps, computed, ref, onMounted  } from 'vue'
+import { defineProps, computed, ref  } from 'vue'
 import entityStatuses from '../entities/statuses'
 import entitiyTypes from '../entities/types'
 import {getEntityType} from '../entities/utils'
@@ -145,13 +145,6 @@ const whatCard = computed(() => {
     }[entity.type] ?? EntityInfo)
 })
 /* - determine card component */
-
-onMounted(() => {
-    // console.log('props.card', props.card)
-    // console.log('settings', settings)
-    // console.log('entity', entity)
-    // console.log('entityStatuses', entityStatuses)
-})
 
 </script>
 

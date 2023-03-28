@@ -78,7 +78,7 @@
     </section>
   </robo-details>
 
-  <robo-text size="small" highlight="error" v-if="typeerror">Here you need another type of account. Your account is {{activeAccount?.type}}, you need {{props.type}}</robo-text>
+  <robo-text size="tiny" weight="bold" highlight="error" v-if="typeerror">Your account's type is {{activeAccount?.type}}, you need here {{props.type}}. Try another account.</robo-text>
 
 </template>
 
@@ -106,6 +106,10 @@
     extensionShowIcon: {
       type: Boolean,
       default: false
+    },
+    generationAllow: {
+      type: Boolean,
+      default: true
     },
     inline: {
         type: Boolean,
@@ -283,17 +287,6 @@
 
     return result
   }
-
-  let reset = () => {
-    /* need add store reset */
-    console.log('RESET FIRED')
-    activeAddress.value = ''
-    accounts.value = null
-    activeAccount.value = null
-    activeExtension.value = null
-    activeWallet.value = null
-    activeChain.value = null
-  }
   /* - All account tools */
 
   /* + Type error */
@@ -306,17 +299,18 @@
   })
   /* - Type error */
 
+  
   onMounted(async () => {
 
     try {
 
       /* + Get list of available accounts from extension */
       emit('beforeInjected')
-      await store.dispatch('polkadot/waitWeb3Injected')
-      accounts.value = await store.dispatch('polkadot/getAccounts', activeChain.value)
-      emit('afterInjected')
-      /* - Get list of available accounts from extension */
+      await store.dispatch('polkadot/waitWeb3Injected').then( () => {
+        emit('afterInjected')
+      })
 
+      accounts.value = await store.dispatch('polkadot/getAccounts', activeChain.value)
       activeAddress.value = activeAddressRecalculate(activeAddress.value, accounts.value)
       activeAccount.value = getActiveAccount()
 

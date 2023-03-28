@@ -240,16 +240,6 @@ let adduser = () => {
             statustype.value = 'duplicated'
         }
     })
-
-    // processing.value = true
-
-    // if(props.edit) {
-    //     emit('onUserEdit', (status, message) => userStatus(status, message))
-    // } else {
-    //     emit('onUserSetup', (status, message) => userStatus(status, message))
-    // }
-
-    // processing.value = false
 }
 
 /* - process */

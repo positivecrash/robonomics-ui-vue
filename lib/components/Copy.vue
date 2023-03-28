@@ -12,7 +12,7 @@
 </script>
 
 <script setup>
-import { defineProps, ref, computed } from 'vue'
+import { defineProps, ref } from 'vue'
 
 const props = defineProps({
     size: {

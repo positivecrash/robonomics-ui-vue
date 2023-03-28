@@ -123,7 +123,7 @@
 </script>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 
 const emit = defineEmits(['onUpdate'])
 

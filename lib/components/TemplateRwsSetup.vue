@@ -2,9 +2,19 @@
     
     <robo-section offset="x0" width="narrow">
         <form>
-        <robo-grid offset="x0" gap="x1" columns="1">
+        <robo-grid offset="x0" gap="x2" columns="1">
 
-            <robo-grid-item>
+            <robo-grid offset="x0" gap="x05" columns="1">
+                <robo-text title="3" offset="x0">Owner credits</robo-text>
+
+                <robo-text size="small" v-if="!props.edit && !getDate">
+                    Don't have owner address? <robo-link :router="rwsLink">Activate RWS subscription</robo-link>
+                </robo-text>
+
+                <robo-text size="small" v-if="!props.edit && getDate">
+                    Active till: {{getDate}}
+                </robo-text>
+
                 <robo-text v-if="props.edit && ownerModel && enddateModel" weight="bold" title="3">
                     RWS <robo-text :highlight="isActiveColor" inline>{{nameModel}}</robo-text> active till: {{getDate}}
                 </robo-text>
@@ -19,27 +29,26 @@
                     @change="emit('ownerChanged')"
                 />
 
+            </robo-grid>
+
+            <robo-grid offset="x0" gap="x05" columns="1">
+                <robo-text title="3" offset="x0">Controller credits</robo-text>
                 <robo-text size="small" v-if="!props.edit && !getDate">
-                    Don't have owner address? <robo-link :router="rwsLink">Activate RWS subscription</robo-link>
+                    You need here Polkadot ed25519 address added in RWS subscription. 
+                    <robo-account-polkadot-generate
+                        v-model:name="newaccountName"
+                        v-model:password="newaccountPassword"
+                        v-model:address="newaccountAddress"
+                        v-model:seed="newaccountSeed"
+                    />
                 </robo-text>
-
-                <robo-text size="small" v-if="!props.edit && getDate">
-                    Active till: {{getDate}}
-                </robo-text>
-
-            </robo-grid-item>
-
-            <robo-grid-item>
                 <robo-address-polkadot 
                     v-model:address="controllerModel" 
                     chain="32" 
-                    label="Controller address (ed25519)"
+                    :label="`${controllerLabel} address (ed25519)`"
                     :error="controllerModelError"
                     @click="reset('controllerModelError')"
                 />
-            </robo-grid-item>
-
-            <robo-grid-item>
                 <robo-input 
                     :label="`${controllerLabel} seed (12 words)`"
                     v-model="scontrollerModel"
@@ -48,9 +57,10 @@
                     @click="reset('scontrollerModelError')"
                     tip="The seed phrase provided here is essential for encrypting your data. We understand the sensitivity of this information and therefore, do not share it with any third parties or store it on our servers. As an extra layer of security, we recommend avoiding storing a large number of tokens in this account to reduce the risk of potential unauthorized access."
                 />
-            </robo-grid-item>
+            </robo-grid>
 
-            <robo-grid-item>
+            <robo-grid offset="x0" gap="x05" columns="1">
+                <robo-text title="3" offset="x0">Other settings</robo-text>
                 <robo-input 
                     label="Name of dashboard"
                     v-model="nameModel"
@@ -58,7 +68,7 @@
                     @click="reset('nameModelError')"
                     tip="You can change it later"
                 />
-            </robo-grid-item>
+            </robo-grid>
 
             <robo-input 
                 v-if="ownerModel && enddateModel"
@@ -102,7 +112,7 @@
 </script>
 
 <script setup>
-import { ref, computed, defineProps, defineEmits } from 'vue'
+import { ref, computed, defineProps, defineEmits, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
 const store = useStore()
 
@@ -321,6 +331,25 @@ const controllerLabel = computed( () => {
     } else {
         return 'Your'
     }
+})
+
+
+/* + Generate new account */
+let newaccountName = ref(null)
+let newaccountPassword = ref(null)
+let newaccountAddress = ref(null)
+let newaccountSeed = ref(null)
+/* - Generate new account */
+
+onMounted ( ()=> {
+
+    /* + Generate new account */
+    watch(newaccountAddress, value => {
+      controllerModel.value = newaccountAddress.value
+      scontrollerModel.value = newaccountSeed.value
+    })
+    /* - Generate new account */
+
 })
 
 </script>

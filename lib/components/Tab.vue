@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import { defineComponent, inject, onBeforeMount, onMounted, watch, toRefs, ref } from 'vue'
+import { defineComponent, inject, onBeforeMount, watch, toRefs, ref } from 'vue'
 
 export default defineComponent({
   name: 'RoboTab',

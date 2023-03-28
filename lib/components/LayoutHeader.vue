@@ -4,15 +4,10 @@
 
     <div class="robo-layout-header-grid">
 
-      <!-- + Logo -->
       <a v-if="logoIcon" href="/" class="robo-layout-header-logo"><img :src="logoIcon" /></a>
-      <!-- - Logo -->
 
-      <!-- + Title -->
       <div v-if="title" class="robo-layout-header-title">{{title}}</div>
-      <!-- - Title -->
 
-      <!-- + Toolbar -->
       <robo-grid type="flex" offset="0" gap="x05" valign="center" class="robo-layout-header-toolbar">
 
         <robo-text size="small">
@@ -57,7 +52,6 @@
         
         </robo-details>
       </robo-grid>
-      <!-- - Toolbar -->
 
     </div>
 
@@ -70,7 +64,7 @@
 </script>
 
 <script setup>
-  import { defineProps, computed, onMounted, inject } from 'vue'
+  import { defineProps, computed } from 'vue'
 
   const props = defineProps({
     logoIcon: {
@@ -106,13 +100,6 @@
   const role = computed( () => {
     return checkRole(store.state.robonomicsUIvue.polkadot.address, store.state.robonomicsUIvue.rws.active)
   })
-
-  // onMounted( ()=> {
-  //   console.log('.env header', process.env.VUE_APP_ROBONOMICS_UI_KEY)
-  //   const key = inject('KEY')
-  //   console.log('key inject', key)
-  //   console.log('store.state.name', store.state.name)
-  // })
 </script>
 
 <style>

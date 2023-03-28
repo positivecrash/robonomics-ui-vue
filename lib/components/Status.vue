@@ -87,16 +87,7 @@ export default defineComponent({
         gap: var(--status-gap);
         line-height: 1.2;
     }
-
-    /* .robo-status .robo-icon {
-      color: var(--status-color);
-    }
-
-    .robo-status--success { --status-color: var(--color-green); }
-    .robo-status--info { --status-color: var(--color-blue); }
-    .robo-status--warning { --status-color: var(--color-orange); }
-    .robo-status--error { --status-color: var(--color-red); } */
-
+    
     .robo-status--gap-top { margin-top: var(--status-gap) }
     .robo-status--gap-right { margin-right: var(--status-gap) }
     .robo-status--gap-bottom { margin-bottom: var(--status-gap) }

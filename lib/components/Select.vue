@@ -158,10 +158,6 @@ const selected = computed({
     padding-top: var(--input-padding-v);
   }
 
-  /* .robo-select.robo-select--clean, .robo-select.robo-select--clean select {
-    --color: var(--robo-color-link)
-  } */
-
   .robo-icon {
     font-size: 60%;
     pointer-events: none;

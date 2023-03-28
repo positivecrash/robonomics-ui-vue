@@ -2,7 +2,7 @@
   "name": "robonomics-ui-vue",
   "main": "dist/index.js",
   "private": false,
-  "version": "0.1.6-4",
+  "version": "0.1.7-1",
   "scripts": {
     "build-clear": "rimraf /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue/lib/icons",
     "test-clear": "rimraf /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue3-components-guide/node_modules/robonomics-ui-vue",
@@ -12,16 +12,16 @@
     "build-test": "vite build && yarn test-clear && yarn test-copy",
     "preview": "vite preview"
   },
-  "dependencies": {
-    "@polkadot/util-crypto": "^9.4.1",
-    "crypto-js": "^4.1.1",
-    "file-saver": "^2.0.5",
-    "jszip": "^3.10.1"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "@polkadot/ui-keyring": "^3.1.1",
+    "@polkadot/util-crypto": "^11.1.1",
     "@types/node": "^17.0.42",
     "@vitejs/plugin-vue": "^2.3.3",
     "autoprefixer": "^10.4.7",
+    "crypto-js": "^4.1.1",
+    "file-saver": "^2.0.5",
+    "jszip": "^3.10.1",
     "postcss-import": "^14.1.0",
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-peer-deps-external": "^2.2.4",

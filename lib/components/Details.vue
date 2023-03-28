@@ -153,12 +153,6 @@ const classes = computed( () => {
 
 /* + methods */
 const isOutOfViewport = elem => {
-  /*!
-    * Check if an element is out of the viewport
-    * (c) 2018 Chris Ferdinandi, MIT License, https://gomakethings.com
-    * @param  {Node}  elem The element to check
-    * @return {Object}     A set of booleans for each side of the element
-    */
    // Get element's bounding
   var bounding = elem.getBoundingClientRect();
 
@@ -380,10 +374,6 @@ onMounted(() => {
     vertical-align: middle;
   }
 
-  /* details:not([open]):hover summary {
-    opacity: 0.8;
-  } */
-
   .robo-details-summary-toggler {
     font-size: 40% !important;
   }
@@ -571,7 +561,7 @@ onMounted(() => {
     color: var(--robo-details-popup-color);
     left: calc(50% - var(--robo-details-popup-maxwidth)/2);
     opacity: 0;
-    padding: var(--robo-details-content-padding);
+    padding: var(--robo-details-content-padding) calc(var(--robo-details-content-padding)/2) var(--robo-details-content-padding);
     position: fixed;
     top: var(--robo-details-popup-content-offset);
     transform: translateY(-50%);
