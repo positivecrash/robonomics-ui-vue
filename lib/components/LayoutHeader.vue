@@ -28,11 +28,11 @@
           <robo-grid :columns="navigation.length + 1" offset="x0" gap="x1">
             <nav>
               <h4>Smart home</h4>
-              <div><router-link :to="store.state.robonomicsUIvue.rws.links.activate">Activation</router-link></div>
-              <div><router-link :to="store.state.robonomicsUIvue.rws.links.list">RWS Setups</router-link></div>
-              <div><router-link :to="store.state.robonomicsUIvue.rws.links.hasetup">HA setup</router-link></div>
-              <div><router-link :to="store.state.robonomicsUIvue.rws.links.users">Users</router-link></div>
-              <div><router-link :to="store.state.robonomicsUIvue.rws.links.devices">Devices</router-link></div>
+              <div><router-link :to="store.state.robonomicsUIvue.rws.links.activate" exact>Activation</router-link></div>
+              <div><router-link :to="store.state.robonomicsUIvue.rws.links.list" exact>RWS Setups</router-link></div>
+              <div><router-link :to="store.state.robonomicsUIvue.rws.links.hasetup" exact>HA setup</router-link></div>
+              <div><router-link :to="store.state.robonomicsUIvue.rws.links.users" exact>Users</router-link></div>
+              <div><router-link :to="store.state.robonomicsUIvue.rws.links.devices" exact>Devices</router-link></div>
             </nav>
 
             <nav v-for="item in navigation" :key="item.id">
@@ -40,7 +40,7 @@
 
               <div v-for="link in item.links" :key="link.id">
                 <template v-if="link.type && link.type === 'router'">
-                  <router-link :to="link?.link">{{link?.title}}</router-link>
+                  <router-link :to="link?.link" exact>{{link?.title}}</router-link>
                 </template>
                 <template v-else>
                   <a :href="link?.link" :target="link.type === 'external' ? '_blank' : null">{{link?.title}}</a>
@@ -227,4 +227,8 @@
     max-width: var(--robo-header-logo-width);
   }
   /* - LOGO */
+
+  .router-link-active {
+    color: var(--robo-color-dark)
+  }
 </style>
