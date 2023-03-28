@@ -2,7 +2,7 @@
   "name": "robonomics-ui-vue",
   "main": "dist/index.js",
   "private": false,
-  "version": "0.1.8-2",
+  "version": "0.1.8-3",
   "scripts": {
     "build-clear": "rimraf /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue/lib/icons",
     "test-clear": "rimraf /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue3-components-guide/node_modules/robonomics-ui-vue",
