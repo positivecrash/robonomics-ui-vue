@@ -1,11 +1,16 @@
 <template>
+
     <robo-select 
-        :options="rwsNames" 
-        :values="rwsOwners" 
-        v-model="rwsactiveModel" 
-        @change="setActive()"
-        v-bind="$attrs"
+      v-if="rws.length > 0"
+      :options="rwsNames" 
+      :values="rwsOwners" 
+      v-model="rwsactiveModel" 
+      @change="setActive()"
+      v-bind="$attrs"
+      label="Choose RWS"
     />
+
+    <robo-input v-else v-model="rwsactiveModel" v-bind="$attrs" label="Enter RWS owner address" />
 </template>
 
 <script>
