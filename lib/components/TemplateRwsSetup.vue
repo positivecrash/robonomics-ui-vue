@@ -5,7 +5,7 @@
         <robo-grid offset="x0" gap="x2" columns="1">
 
             <robo-grid offset="x0" gap="x05" columns="1">
-                <robo-text title="3" offset="x0">Owner credits</robo-text>
+                <robo-text title="3" offset="x0" v-if="!props.edit">Owner credits</robo-text>
 
                 <robo-text size="small" v-if="!props.edit && !getDate">
                     Don't have owner address? <robo-link :router="rwsLink">Activate RWS subscription</robo-link>
@@ -32,8 +32,8 @@
             </robo-grid>
 
             <robo-grid offset="x0" gap="x05" columns="1">
-                <robo-text title="3" offset="x0">Controller credits</robo-text>
-                <robo-text size="small" v-if="!props.edit && !getDate">
+                <robo-text title="3" offset="x0" v-if="!props.edit">Controller credits</robo-text>
+                <robo-text size="small" v-if="!props.edit">
                     You need here Polkadot ed25519 address added in RWS subscription. 
                     <robo-account-polkadot-generate
                         v-model:name="newaccountName"
@@ -60,7 +60,7 @@
             </robo-grid>
 
             <robo-grid offset="x0" gap="x05" columns="1">
-                <robo-text title="3" offset="x0">Other settings</robo-text>
+                <robo-text title="3" offset="x0" v-if="!props.edit">Other settings</robo-text>
                 <robo-input 
                     label="Name of dashboard"
                     v-model="nameModel"

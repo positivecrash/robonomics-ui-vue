@@ -1,6 +1,6 @@
 <template>
-    <robo-image :src="getImage('boy-smarthome.png')" max="280px"/>
-    <robo-text size="medium" offset="x05">Here will be your smart devices dashboard</robo-text>
+    <robo-image :src="getImage('boy-smarthome.svg')" max="280px"/>
+    <robo-text size="small" weight="bold" offset="x05">Here will be your smart devices dashboard</robo-text>
     <robo-button 
     v-if="rwsobj.links.setup" 
     :router="rwsobj.links.setup" 

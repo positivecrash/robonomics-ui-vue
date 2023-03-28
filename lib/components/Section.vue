@@ -2,8 +2,8 @@
     <section :class="classes" :style="styles">
       <div v-if="mark" class="section-image">
         <p v-if="marktitle">{{marktitle}}</p>
-        <img v-if="mark === 'info'" :src="getImage('boy-info.png')" />
-        <img v-if="mark === 'question'" :src="getImage('boy-question.png')" />
+        <img v-if="mark === 'info'" :src="getImage('boy-info.svg')" />
+        <img v-if="mark === 'question'" :src="getImage('boy-question.svg')" />
       </div>
       <div class="section-content" v-if="mark">
         <robo-text size="small" paragraphs weight="normal-italic">
