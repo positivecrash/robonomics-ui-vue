@@ -30,7 +30,7 @@
               <h4>Smart home</h4>
               <div><router-link :to="store.state.robonomicsUIvue.rws.links.activate">Activation</router-link></div>
               <div><router-link :to="store.state.robonomicsUIvue.rws.links.list">RWS Setups</router-link></div>
-              <div v-if="role"><router-link :to="store.state.robonomicsUIvue.rws.links.list">HA setup</router-link></div>
+              <div v-if="role"><router-link :to="store.state.robonomicsUIvue.rws.links.hasetup">HA setup</router-link></div>
               <div v-if="role === 'owner'"><router-link :to="store.state.robonomicsUIvue.rws.links.users">Users</router-link></div>
               <div><router-link :to="store.state.robonomicsUIvue.rws.links.devices">Devices</router-link></div>
             </nav>
