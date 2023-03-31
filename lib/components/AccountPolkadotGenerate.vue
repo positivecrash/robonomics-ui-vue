@@ -1,6 +1,6 @@
 <template>
 
-    <robo-details type="popup" linkstyle class="account-polkadot-generate">
+    <robo-details type="popup" summarystyle="link" class="account-polkadot-generate">
         <template #summary><robo-text size="small" weight="bold"><slot name="summary">Generate new account</slot></robo-text></template>
         <robo-text title="3"><slot name="summary">Generate new account</slot></robo-text>
         <robo-grid offset="x0" gap="x05" columns="1">

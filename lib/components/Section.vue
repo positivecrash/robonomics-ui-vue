@@ -50,6 +50,11 @@ const props = defineProps({
       }
     },
 
+    gcenter: {
+      type: Boolean,
+      default: false
+    },
+
     mark: {
       type: String,
       default: null,
@@ -66,6 +71,7 @@ const props = defineProps({
     textColor: {
       type: String
     },
+
     offset: {
         type: String,
         default: 'x2',
@@ -77,7 +83,7 @@ const props = defineProps({
       type: String,
       default: 'wide',
       validator(value) {
-        return ['wide', 'middle', 'narrow'].includes(value)
+        return ['wide', 'middle', 'narrow', 'inline'].includes(value)
       }
     }
 })
@@ -85,6 +91,7 @@ const props = defineProps({
 const classes = computed(() => {
   return {
     [`robo-section`]: true,
+    [`robo-section-gcenter`]: props.gcenter,
     [`robo-section-offset-${props.offset}`]: props.offset,
     [`robo-section--backimage`]: props.backImage,
     [`robo-section--colored`]: props.backColor,
@@ -156,6 +163,11 @@ const styles = computed (() => {
       --section-width: 1000px;
     }
 
+    .robo-section-width--inline {
+      width: auto;
+      --section-width: 100%
+    }
+
 
     /* + MARK (info, question) */
 
@@ -188,11 +200,6 @@ const styles = computed (() => {
         margin-bottom: 10px;
     }
 
-    /* .robo-section[class *= 'robo-section--mark-'] .section-content {
-      border: 1px solid var(--robo-color-dark);
-      padding: calc(var(--robo-space) * 1.5);
-    } */
-
     @media screen and (max-width: 640px) {
       .robo-section[class *= 'robo-section--mark-'] {
         grid-template-columns: 1fr 2fr;
@@ -211,4 +218,9 @@ const styles = computed (() => {
     }
 
     /* - MARK (info, question) */
+
+
+    .robo-section-gcenter {
+      text-align: center;
+    }
 </style>

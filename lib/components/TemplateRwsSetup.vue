@@ -1,5 +1,5 @@
 <template>
-    
+
     <robo-section offset="x0" width="narrow">
         <form>
         <robo-grid offset="x0" gap="x2" columns="1">
@@ -210,6 +210,7 @@ let nameModelError = ref(false)
 let status = ref(null) // ok, error, cancel
 let statustype = ref(null) // duplicated, missdata
 let message = ref(null) // string
+let usersFromStorage = ref([])
 
 const pending = computed(() => {
     let summary = {}
@@ -218,10 +219,15 @@ const pending = computed(() => {
     summary.scontroller = scontrollerModel.value
     summary.name = nameModel.value
     summary.enddate = enddateModel.value
-    summary.users = []
-
-    return summary
+    summary.users = usersFromStorage.value
+    return summary   
 })
+
+let getUsers = () => {
+    store.dispatch('rws/userslist', ownerModel.value).then( result => {
+        usersFromStorage.value = result
+    })
+}
 
 let rwsStatus = (statusFromApp, messageFromApp) => {
     if(statusFromApp) { 
@@ -284,22 +290,20 @@ let addRWS = () => {
         return
     }
 
-    /* If rws exists, don't do anything except showing error */
-    store.dispatch('rws/rwsexistance', pending.value).then( result => {
-        if(result < 0) {
-            processing = true
-
-            if(props.edit) {
-                emit('onRwsEdit', (status, message) => rwsStatus(status, message))
-            } else {
+    processing = true
+   
+    if(!props.edit) {
+        store.dispatch('rws/rwsexistance', pending.value).then( result => {
+            if(result < 0) {
                 emit('onRwsSetup', (status, message) => rwsStatus(status, message))
+            } else {
+                status.value = 'error'
+                statustype.value = 'duplicated'
             }
-
-        } else {
-            status.value = 'error'
-            statustype.value = 'duplicated'
-        }
-    })
+        })
+    } else {
+        emit('onRwsEdit', (status, message) => rwsStatus(status, message))
+    }
 
 }
 
@@ -343,10 +347,16 @@ let newaccountSeed = ref(null)
 
 onMounted ( ()=> {
 
-    /* + Generate new account */
+    getUsers()
+
     watch(newaccountAddress, value => {
       controllerModel.value = newaccountAddress.value
       scontrollerModel.value = newaccountSeed.value
+    })
+
+    /* + Generate new account */
+    watch(ownerModel.value, value => {
+        getUsers()
     })
     /* - Generate new account */
 

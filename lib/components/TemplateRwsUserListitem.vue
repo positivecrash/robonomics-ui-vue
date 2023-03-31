@@ -1,4 +1,5 @@
 <template>
+
     <robo-grid class="robo-rws-list-item" columns="1" offset="x0" gap="x05">
         <robo-grid :columns="columnsSize" offset="x0" gap="x05" valign="center">
             <robo-text title="3" offset="x0" break>

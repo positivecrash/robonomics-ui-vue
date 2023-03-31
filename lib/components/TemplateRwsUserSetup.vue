@@ -1,10 +1,6 @@
 <template>
 
-    <robo-layout-section width="narrow" vcenter gcenter v-if="rws?.length < 1">
-            <robo-template-rws-users-empty :checkusers="false" />
-    </robo-layout-section>
-
-    <template v-else>
+    <robo-section offset="x0" width="narrow">
         <form>
 
             <robo-grid offset="x0" gap="x1" columns="1">
@@ -72,7 +68,7 @@
             </robo-grid>
 
         </form>
-    </template>
+    </robo-section>
 
 </template>
 
@@ -177,9 +173,9 @@ let userStatus = (statusFromApp, messageFromApp) => {
     if(status.value  === 'ok') {
 
         if(props.edit) {
-            store.dispatch('rws/editUser', { rws: rwsactiveModel, user: pending.value })
+            store.dispatch('rws/editUser', { rws: rwsactiveModel.value, user: pending.value })
         } else {
-            store.dispatch('rws/addUser', { rws: rwsactiveModel, user: pending.value })
+            store.dispatch('rws/addUser', { rws: rwsactiveModel.value, user: pending.value })
         }
     }
 }
@@ -219,21 +215,21 @@ let adduser = () => {
     }
 
     /* If user in this rws exists, don't do anything except showing error */
-    store.dispatch('rws/userexistance', { rws: rwsactiveModel, user: pending.value }).then( result => {
-        if(result < 0) {
-            processing = true
+    processing = true
 
-            if(props.edit) {
-                emit('onUserEdit', (status, message) => userStatus(status, message))
-            } else {
+    if(!props.edit) {
+        store.dispatch('rws/userexistance', { rws: rwsactiveModel.value, user: pending.value }).then( result => {
+            if(result < 0) {
                 emit('onUserSetup', (status, message) => userStatus(status, message))
-            }
 
-        } else {
-            status.value = 'error'
-            statustype.value = 'duplicated'
-        }
-    })
+            } else {
+                status.value = 'error'
+                statustype.value = 'duplicated'
+            }
+        })
+    } else {
+        emit('onUserEdit', (status, message) => userStatus(status, message))
+    }
 }
 
 /* - process */

@@ -60,14 +60,6 @@ const iconSize = computed( () => {
 let svg = defineAsyncComponent(() =>
   import(`../icons/${props.icon}.vue`)
 )
-
-// onMounted(() => {
-//   watch(props.icon, value => {
-//     let svg = defineAsyncComponent(() =>
-//       import(`../icons/${value}.vue`)
-//     )
-//   })
-// })
 /* - Get svg of icon */
 
 </script>
@@ -91,7 +83,7 @@ let svg = defineAsyncComponent(() =>
     --icon-size: v-bind(iconSize);
 
     display: inline-block;
-    line-height: var(--robo-lineheight);
+    line-height: 0;
     color: var(--icon-color);
     font-size: var(--icon-size);
   }

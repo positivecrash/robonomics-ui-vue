@@ -1,7 +1,7 @@
 <template>
-    <div class="robo-layout">
-        <slot/>
-    </div>
+  <div class="robo-layout">
+      <slot/>
+  </div>
 </template>
 
 <script>

@@ -1,6 +1,6 @@
 <template>
 
-  <robo-details type="tooltip" toggler :class="classes" :closeOutOfFocus="false">
+  <robo-details type="tooltip" :class="classes" :closeOutOfFocus="false" :summarystyle="selectstyle ? 'select' : 'text'">
 
     <template #summary>
 
@@ -69,7 +69,7 @@
     <section v-if="extensionAllowShift" class="robo-account-polkadot-info-section">
       <h4 v-if="activeWallet">Shift extension</h4>
 
-      <robo-grid type="grid" offset="x0" gap="x05" columns="4">
+      <robo-grid type="grid" offset="x0" gap="x1" columns="4">
         <template v-for="item in extensions" :key="item.id">
           <robo-account-polkadot-extension :wallet="item.wallet" />
         </template>
@@ -372,14 +372,8 @@
     --robo-account-polkadot-extension-logo: 1.2rem;
   }
 
-  .robo-polkadot-account--selectstyle .robo-details-summary {
-    background-color: var(--robo-color-input);
-    border: 1px solid var(--robo-color-inputborder);
-    color: var(----robo-color-inputcolor);
-    padding: var(--input-padding-v) var(--input-padding-g);
-  }
-
-  .robo-polkadot-account--selectstyle.robo-account--error .robo-details-summary {
+  /* needs check*/
+  .robo-account--error .robo-details--summarystyle-select .robo-details-summary {
     --robo-color-inputborder: var(--robo-color-red)
   }
 

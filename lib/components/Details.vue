@@ -4,7 +4,7 @@
     <summary class="robo-details-summary" aria-expanded="false" tabindex="0" role="button" @click="doFixRatio">
       <robo-grid type="flex" offset="x0" gap="x025" valign="center">
         <slot name="summary" />
-        <robo-icon v-if="toggler" icon="sort-down" class="robo-details-summary-toggler" />
+        <robo-icon v-if="togglerShow" icon="sort-down" class="robo-details-summary-toggler" />
       </robo-grid>
     </summary>
     
@@ -55,11 +55,6 @@ const props = defineProps({
     default: false
   },
 
-  linkstyle: {
-    type: Boolean,
-    default: false
-  },
-
   popupOverlay: {
     type: Boolean,
     default: true
@@ -68,6 +63,14 @@ const props = defineProps({
   popupTitle: {
     type: String,
     default: null
+  },
+
+  summarystyle: {
+    type: String,
+    default: 'text',
+    validator: function (value) {
+      return ['text', 'link', 'select'].includes(value)
+    }
   },
 
   textStyle: {
@@ -124,6 +127,7 @@ const props = defineProps({
 const details = ref(null)
 const content = ref(null)
 let tooltipPlacementValue = ref(props.tooltipPlacement)
+const togglerShow = ref(props.summarystyle == 'select' ? true : props.toggler)
 
 const classes = computed( () => {
   
@@ -135,7 +139,7 @@ const classes = computed( () => {
       [`robo-details--content-align--${props.contentTextalign}`]: props.contentTextalign,
       [`robo-details--loading`]: props.summaryLoading,
       [`robo-details--textStyle-${props.textStyle}`]: props.textStyle,
-      [`robo-details--linkstyle`]: props.linkstyle,
+      [`robo-details--summarystyle-${props.summarystyle}`]: props.summarystyle,
     }  
 
     if (props.type === 'tooltip') {
@@ -392,7 +396,7 @@ onMounted(() => {
   .robo-details-content-inside {
     max-height: 100%;
     overflow: auto;
-    padding: var(--robo-details-content-padding) calc(var(--robo-details-content-padding) * 2) var(--robo-details-content-padding) var(--robo-details-content-padding);
+    padding: var(--robo-details-content-padding);
     position: relative;
   }
   /* - content */
@@ -405,19 +409,12 @@ onMounted(() => {
 
   .robo-details-content-close {
     cursor: pointer;
-    /* position: absolute;
-    right: var(--robo-details-content-padding);
-    top: var(--robo-details-content-padding); */
     position: sticky;
-    top: var(--robo-details-content-padding);
-    right: var(--robo-details-content-padding);
+    right: 5px;
+    top: 5px;
     float: right;
     z-index: 10;
   }
-
-  /* .robo-details--tooltip-closable > .robo-details-content {
-    padding-right: calc(var(--robo-details-content-padding) * 2 + 0.2rem) !important;
-  } */
   /* - actions */
 
   /* + tooltip */
@@ -597,8 +594,17 @@ onMounted(() => {
   }
   /* - popup animation */
 
-  .robo-details--linkstyle summary {
+  /* + summarystyle */
+  .robo-details--summarystyle-link summary {
     color: var(--robo-color-blue);
     border-bottom: 1px dashed var(--robo-color-blue);
   }
+
+  .robo-details--summarystyle-select summary {
+    background-color: var(--robo-color-input);
+    border: 1px solid var(--robo-color-inputborder);
+    color: var(----robo-color-inputcolor);
+    padding: var(--input-padding-v) var(--input-padding-g);
+  }
+  /* - summarystyle */
 </style>

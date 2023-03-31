@@ -108,7 +108,7 @@ export default defineConfig({
       fileName: () => '[name].js',
     },
     rollupOptions: {
-      external: ['vue'],
+      external: ['vue', 'vue-router'],
       output: {
         globals: {
           vue: 'Vue',

@@ -22,6 +22,8 @@
             class="robo-input-control"
             :disabled = "disabled"
             :placeholder="placeholder ? placeholder : null"
+
+            id="fileupload"
         />
         
         <input 
@@ -33,6 +35,8 @@
             :placeholder="placeholder ? placeholder : null"
             type="text"
         />
+
+        <label v-if="inputType === 'file'" for="fileupload">file upload</label>
 
         <robo-button 
           v-if="inputType === 'password'"
@@ -274,6 +278,14 @@ export default defineComponent({
       --border: var(--robo-color-red);
       --color: var(--robo-color-red);
     }
+
+    .robo-input input[type="file"] {
+      height: 0 !important;
+      overflow: hidden !important;
+      width: 0 !important;
+      border: 0 !important;
+      padding: 0 !important;
+    }
 </style>
 
 <style>
@@ -281,10 +293,5 @@ export default defineComponent({
     position: absolute;
     bottom: 0.5rem;
     right: 0.5rem;
-  }
-
-  .robo-details--tooltip .robo-button {
-    --robo-button-padding: calc(var(--robo-input-padding) * .4);
-    text-transform: lowercase;
   }
 </style>

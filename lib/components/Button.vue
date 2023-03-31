@@ -163,8 +163,8 @@
 }
 
 .robo-button-size-small {
-  --robo-button-fontsize: calc(var(--robo-input-fontsize) * 0.8);
-  --robo-button-padding: calc(var(--robo-input-padding) * 0.8);
+  /* --robo-button-fontsize: calc(var(--robo-input-fontsize) * 0.8); */
+  --robo-button-padding: calc(var(--robo-input-padding) * 0.6);
 }
 
 .robo-button-size-large {
@@ -259,6 +259,7 @@
 
   .robo-button.robo-button-clean,
   .robo-button.robo-button-clean:hover {
+    --robo-button-padding: 0;
     background-color: transparent;
     border-color: transparent;
   }

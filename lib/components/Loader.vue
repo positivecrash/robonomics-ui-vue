@@ -74,8 +74,10 @@ export default defineComponent({
 
     display: inline-block;
     vertical-align: middle;
-    width: 23px;
-    max-height: 100%;
+    /* width: 23px;
+    max-height: 100%; */
+    width: 1vi;
+    height: 1vi;
     color: var(--loader-color);
   }
 

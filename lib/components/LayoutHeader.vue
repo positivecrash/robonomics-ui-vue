@@ -54,8 +54,9 @@
       </robo-grid>
 
     </div>
-
+    
   </header>
+
 
 </template>
 
@@ -171,7 +172,7 @@
 
 
   /* + STYLING */
-  .robo-layout-header {
+  .robo-layout-header .robo-layout-header-grid {
     background-color: var(--robo-header-background);
     color: var(--robo-header-color);
   }
