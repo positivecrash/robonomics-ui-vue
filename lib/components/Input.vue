@@ -5,10 +5,9 @@
         <robo-text
             v-if="label"
             class="robo-input-label"
-            v-html="label"
             :size="labelSize"
             weight="bold"
-        />
+        >{{label}}</robo-text>
         
         <input 
             @focus="focused"

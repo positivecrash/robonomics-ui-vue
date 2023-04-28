@@ -1,7 +1,6 @@
 <template>
     <div
         :class="classList"
-        :style="styles"
         ref="card"
     >
         <robo-progress v-if="loading || progress" :progress="progress" />
@@ -43,28 +42,6 @@ export default defineComponent({
       default: 'light',
       validator: function (value) {
         return ['light', 'dark', 'lightblue', 'opacitylight'].indexOf(value) !== -1;
-      }
-    },
-    backImage: {
-      type: String,
-      default: null
-    },
-    backPosition: {
-      type: String,
-      default: '100% 100%'
-    },
-    backRepeat: {
-      type: String,
-      default: 'no-repeat',
-      validator: function (value) {
-        return ['no-repeat', 'repeat-x', 'repeat-y', 'repeat', 'space'].indexOf(value) !== -1;
-      }
-    },
-    backSize: {
-      type: String,
-      default: 'auto',
-      validator: function (value) {
-        return ['contain', 'cover', 'auto'].indexOf(value) !== -1;
       }
     },
     fixedButton: {
@@ -128,27 +105,6 @@ export default defineComponent({
         [`robo-card--widget`]: this.widget,
         [`robo-card--simplefont`]: this.simplefont,
       };
-    },
-    styles() {
-      var s = '';
-
-      if (this.backImage) {
-        s += 'background-image: url(' + this.backImage + ');'
-      }
-
-      if (this.backImage && this.backPosition) {
-        s += ' background-position:' + this.backPosition + ';'
-      }
-
-      if (this.backImage && this.backRepeat) {
-        s += ' background-repeat:' + this.backRepeat + ';'
-      }
-
-      if (this.backImage && this.backSize) {
-        s += ' background-size:' + this.backSize + ';'
-      }
-
-      return s
     }
   },
 
@@ -178,10 +134,6 @@ export default defineComponent({
     .robo-card-content {
       padding: var(--card-padding);
     }
-
-    /* .robo-card:not(.robo-card--paddings) {
-      --card-padding: 0;
-    } */
 
     .robo-card .robo-progress {
       position: absolute;
@@ -256,7 +208,9 @@ export default defineComponent({
       background-color: var(--robo-color-input);
     }
     .robo-card.robo-card--widget .robo-card-content {
-      align-self: center;
+      align-self: stretch;
+      padding-bottom: 0;
+      padding-top: 0;
     }
 
     .robo-card--simplefont {
@@ -311,11 +265,16 @@ export default defineComponent({
       width: 100%;
     }
 
-
     .robo-card-widgeticon > * {
       display: grid !important;
       align-content: center;
       justify-content: center;
+      height: 100%;
+    }
+
+    .robo-card.robo-card--widget .robo-card-content > .robo-details,
+    .robo-card.robo-card--widget .robo-card-content > .robo-select,
+    .robo-card.robo-card--widget .robo-card-content > .robo-select select {
       height: 100%;
     }
 </style>

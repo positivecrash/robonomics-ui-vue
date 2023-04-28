@@ -1,18 +1,24 @@
 <template>
-    <section :class="classes" :style="styles">
+  <section :class="classes">
+    <template v-if="imaged" >
+      <robo-image :src="getImage(`boy-${imaged}.svg`)" max="220px"/>
+      <robo-text v-if="imagedtitle" size="small" weight="bold" offset="x05">{{imagedtitle}}</robo-text>
+      <slot/>
+    </template>
+    <template v-else>
       <div v-if="mark" class="section-image">
         <p v-if="marktitle">{{marktitle}}</p>
-        <img v-if="mark === 'info'" :src="getImage('boy-info.svg')" />
-        <img v-if="mark === 'question'" :src="getImage('boy-question.svg')" />
+        <img :src="getImage(`boy-${mark}.svg`)" />
       </div>
       <div class="section-content" v-if="mark">
         <robo-text size="small" paragraphs weight="normal-italic">
           <slot/>
         </robo-text>
       </div>
-
       <slot v-if="!mark" />
-    </section>
+    </template>
+  </section>
+
 </template>
 
 <script>
@@ -24,30 +30,9 @@ import { defineProps, computed } from 'vue'
 import { getImage } from '../tools'
 
 const props = defineProps({
-    backColor: {
-      type: String
-    },
-    backImage: {
-      type: String,
-      default: null
-    },
-    backPosition: {
-      type: String,
-      default: '100% 50%'
-    },
-    backRepeat: {
-      type: String,
-      default: 'no-repeat',
-      validator: function (value) {
-        return ['no-repeat', 'repeat-x', 'repeat-y', 'repeat', 'space'].indexOf(value) !== -1;
-      }
-    },
-    backSize: {
-      type: String,
-      default: 'auto',
-      validator: function (value) {
-        return ['contain', 'cover', 'auto'].indexOf(value) !== -1;
-      }
+    clean: {
+      type: Boolean,
+      default: false
     },
 
     gcenter: {
@@ -68,8 +53,17 @@ const props = defineProps({
       default: null
     },
 
-    textColor: {
-      type: String
+    imaged: {
+      type: String,
+      default: null,
+      validator: function (value) {
+        return ['info', 'notfound', 'playing', 'question', 'smarthome', 'users'].indexOf(value) !== -1;
+      }
+    },
+
+    imagedtitle: {
+      type: String,
+      default: null
     },
 
     offset: {
@@ -91,43 +85,12 @@ const props = defineProps({
 const classes = computed(() => {
   return {
     [`robo-section`]: true,
+    [`robo-section-clean`]: props.clean,
     [`robo-section-gcenter`]: props.gcenter,
     [`robo-section-offset-${props.offset}`]: props.offset,
-    [`robo-section--backimage`]: props.backImage,
-    [`robo-section--colored`]: props.backColor,
     [`robo-section--mark-${props.mark}`]: props.mark,
     [`robo-section-width--${props.width}`]: props.width,
   }
-})
-
-const styles = computed (() => {
-    var s = '';
-
-    if (props.backImage) {
-      s += 'background-image: url(' + props.backImage + ');'
-
-      if (props.backPosition) {
-        s += ' background-position:' + props.backPosition + ';'
-      }
-
-      if (props.backRepeat) {
-        s += ' background-repeat:' + props.backRepeat + ';'
-      }
-
-      if (props.backSize) {
-        s += ' background-size:' + props.backSize + ';'
-      }
-    }
-
-    if (props.backColor) {
-      s += ' background-color:' + props.backColor + ';'
-    }
-
-    if (props.textColor) {
-      s += ' color:' + props.textColor + ';'
-    }
-
-    return s
 })
 
 </script>
@@ -168,6 +131,11 @@ const styles = computed (() => {
       --section-width: 100%
     }
 
+
+    .robo-section.robo-section-clean {
+      margin: 0;
+      --offset: 0;
+    }
 
     /* + MARK (info, question) */
 

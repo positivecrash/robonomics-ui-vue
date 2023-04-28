@@ -81,14 +81,13 @@ export default defineComponent({
 })
 </script>
 
-<style>
+<style scoped>
 
-.robo-tabs div[role="tablist"] .robo-btn {
+div[role="tablist"] .robo-button {
   margin-right: var(--gap-text);
-  margin-bottom: var(--gap-text);
 }
 
-.robo-tabs div[role="tablist"] .robo-btn:last-child {
+div[role="tablist"] .robo-button:last-child {
   margin-right: 0;
 }
 

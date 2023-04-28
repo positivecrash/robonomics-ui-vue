@@ -29,7 +29,7 @@
 </script>
 
 <script setup>
-import { defineProps, computed } from 'vue'
+import { defineProps, defineEmits, computed } from 'vue'
 
 const props = defineProps({
   block: {
@@ -127,10 +127,6 @@ const selected = computed({
     --border: var(--robo-color-inputborderdisabled);
   }
 
-  .robo-select--block {
-    display: block;
-  }
-
   select {
     --webkit-appearance: none;
     appearance: none;
@@ -143,7 +139,11 @@ const selected = computed({
     font-weight: bold;
     line-height: 2;
     padding-right: calc(var(--input-padding-g) * 1.5 + var(--select-tog-size));
-    width: 100%;
+    min-width: 100%;
+  }
+
+  .robo-select--block {
+    display: block;
   }
 
   .robo-select:not(.robo-select--clean) {
@@ -178,7 +178,7 @@ const selected = computed({
 
   .robo-select--size-small {
     --input-padding-v: calc(var(--input-padding-g) * 0.5);
-    --input-padding-g: 0.5rem;
+    /* --input-padding-g: 0.5rem; */
   }
 
   .robo-select--size-small .robo-icon {
@@ -187,7 +187,7 @@ const selected = computed({
   }
 
   .robo-select-label {
-      left: var(--space);
+      left: var(--input-padding-g);
       position: absolute;
       top: calc(var(--space) * 0.5);
       transition: 0.2s all ease;
@@ -199,6 +199,10 @@ const selected = computed({
 
   .robo-select--labeled select {
     --input-padding-g: var(--space);
+  }
+
+  .robo-select--clean .robo-select-label {
+    left: 0;
   }
 
 </style>

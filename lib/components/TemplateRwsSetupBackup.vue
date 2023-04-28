@@ -1,9 +1,12 @@
 <template>
 
-    <robo-section :class="classes" offset="x1">
-        <robo-details summarystyle="select">
+    <robo-details class="robo-rws-backup" type="popup">
             <template #summary>
-                <robo-text size="small" weight="bold" nowrap>Recover RWS settings</robo-text>
+                <robo-button block outline>
+                    <template v-if="recover && save">Recover / Save</template>
+                    <template v-if="recover && !save">Recover</template>
+                    <template v-if="!recover && save">Save</template>
+                </robo-button>
             </template>
 
             <template v-if="save && store.state.robonomicsUIvue.rws.list.length > 0">
@@ -14,7 +17,8 @@
                         size="small"
                     >
                         <robo-icon icon="file-arrow-down" />
-                        <span>Save setups</span>
+                        <span v-if="!recover">Upload file</span>
+                        <span v-else>Save setups</span>
                     </robo-button>
                 </robo-section>
             </template>
@@ -31,7 +35,8 @@
                         <template v-else>
                             <template v-if="importResult === null">
                                 <robo-icon icon="file-arrow-up" />
-                                Recover
+                                <span v-if="!save">Upload file</span>
+                                <span v-else>Recover setups</span>
                             </template>
 
                             <template v-else>
@@ -56,8 +61,7 @@
                 <robo-text v-if="store.state.robonomicsUIvue.rws.list.length > 0" weight="normal-italic" size="tiny" highlight="attention">Recovering will rewrite all your current settings.</robo-text>
             </template>
 
-        </robo-details>
-    </robo-section>
+    </robo-details>
 
 </template>
 
@@ -84,12 +88,6 @@ const props = defineProps({
     type: Boolean,
     default: false
   }
-})
-
-const classes = computed( () => {
-    return {
-      [`robo-rws-backup`]: true
-    }
 })
 
 const classesLabel = computed( () => {
@@ -122,9 +120,9 @@ let importSelected = e => {
 
         setTimeout( () => {
             importResult.value = null
-            if(props.recoverRedirect) {
-                router.push({ path: store.state.robonomicsUIvue.rws.links.list })
-            }
+            // if(props.recoverRedirect) {
+            //     router.push({ path: store.state.robonomicsUIvue.rws.links.list })
+            // }
         }, 3000)
 
     }
@@ -175,6 +173,10 @@ let exportSettings = () => {
 
         display: block;
         width: 100%;
+    }
+
+    .robo-label-buttonlike span:not(:first-child) {
+        margin-left: var(--robo-space)
     }
 
     input[type="file"] {

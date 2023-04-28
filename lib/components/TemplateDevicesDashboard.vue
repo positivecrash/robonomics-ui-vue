@@ -1,119 +1,80 @@
 <template>
 
 <div class="robo-rws-devices-dashboard-mobile">
-  <robo-grid type="flex" offset="x1" galign="start">
-      <robo-button :router="store.state.robonomicsUIvue.rws.links.list" v-if="store.state.robonomicsUIvue.rws.links.list">
-        <robo-icon icon="house" />
-      </robo-button>
-
-      <robo-button 
+  <robo-grid type="flex" gap="x1" offset="x0" galign="start">
+    <robo-button 
         block 
         @click.prevent="updateInfo()"
         :type="status ? status : 'primary'"
         :disabled="updating"
-        :class="updating ? 'robo-button-uploading' : null"
+        class="robo-button-uploading"
       >
         <robo-icon icon="check" v-if="status === 'ok'" />
         <robo-icon icon="rotate" v-if="!status" />
-      </robo-button>
+    </robo-button>
 
-      <robo-button v-if="Object.keys(users).length > 0 && store.state.robonomicsUIvue.rws.links.users" :router="store.state.robonomicsUIvue.rws.links.users">
-        <robo-icon icon="user" />
-        <template #badge>{{Object.keys(users).length}}</template>
-      </robo-button>
-
-      <robo-button @click.prevent="exportAll()">
-        <robo-icon icon="file-arrow-down" />
-      </robo-button>
-  </robo-grid>
-
-  <robo-grid offset="x1" gap="x05">
-  
-    <robo-card widget simplefont v-if="store.state.robonomicsUIvue.rws.links.list">
-      <template #widgeticon>
-        <robo-icon icon="house" />
+    <robo-details>
+      <template #summary>
+        <robo-button><robo-icon icon="gear" /></robo-button>
       </template>
-      <robo-template-rws-activeselect size="small" clean block />
-    </robo-card>
 
-    <robo-card widget simplefont>
-      <template #widgeticon>
-        <robo-icon icon="rotate" />
-      </template>
-      <robo-select 
-        :options="ipfsGateways" 
-        :values="ipfsGateways" 
-        v-model="selectedGateway" 
-        size="small" 
-        clean
-        @change="setGateway()"
-      />
-    </robo-card>
+      <robo-grid gap="x05" offset="x0">
+        <robo-template-rws-activeselect size="small" />
 
-    <robo-card widget simplefont v-if="config">
-      <template #widgeticon>
-        <robo-icon icon="eye" />
-      </template>
-      <robo-select :options="viewas" :values="viewas" v-model="viewasSelected" size="small" clean block @change="setView" />
-    </robo-card>
+        <robo-select 
+          :options="ipfsGateways" 
+          :values="ipfsGateways" 
+          v-model="selectedGateway" 
+          size="small" 
+          @change="setGateway()"
+          label="Gateway"
+        />
 
-  </robo-grid>
-  
-</div>
+      </robo-grid>
 
-<robo-grid type="flex" offset="x0" class="robo-rws-devices-dashboard">
-  <robo-grid type="flex" galign="start" gap="x1" offset="x0">
-    
-    <robo-card widget simplefont>
-      <template #widgeticon v-if="store.state.robonomicsUIvue.rws.links.list">
-        <robo-button :router="store.state.robonomicsUIvue.rws.links.list">
-          <robo-icon icon="house" />
-        </robo-button>
-      </template>
-      <robo-template-rws-activeselect size="small" clean />
-    </robo-card>
+    </robo-details>
 
-    <robo-card widget simplefont>
-      <template #widgeticon>
-        <robo-button 
-          block 
-          @click.prevent="updateInfo()"
-          :type="status ? status : 'primary'"
-          :disabled="updating"
-          :class="updating ? 'robo-button-uploading' : null"
-        >
-          <robo-icon icon="check" v-if="status === 'ok'" />
-          <robo-icon icon="rotate" v-if="!status" />
-        </robo-button>
-      </template>
-      <robo-select 
-        :options="ipfsGateways" 
-        :values="ipfsGateways" 
-        v-model="selectedGateway" 
-        size="small" 
-        clean
-        @change="setGateway()"
-      />
-    </robo-card>
-    
     <robo-button class="robo-devices-dashboardicon" v-if="Object.keys(users).length > 0 && store.state.robonomicsUIvue.rws.links.users" :router="store.state.robonomicsUIvue.rws.links.users">
       <robo-icon icon="user" />
       <template #badge>{{Object.keys(users).length}}</template>
     </robo-button>
 
-    <robo-button @click.prevent="exportAll()">
-      <robo-icon icon="file-arrow-down" />
-      Save
-    </robo-button> 
+    <robo-template-rws-setup-backup save />
+  </robo-grid>
+</div>
 
+<robo-grid type="flex" offset="x0" gap="x1" class="robo-rws-devices-dashboard">
+  <robo-grid type="flex" galign="start" gap="x1" offset="x0">
+    <robo-button 
+        block 
+        @click.prevent="updateInfo()"
+        :type="status ? status : 'primary'"
+        :disabled="updating"
+        class="robo-button-uploading"
+      >
+        <robo-icon icon="check" v-if="status === 'ok'" />
+        <robo-icon icon="rotate" v-if="!status" />
+    </robo-button>
+
+    <robo-template-rws-activeselect size="small" />
+
+    <robo-select 
+      :options="ipfsGateways" 
+      :values="ipfsGateways" 
+      v-model="selectedGateway" 
+      size="small" 
+      @change="setGateway()"
+      label="Gateway"
+    />
+
+    <robo-button class="robo-devices-dashboardicon" v-if="Object.keys(users).length > 0 && store.state.robonomicsUIvue.rws.links.users" :router="store.state.robonomicsUIvue.rws.links.users">
+      <robo-icon icon="user" />
+      <template #badge>{{Object.keys(users).length}}</template>
+    </robo-button>
   </robo-grid>
 
-  <robo-card widget simplefont v-if="config">
-    <template #widgeticon>
-      <robo-icon icon="eye" />
-    </template>
-    <robo-select :options="viewas" :values="viewas" v-model="viewasSelected" size="small" clean @change="setView" />
-  </robo-card>
+  <robo-template-rws-setup-backup save />
+  
 </robo-grid>
 
 </template>
@@ -130,10 +91,7 @@ const emit = defineEmits(['onUpdate'])
 const props = defineProps({
     config: {
         type: [Object, String]
-    },
-    datalog: {
-        type: [Object, String]
-    },
+    }
 })
 
 /* + store */
@@ -178,41 +136,6 @@ let updateInfo = () => {
   updating.value = false
 }
 /* - Update */
-
-/* + Datalog view */
-let viewas = ref([])
-
-if(props.config) {
-    viewas = ['Home Assistant', 'Devices']
-} else {
-    viewas = [ 'Devices' ]
-}
-
-let viewasSelected = ref(viewas[0])
-store.state.robonomicsUIvue.rws.devices.view = viewasSelected.value
-
-let setView = () =>{
-  store.state.robonomicsUIvue.rws.devices.view = viewasSelected.value
-}
-
-/* - Datalog view */
-
-
-/* + Export */
-import JSZip from 'jszip'
-import FileSaver from 'file-saver'
-
-let exportAll = () => {
-  const zip = new JSZip()
-  let rwsSetups = localStorage.getItem('robonomicsUIrwslist')
-  zip.file('dapp.robonomics.network-rws.json', rwsSetups)
-  zip.file('dapp.robonomics.network-devices.json', JSON.stringify(props.datalog))
-  zip.file('dapp.robonomics.network-config.json', JSON.stringify(props.config))
-
-  zip.generateAsync({ type: 'blob' }).then(function (content) {
-      FileSaver.saveAs(content, 'dapp.robonomics.network.zip')
-  })
-}
 /* - Export */
 
 </script>
@@ -226,9 +149,8 @@ let exportAll = () => {
     min-width: 50px;
   }
 
-  .robo-rws-devices-dashboard-mobile .robo-button {
-    width: 40px;
-    height: 40px;
+  .robo-button-uploading {
+    width: 5rem
   }
 
   @media screen and (min-width: 850px) {

@@ -92,7 +92,7 @@
             </robo-grid-item>
 
             <robo-grid-item v-if="message">
-                <robo-text :highlight="status ? status : null" v-html="message" />
+                <robo-text :highlight="status ? status : null">{{message}}</robo-text>
             </robo-grid-item>
 
             <robo-grid-item v-if="status === 'error' && statustype">

@@ -1,14 +1,39 @@
 <template>
-    <component 
-        :is="whatCard"
-        :class="classes"
-        :icon="icon"
-        :name="name"
-        :status="status"
+    
+    <robo-section class="entity" clean>
 
-        :card="card"
-        :entity="entity"
-    />
+        <template v-if="card === 'glance' && enIcon">
+            <robo-grid type="grid" offset="x0" gap="x0" galign="center" :title="entity">
+                <robo-icon v-if="enIcon" :icon="enIcon" />
+                <robo-text v-if="enData.state && !enServices" size="tiny" weight="bold">
+                {{enStateText ?? enData.state}}
+                <template v-if="enUnits">{{enUnits}}</template>
+                </robo-text>
+            </robo-grid>
+        </template>
+
+        <template v-else>
+            <robo-grid type="flex" offset="x0" gap="x0" valign="center" fluid>
+                <robo-grid v-if="enIcon || entity" type="flex" offset="x0" gap="x05" galign="start" valign="center">
+                <robo-icon v-if="enIcon" :icon="enIcon" :key="iconChange" />
+                <robo-text v-if="entity" size="tiny">{{enData?.attributes?.friendly_name || entity}}</robo-text>
+                </robo-grid>
+                <robo-text v-if="enData.state && !enServices" size="tiny" weight="bold">
+                    {{enStateText ?? enData.state}}
+                    <template v-if="enUnits">{{enUnits}}</template>
+                </robo-text>
+                <robo-toggle v-if="enServices?.toggle" v-model="toggleService" />
+            </robo-grid>
+        </template>
+
+    </robo-section>
+    
+    <!-- <div style="font-size:9px;display:none">entity<br/> {{entity}}</div>
+    <div style="font-size:9px;display:none">enType<br/> {{enType}}</div>
+    <div style="font-size:9px;display:none">enIcon<br/> {{enIcon}}</div>
+    <div style="font-size:9px;display:none">enData<br/> {{enData}}</div>
+    <div style="font-size:9px;display:none">enSettings<br/> {{enSettings}}</div>
+    <div style="font-size:9px;display:none">iconChange<br/> {{iconChange}}</div> -->
 </template>
 
 <script>
@@ -16,135 +41,144 @@
 </script>
 
 <script setup>
-import { defineProps, computed, ref  } from 'vue'
+import { defineProps, computed, ref, onMounted, watch } from 'vue'
 import entityStatuses from '../entities/statuses'
-import entitiyTypes from '../entities/types'
-import {getEntityType} from '../entities/utils'
+import entityTypes from '../entities/types'
+import {getEntityFullType, getEntityType} from '../entities/utils'
 
 const props = defineProps({
     card: {
-        type: String
+        type: String,
+        required: true
+    },
+    config: {
+        type: Object,
+        required: true
     },
     entity: {
-        type: Object
-    },
-    name: {
         type: String,
         required: true
     }
 })
 
-let entity = ref(props.entity).value
-
-const classes = computed( () => {
-    return {
-      [`robo-entity--disabled`]: !entity.state || entity.state === 'unavailable'
-    }
+import { useStore } from 'vuex'
+const store = useStore()
+const telemetry = computed( () => {
+  return store.state.robonomicsUIvue.rws.telemetry
 })
 
-/* + NAME */
-const getEntityName = () => {
-    if(typeof props.name != 'string'){
-        console.warn('[robonomics-ui-vue]: wrong prop type for "name" in robo-template-entity, expected string, got: ', typeof props.name)
-        return
-    }
+const enTypeFull = computed(() => {
+    return getEntityFullType(props.entity, entityTypes)
+})
 
-    return props.name.split('.')[1]
-}
+const enType = computed(() => {
+    return getEntityType(props.entity, entityTypes)
+})
 
-let name = ref(getEntityName())
-/* - NAME */
-
-/* + SETTINGS (type, icon, text etc from external file) */
-const getSettings = () => {
-
-    // try to get type, if we have not in income object
-    if(!entity.hasOwnProperty('type')) {
-        entity.type = getEntityType(props.name , entitiyTypes)
-    }
-    if(entity.hasOwnProperty('type') && Array.isArray(entity.type)) {
+const enSettings = computed(() => {
+   if(enTypeFull.value && Array.isArray(enTypeFull.value)) {
         for (const status of entityStatuses) {
-            if(status.type.every(v => entity.type.some(entityValue => entityValue == v))){
+            if(status?.type.every(v => enTypeFull.value.some(entityValue => entityValue == v))){
                 return status
             }
         }
     } else {
         return null
     }
-}
+})
 
-let settings = ref(getSettings())
+const enData = computed(() => {
 
-/* - SETTINGS (type, icon, text etc from external file) */
+    if(telemetry.value?.entities[props.entity]){
+        return telemetry.value.entities[props.entity]
+    } else {
+        return null
+    }
+})
 
-/* + ICON */
-const getIcon = (settings) => {
+const enIcon = computed(() => {
 
-    if(entity.state) {
-        if(settings?.state && settings.state.hasOwnProperty(entity.state)) {
-            return settings.state[entity.state].icon
+    if(enData.value?.state && enSettings.value) {
+        if(enSettings.value?.state && enSettings.value?.state.hasOwnProperty(enData.value?.state)) {
+            return enSettings.value?.state[enData.value?.state].icon
         } else {
-            if (settings?.icon){
-                return settings.icon
-            } else {
-                return null
-            }
+            return enSettings.value?.icon
         }
     } else {
-        if (settings?.state && settings.state.hasOwnProperty('unavailable')) {
-            return settings.state['unavailable'].icon
+        return null
+    }
+
+})
+
+const enStateText = computed(() => {
+
+    if(enData.value?.state && enSettings.value) {
+        if(enSettings.value?.state && enSettings.value?.state.hasOwnProperty(enData.value?.state)) {
+            return enSettings.value?.state[enData.value?.state].text
         } else {
             return null
         }
-    }
-}
-
-const icon =  getIcon(settings.value)
-/* - ICON */
-
-/* + STATUS */
-const getStatus = (settings) => {
-
-    if(entity.state && settings?.state && settings.state.hasOwnProperty(entity.state) && settings.state[entity.state].text) {
-        return settings.state[entity.state].text
-    } else if (settings?.text){
-        return settings.text
-    } else if (entity?.state) {
-        if(entity.state === 'unavailable') {
-            //rewrite text for unavailable
-            return 'n/a'
-        } else{
-            return entity.state
-        }
-    } else if (settings?.state && settings.state.hasOwnProperty('unavailable')?.text) {
-        return settings.state['unavailable'].text
     } else {
-        return 'n/a'
+        return null
+    }
+    
+})
+
+const enServices = computed( () => {
+  const service = Object.keys(props.config?.services).find(k => k === enType.value)
+
+  if(service) {
+    return props.config?.services[service]
+  } else {
+    return null
+  }
+})
+
+let toggleService = ref(null)
+if(enServices?.value?.toggle) {
+    if(enData?.value.state === 'on') {
+        toggleService.value = true
+    }
+    if(enData?.value.state === 'off') {
+        toggleService.value = false
     }
 }
 
-const status =  getStatus(settings.value)
-/* - STATUS */
+let iconChange = ref(0)
 
-// const checkType = (type) => {
-//     if(Array.isArray(entity.type)) {
-//         return entity.type.every((element) => type.includes(element))
-//     }
+onMounted( () => {
+    watch(toggleService, value => {
+        let bufer = store.state.robonomicsUIvue.rws.telemetry
 
-//     if(typeof entity.type === 'string') {
-//         return type.every((element) => entity.type === element)
-//     }
-// }
+        let state = null
+        if(value) {
+            state = 'on'
+        } else {
+            state = 'off'
+        }
 
-/* + determine card component */
-import {EntityInfo, EntityLight} from '../entities/cards'
+        bufer.entities[props.entity].state = state
 
-const whatCard = computed(() => {
-    return ({
-      'light': EntityLight
-    }[entity.type] ?? EntityInfo)
+        let launch = `{"platform": ${enType.value}, "service": toggle, "parameters": {"entity_id": ${props.entity}, "state": ${state} }}`
+
+        store.commit('rws/setTelemetry', bufer)
+        store.commit('rws/setLaunch', launch)
+    })
+
+    watch(enData.value, value => {
+        if(enServices?.value?.toggle) {
+            if(value.state === 'on') {
+                toggleService.value = true
+            }
+            if(value.state === 'off') {
+                toggleService.value = false
+            }
+            iconChange.value += 1
+        }
+        
+    })
+
 })
-/* - determine card component */
 
 </script>
 

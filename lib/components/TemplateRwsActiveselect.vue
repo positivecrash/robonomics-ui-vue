@@ -7,7 +7,7 @@
       v-model="rwsactiveModel" 
       @change="setActive()"
       v-bind="$attrs"
-      label="Choose RWS"
+      label="Active RWS"
     />
 
     <robo-input v-else v-model="rwsactiveModel" v-bind="$attrs" label="Enter RWS owner address" />
@@ -55,3 +55,7 @@ let setActive = () => {
 }
 
 </script>
+
+<style scoped>
+  .robo-select { min-width: 8rem; }
+</style>

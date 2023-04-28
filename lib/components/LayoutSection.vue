@@ -1,8 +1,7 @@
 <template>
     <div :class="classList">
-        <robo-template-rws-setup-backup v-if="rwsrecover" recoverRedirect :save="rwssave" />
-
-        <slot/>
+      <slot/>
+      <robo-template-rws-setup-backup v-if="rwsrecover" recoverRedirect :save="rwssave" />
     </div>
 </template>
 
@@ -98,7 +97,7 @@ export default defineComponent({
 <style>
 /* + backup */
     @media screen and (min-width: 1000px){
-        .robo-rws-backup {
+        .robo-layout-section > .robo-rws-backup {
             position: absolute;
             right: var(--robo-layout-padding);
             top: var(--robo-layout-padding);
@@ -108,15 +107,10 @@ export default defineComponent({
     }
 
     @media screen and (max-width: 1000px){
-        .robo-rws-backup .robo-details {
+        .robo-layout-section > .robo-rws-backup {
             display: block;
             width: 100%;
-        }
-
-        .robo-rws-backup {
-            box-sizing: border-box;
-            margin: var(--robo-layout-padding);
-            width: auto;
+            margin-top: calc(var(--robo-space) * 4);
         }
     }
     /* - backup */

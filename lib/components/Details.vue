@@ -2,10 +2,11 @@
 
   <details :class="classes" tabindex="0" ref="details" :open="open ? true : null">
     <summary class="robo-details-summary" aria-expanded="false" tabindex="0" role="button" @click="doFixRatio">
-      <robo-grid type="flex" offset="x0" gap="x025" valign="center">
+      <robo-grid v-if="togglerShow" type="flex" offset="x0" gap="x025" valign="center">
         <slot name="summary" />
-        <robo-icon v-if="togglerShow" icon="sort-down" class="robo-details-summary-toggler" />
+        <robo-icon icon="sort-down" class="robo-details-summary-toggler" />
       </robo-grid>
+      <slot v-else name="summary" />
     </summary>
     
     <div class="robo-details-content" ref="content">
@@ -371,7 +372,9 @@ onMounted(() => {
     background-color: var(--robo-details-summary-background);
     color: var(--robo-details-summary-color);
     cursor: pointer;
+    display: flex;
     fill: var(--robo-details-summary-color); /* for svgs inside */
+    height: 100%;
     padding: var(--robo-details-summary-padding);
     transition: 0.2s linear all;
     user-select: none;
@@ -427,7 +430,13 @@ onMounted(() => {
     max-width: var(--robo-details-tooltip-maxwidth);
     position: absolute;
     text-transform: none;
-    z-index: 1000;
+    z-index: 900;
+  }
+
+  @media screen and (max-width: 900px) {
+    .robo-details--tooltip .robo-details-content {
+      z-index: 1100;
+    }
   }
   /* - tooltip */
 
@@ -597,7 +606,7 @@ onMounted(() => {
   /* + summarystyle */
   .robo-details--summarystyle-link summary {
     color: var(--robo-color-blue);
-    border-bottom: 1px dashed var(--robo-color-blue);
+    /* border-bottom: 1px dashed var(--robo-color-blue); */
   }
 
   .robo-details--summarystyle-select summary {

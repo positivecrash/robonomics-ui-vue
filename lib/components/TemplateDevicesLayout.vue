@@ -1,31 +1,28 @@
-<template>      
+<template>
 
-    <robo-layout-section :width="(rws?.length < 1) ? 'narrow' : null" :vcenter="rws?.length < 1" :gcenter="rws?.length < 1">
-        <template v-if="rws?.length < 1">
-            <robo-template-devices-empty />
-            <robo-section offset="x2">
-                <robo-template-rws-setup-backup />
+    <template v-if="rws?.length < 1">
+        <robo-layout-section rwsrecover>
+            <robo-section width="narrow" gcenter>
+                <robo-template-devices-empty />
             </robo-section>
-        </template>
+        </robo-layout-section>
+    </template>
 
-        <temlate v-if="rws?.length > 0">
+    <template v-if="rws?.length > 0">
+        <robo-layout-section>
             <robo-template-devices-dashboard 
                 @before-update="beforeUpdate"
                 @on-update="onUpdate"
                 @after-update="afterUpdate"
 
                 :config = "config"
-                :datalog = "datalog"
             />
 
             <robo-section offset="x2">
-                <robo-template-devices
-                    :config = "config"
-                    :telemetry = "datalog"
-                />
+                <robo-template-devices :config = "config" />
             </robo-section>
-        </temlate>
-    </robo-layout-section>
+        </robo-layout-section>
+    </template>
 
 </template>
 
@@ -34,7 +31,7 @@
 </script>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onBeforeMount, onMounted } from 'vue'
 
 const props = defineProps({
     config: {
@@ -64,5 +61,9 @@ const rws = computed( () => {
   return store.state.robonomicsUIvue.rws.list
 })
 /* - get rws */
+
+onBeforeMount( () => {
+    store.commit('rws/setTelemetry', props.datalog)
+})
 
 </script>

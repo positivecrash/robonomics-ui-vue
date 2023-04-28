@@ -282,10 +282,9 @@ const classes = computed( () => {
   .robo-grid-type--masonry > * {
     --grid-masonry-gap: v-bind(gapFromData);
 
-    display: inline-block;
-    width: 100%;
+    break-inside: avoid;
     margin-bottom: var(--grid-masonry-gap);
-    box-sizing: border-box;
+    width: 100%;
   }
   /* - TYPE MASONRY */
 

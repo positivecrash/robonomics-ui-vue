@@ -13,7 +13,7 @@
 </script>
 
 <script setup>
-import { defineProps, computed, defineAsyncComponent } from 'vue'
+import { defineProps, computed, defineAsyncComponent, onMounted, watch } from 'vue'
 
 const props = defineProps({
   color: {
