@@ -19,9 +19,11 @@
 
           class="robo-card-expand"
           clean
-          :iconLeft="expand ? 'down-left-and-up-right-to-center' : 'up-right-and-down-left-from-center'"
           type="na"
-        />
+        >
+          <robo-icon v-if="expand" icon="down-left-and-up-right-to-center" />
+          <robo-icon v-else icon="up-right-and-down-left-from-center" />
+        </robo-button>
 
     </div>
 </template>

@@ -11,10 +11,7 @@
     <template v-if="rws?.length > 0">
         <robo-layout-section>
             <robo-template-devices-dashboard 
-                @before-update="beforeUpdate"
                 @on-update="onUpdate"
-                @after-update="afterUpdate"
-
                 :config = "config"
             />
 
@@ -41,13 +38,7 @@ const props = defineProps({
         type: [Object, String]
     },
 
-    beforeUpdate: {
-        type: Function
-    },
     onUpdate: {
-        type: Function
-    },
-    afterUpdate: {
         type: Function
     },
 })
@@ -65,5 +56,10 @@ const rws = computed( () => {
 onBeforeMount( () => {
     store.commit('rws/setTelemetry', props.datalog)
 })
+
+// onMounted ( () => {
+//     console.log('devicelayout datalog', props.datalog)
+//     console.log('devicelayout config', props.config)
+// })
 
 </script>
