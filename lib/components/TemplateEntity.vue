@@ -105,9 +105,7 @@ const enSettings = computed(() => {
 
 const enData = computed(() => {
 
-    console.log('telemetry.value', telemetry.value)
-
-    if(props.entity && telemetry.value?.entities && telemetry.value?.entities[props.entity]){
+    if(props.entity && telemetry.value && telemetry.value?.entities && telemetry.value?.entities[props.entity]){
         return telemetry.value.entities[props.entity]
     } else {
         return null
@@ -143,7 +141,6 @@ const enStateText = computed(() => {
 })
 
 const enUnits = computed( () => {
-    console.log('enData.value?.state', enData.value?.state)
     if(enData.value?.units !== 'None' && enData.value?.units !== '-' && enData.value?.state !== 'unavailable' && enData.value?.state !== 'unknown') {
         return enData.value?.units
     } else {
@@ -203,7 +200,7 @@ onMounted( () => {
 
                 bufer.entities[props.entity].state = state
 
-                let launch = `{"platform": ${enType.value}, "service": toggle, "parameters": {"entity_id": ${props.entity}, "state": ${state} }}`
+                let launch = `{"platform": "${enType.value}", "name": "toggle", "params": {"entity_id": "${props.entity}" }}`
 
                 store.commit('rws/setTelemetry', bufer)
                 store.commit('rws/setLaunch', launch)
@@ -223,11 +220,6 @@ onMounted( () => {
         }
         
     })
-
-    // if(props.entity){
-    //     console.log('entity', props.entity)
-    //     console.log('enData', enData)
-    // }
 
 })
 

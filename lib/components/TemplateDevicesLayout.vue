@@ -9,7 +9,11 @@
     </template>
 
     <template v-if="rws?.length > 0">
-        <robo-layout-section>
+        <robo-layout-section v-if="!config || !datalog" gcenter vcenter>
+            <robo-loader size="2" />
+        </robo-layout-section>
+
+        <robo-layout-section v-if="config && datalog">
             <robo-template-devices-dashboard 
                 @on-update="onUpdate"
                 :config = "config"
@@ -19,6 +23,7 @@
                 <robo-template-devices :config = "config" />
             </robo-section>
         </robo-layout-section>
+        
     </template>
 
 </template>
@@ -28,7 +33,7 @@
 </script>
 
 <script setup>
-import { computed, onBeforeMount, onMounted } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 
 const props = defineProps({
     config: {
@@ -53,13 +58,10 @@ const rws = computed( () => {
 })
 /* - get rws */
 
-onBeforeMount( () => {
-    store.commit('rws/setTelemetry', props.datalog)
+onMounted ( () => {
+    watch(() => props.datalog, value => {
+      store.commit('rws/setTelemetry', value)
+    })
 })
-
-// onMounted ( () => {
-//     console.log('devicelayout datalog', props.datalog)
-//     console.log('devicelayout config', props.config)
-// })
 
 </script>
