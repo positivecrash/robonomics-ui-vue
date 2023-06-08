@@ -30,6 +30,7 @@
                                         :entity="entity.entity ? entity.entity : entity"
                                         :config="config"
                                         :card="card"
+                                        :launchStatus="launchStatus"
                                     />
                                 </template>
                                 <template v-else-if="card?.entity">
@@ -37,12 +38,14 @@
                                         :entity="card.entity"
                                         :config="config"
                                         :card="card"
+                                        :launchStatus="launchStatus"
                                     />
                                 </template>
                                 <template v-else>
                                     <robo-template-entity
                                         :config="config"
                                         :card="card"
+                                        :launchStatus="launchStatus"
                                     />
                                 </template>
                             </robo-grid>
@@ -77,6 +80,9 @@ const rws = computed( () => {
 const props = defineProps({
     config: {
         type: [Object, String]
+    },
+    launchStatus: {
+        type: Array
     }
 })
 
