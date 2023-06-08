@@ -88,7 +88,6 @@ const users = computed( () => {
 /* + Update */
 const date = computed( () => {
   if(props.updateTime) {
-    console.log('test', props.updateTime)
     const d = new Date(props.updateTime)
     return d.toGMTString()
   } else {

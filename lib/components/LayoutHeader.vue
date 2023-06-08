@@ -57,6 +57,7 @@
     
   </header>
 
+  <robo-app-status />
 
 </template>
 

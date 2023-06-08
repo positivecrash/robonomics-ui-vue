@@ -42,15 +42,6 @@
             <robo-account-polkadot-chain clean />
           </robo-grid>
 
-          <!-- <template v-if="rwsLink">
-            <robo-grid type="flex" offset="x0" gap="x025" galign="start" valign="center">
-              <span>RWS:</span>
-              <robo-link :router="rwsLink">
-                <robo-template-rws-state />
-              </robo-link>
-            </robo-grid>
-          </template> -->
-
         </robo-text>
       </template>
     </section>
