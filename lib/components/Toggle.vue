@@ -1,6 +1,6 @@
 <template>
     <div class="robo-toggle">
-        <input type="checkbox" :id="uniqueId" v-bind="$attrs" v-model="inputModel" />
+        <input type="checkbox" :id="uniqueId" v-bind="$attrs" v-model.lazy="inputModel" />
         <label :for="uniqueId" aria-hidden="true">Toggle</label>
     </div>
 </template>
@@ -60,6 +60,7 @@
         width: 0;
     }
 
+
     label {
         background: var(--robo-color-dark);
         border-radius: calc(var(--size) * var(--koef));
@@ -71,28 +72,33 @@
         width: var(--size);
     }
 
-label:after {
-	content: '';
-	position: absolute;
-	top: calc(var(--toggler) * 0.5);
-	left: calc(var(--toggler) * 0.5);
-	width: calc(var(--size) * var(--koef) - var(--toggler));
-	height: calc(var(--size) * var(--koef) - var(--toggler));
-	background: var(--robo-color-light);
-	border-radius: calc(var(--size) * var(--koef) - var(--toggler));
-	transition: 0.3s;
-}
+    label:after {
+        content: '';
+        position: absolute;
+        top: calc(var(--toggler) * 0.5);
+        left: calc(var(--toggler) * 0.5);
+        width: calc(var(--size) * var(--koef) - var(--toggler));
+        height: calc(var(--size) * var(--koef) - var(--toggler));
+        background: var(--robo-color-light);
+        border-radius: calc(var(--size) * var(--koef) - var(--toggler));
+        transition: 0.3s;
+    }
 
-input:checked + label {
-	background: var(--robo-color-green);
-}
+    input:checked + label {
+        background: var(--robo-color-green);
+    }
 
-input:checked + label:after {
-	left: calc(100% - 5px);
-	transform: translateX(-100%);
-}
+    input:checked + label:after {
+        left: calc(100% - 5px);
+        transform: translateX(-100%);
+    }
 
-label:active:after {
-	width: calc(var(--size) * var(--koef));
-}
+    label:active:after {
+        width: calc(var(--size) * var(--koef));
+    }
+
+    input[type=checkbox][disabled] + label {
+        opacity: 0.6;
+        cursor: default;
+    }
 </style>
