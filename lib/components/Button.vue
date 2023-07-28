@@ -9,10 +9,14 @@
     :rel="isExternal ? 'noopener' : null"
     v-bind="$attrs"
   >
+    <slot name="iconleft" />
+
     <div class="robo-button-content">
       <robo-loader v-if="props.loading" />
       <slot />
     </div>
+
+    <slot name="iconright" />
 
     <span class="robo-button-badge" v-if="slots.badge"><slot name="badge" /></span>
 </component>
@@ -47,14 +51,6 @@
       default: false
     },
     href: {
-      type: String,
-      default: null
-    },
-    iconleft: {
-      type: String,
-      default: null
-    },
-    iconright: {
       type: String,
       default: null
     },

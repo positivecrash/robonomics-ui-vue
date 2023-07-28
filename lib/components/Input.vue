@@ -38,7 +38,7 @@
         <label v-if="inputType === 'file'" for="fileupload">file upload</label>
 
         <robo-button 
-          v-if="inputType === 'password'"
+          v-if="inputType === 'password' && !disabled"
           @click="showPassword"
           class="showPasswordButton"
           clean
@@ -243,7 +243,10 @@ export default defineComponent({
         --border: var(--robo-color-inputborderdisabled);
         --color: var(--color-dark);
         --label: var(--color-dark);
-        opacity: var(--robo-opacity-inputdisabled);
+    }
+
+    .robo-input--disabled input {
+      opacity: var(--robo-opacity-inputdisabled);
     }
     /* - disabled */
 

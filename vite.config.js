@@ -7,6 +7,7 @@ import copy from 'rollup-plugin-copy' //for copying and transform icons into com
 // import externals from 'rollup-plugin-node-externals' // not worked
 // import commonjs from 'rollup-plugin-commonjs' // not worked
 import peerDepsExternal from 'rollup-plugin-peer-deps-external' // for excluding external plugins
+import replace from '@rollup/plugin-replace'
 
 const { optimize } = require('svgo')
 
@@ -125,6 +126,9 @@ export default defineConfig({
               transform: (contents, filename) => `<template>${svgTrasnform(contents.toString())}</template>`,
               rename: (name, extension, fullPath) => `${name}.vue`
             }]
+          }),
+          replace({
+            '__VUE_PROD_DEVTOOLS__': 'true'
           })
       ],
     }

@@ -66,10 +66,6 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
-    paddings: {
-      type: Boolean,
-      default: true
-    },
     progress: {
       type: Number,
       default: null
@@ -100,7 +96,6 @@ export default defineComponent({
         [`robo-card--disabled`]: this.disabled,
         [`robo-card--backimage`]: this.backImage,
         [`robo-card--backcolor-${this.backColor}`]: this.backColor,
-        [`robo-card--paddings`]: this.paddings,
         [`robo-card--fixedButton`]: this.fixedButton,
         [`robo-card--pale`]: this.pale,
         [`expand`]: this.expand,

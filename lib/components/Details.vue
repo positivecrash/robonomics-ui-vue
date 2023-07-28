@@ -33,6 +33,12 @@
 import { defineProps, computed, ref, onMounted } from 'vue'
 
 const props = defineProps({
+
+  block: {
+    type: Boolean,
+    default: false
+  },
+
   contentCloseOutOfFocus: {
     type: Boolean,
     default: true
@@ -141,6 +147,7 @@ const classes = computed( () => {
       [`robo-details--loading`]: props.summaryLoading,
       [`robo-details--textStyle-${props.textStyle}`]: props.textStyle,
       [`robo-details--summarystyle-${props.summarystyle}`]: props.summarystyle,
+      [`robo-details--block`]: props.block,
     }  
 
     if (props.type === 'tooltip') {
@@ -347,6 +354,10 @@ onMounted(() => {
       --robo-details-tooltip-color: var(--robo-color-dark);
       --robo-details-tooltip-border-color: var(--robo-color-light);
     }
+
+    .robo-select--clean {
+      --robo-color-inputcolor: var(--robo-color-dark);
+    }
   }
 
   summary button {
@@ -391,14 +402,9 @@ onMounted(() => {
     background-color: var(--robo-details-tooltip-background);
     border: 1px solid var(--robo-details-tooltip-border-color);
     color: var(--robo-details-tooltip-color);
-    max-height: calc(100vh - var(--robo-details-popup-content-offset)*2);
-    /* padding: var(--robo-details-content-padding); */
-    overflow: auto;
   }
 
   .robo-details-content-inside {
-    max-height: 100%;
-    overflow: auto;
     padding: var(--robo-details-content-padding);
     position: relative;
   }
@@ -421,13 +427,24 @@ onMounted(() => {
   /* - actions */
 
   /* + tooltip */
+  /* .robo-details--tooltip .robo-details-content {
+    max-height: calc(100vh - var(--robo-details-popup-content-offset)*2); 
+    overflow: auto;
+  }
+
+  .robo-details--tooltip .robo-details-content-inside {
+    max-height: 100%;
+    overflow: auto;
+  } */
+
   .robo-details--tooltip .robo-details-content {
     font-size: initial;
     letter-spacing: 0;
-    min-height: var(--robo-details-tooltip-minheight);
     max-height: var(--robo-details-tooltip-maxheight);
-    min-width: var(--robo-details-tooltip-minwidth);
     max-width: var(--robo-details-tooltip-maxwidth);
+    min-height: var(--robo-details-tooltip-minheight);
+    min-width: var(--robo-details-tooltip-minwidth);
+    overflow-y: auto;
     position: absolute;
     text-transform: none;
     z-index: 900;
@@ -612,8 +629,14 @@ onMounted(() => {
   .robo-details--summarystyle-select summary {
     background-color: var(--robo-color-input);
     border: 1px solid var(--robo-color-inputborder);
-    color: var(----robo-color-inputcolor);
+    color: var(--robo-color-inputcolor);
     padding: var(--input-padding-v) var(--input-padding-g);
   }
+
+  .robo-details--summarystyle-select summary > .robo-grid {
+    width: 100%;
+  }
   /* - summarystyle */
+
+  .robo-details--block { display: block; }
 </style>

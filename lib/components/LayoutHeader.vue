@@ -4,7 +4,17 @@
 
     <div class="robo-layout-header-grid">
 
-      <a v-if="logoIcon" href="/" class="robo-layout-header-logo"><img :src="logoIcon" /></a>
+      <div class="robo-layout-header-logo-version" v-if="version">
+        <a v-if="logoIcon" href="/" class="robo-layout-header-logo"><img :src="logoIcon" /></a>
+
+        <div>
+          <robo-link href="https://github.com/airalab/dapp.robonomics.network">{{version}}</robo-link>
+          <robo-link href="https://v0.dapp.robonomics.network">Old dapp</robo-link>
+        </div>
+      </div>
+      <template v-else>
+        <a v-if="logoIcon" href="/" class="robo-layout-header-logo"><img :src="logoIcon" /></a>
+      </template>
 
       <div v-if="title" class="robo-layout-header-title">{{title}}</div>
 
@@ -86,6 +96,10 @@
       type: String
     },
 
+    version: {
+      type: String
+    }
+
   })
 
   const classes = computed( () => {
@@ -129,6 +143,12 @@
     .robo-layout-header .navigation .robo-grid-type--grid {
       --grid-columns: 1fr;
     }
+  }
+
+  .robo-layout-header-logo-version a.robo-link {
+    display: block;
+    color: currentColor;
+    text-decoration: underline;
   }
 </style>
 
@@ -232,5 +252,11 @@
 
   .router-link-active {
     color: var(--robo-color-dark)
+  }
+
+  .robo-layout-header-logo-version {
+    display: flex;
+    gap: var(--robo-space);
+    font-size: 60%;
   }
 </style>

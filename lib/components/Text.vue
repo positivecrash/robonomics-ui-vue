@@ -1,7 +1,7 @@
 <template>
-    <div :class="classList" ref="text">
+    <div :class="classList" ref="text" v-bind="$attrs">
 
-        <slot/>
+        <slot />
 
         <robo-icon 
           v-if="highlightLabelClose && highlightLabel"

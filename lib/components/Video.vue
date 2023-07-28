@@ -18,7 +18,7 @@
             <template #summary>
                 <robo-icon icon="text-message" size="medium" />
             </template>
-            <robo-text size="small" paragraphs>{{props.script}}</robo-text>
+            <robo-text size="small" paragraphs v-html="props.script" />
         </robo-details>
     </div>
     

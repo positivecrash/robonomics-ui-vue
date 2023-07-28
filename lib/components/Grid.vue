@@ -104,7 +104,7 @@ let getColumns = () => {
     const columns = props.columns
 
     if( !isNaN(parseFloat(columns)) && isFinite(columns) && (props.type !== 'flex' ) ) {
-      if(props.type === 'masonry') {
+      if(props.type === 'masonry' || typeof columns === 'string') {
         return columns
       } else {
         return `repeat(${columns}, 1fr)`
@@ -139,7 +139,7 @@ let getRows = () => {
     const columns = props.rows
 
     if( !isNaN(parseFloat(columns)) && isFinite(columns) && (props.type !== 'flex' ) ) {
-      if(props.type === 'masonry') {
+      if(props.type === 'masonry' || typeof columns === 'string') {
         return columns
       } else {
         return `repeat(${columns}, 1fr)`

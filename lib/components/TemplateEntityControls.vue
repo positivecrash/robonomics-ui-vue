@@ -32,6 +32,8 @@
 
         </div>
     </template>
+
+    <div v-if="enData" style="font-size:9px;display:none">TemplateEntityControls, enData<br/> {{enData}}</div>
     
 </template>
 
@@ -149,11 +151,22 @@ onMounted( ()=> {
     if(enServices.value?.turn_off && enServices.value?.turn_on) {
 
         // disabling toggles if no values came yet
-        if(toggleService.value === null) {
-            toggleDisabled.value = true
+        toggleDisabled.value = true
+
+        // set toggleService from telemetry
+        if(enData.value?.state === 'on') {
+            toggleService.value = true
+            toggleDisabled.value = false
+        }
+
+        if(enData.value?.state === 'off') {
+            toggleService.value = false
+            toggleDisabled.value = false
         }
 
         watch(() => enData.value, () => {
+            console.log('TemplateEntityControls enData.value', enData.value)
+
             // set toggleService from telemetry
             if(enData.value?.state === 'on') {
                 toggleService.value = true

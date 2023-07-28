@@ -1,6 +1,6 @@
 <template>
 
-  <robo-details type="tooltip" :class="classes" :closeOutOfFocus="false" :summarystyle="selectstyle ? 'select' : 'text'">
+  <robo-details :type="interact" :class="classes" :closeOutOfFocus="false" :summarystyle="selectstyle ? 'select' : 'text'">
 
     <template #summary>
 
@@ -11,7 +11,12 @@
       </robo-grid>
 
       <template v-if="!activeAddress">
-        Connect <template v-if="type">{{type}}</template> account
+        <template v-if="selecttitle">
+          {{selecttitle}}
+        </template>
+        <template v-else>
+          Connect <template v-if="type">{{type}}</template> account
+        </template>
       </template>
 
     </template>
@@ -60,7 +65,7 @@
     <section v-if="extensionAllowShift" class="robo-account-polkadot-info-section">
       <h4 v-if="activeWallet">Shift extension</h4>
 
-      <robo-grid type="grid" offset="x0" gap="x1" columns="4">
+      <robo-grid type="grid" offset="x0" gap="x1" :columns="4">
         <template v-for="item in extensions" :key="item.id">
           <robo-account-polkadot-extension :wallet="item.wallet" />
         </template>
@@ -106,6 +111,13 @@
         type: Boolean,
         default: false
     },
+    interact: {
+      type: String,
+      default: 'tooltip',
+      validator: function (value) {
+        return ['tooltip', 'popup', 'inital'].includes(value)
+      }
+    },
     selectable: {
       type: Boolean,
       default: false
@@ -117,6 +129,10 @@
     selectblock: {
       type: Boolean,
       default: false
+    },
+    selecttitle: {
+      type: String,
+      default: null
     },
     short: {
         type: Boolean,

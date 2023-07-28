@@ -30,6 +30,8 @@
                     />
                 </robo-grid>
             </template>
+
+            <div style="font-size:9px;display:none">TemplateEntity, enData<br/> {{enData}}</div>
         </template>
         <template v-if="card?.type === 'picture-elements'">
             <robo-image v-if="card?.image" :src="`https://ipfs.io/ipfs/${card.image}`" />
@@ -96,11 +98,14 @@ const enSettings = computed(() => {
 
 const enData = computed(() => {
 
-    if(props.entity && telemetry.value && telemetry.value?.entities && telemetry.value?.entities[props.entity]){
-        return telemetry.value.entities[props.entity]
-    } else {
-        return null
-    }
+    console.log('enData computed', telemetry.value.entities[props.entity])
+    return telemetry.value.entities[props.entity] ?? null
+
+    // if(props.entity && telemetry.value && telemetry.value?.entities && telemetry.value?.entities[props.entity]){
+    //     return telemetry.value.entities[props.entity]
+    // } else {
+    //     return null
+    // }
 })
 
 const enIcon = computed(() => {
