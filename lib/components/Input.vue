@@ -39,7 +39,7 @@
 
         <robo-button 
           v-if="inputType === 'password' && !disabled"
-          @click="showPassword"
+          @click.prevent="showPassword"
           class="showPasswordButton"
           clean
           role="switch"

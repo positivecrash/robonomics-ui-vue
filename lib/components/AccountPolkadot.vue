@@ -1,5 +1,4 @@
 <template>
-
   <robo-details :type="interact" :class="classes" :closeOutOfFocus="false" :summarystyle="selectstyle ? 'select' : 'text'">
 
     <template #summary>
@@ -323,6 +322,7 @@
 
     } catch {
       // reset()
+      console.warn('[robonomics-ui-vue]: RoboAccountPolkadot error')
     }
 
     watch(() => store.state.robonomicsUIvue.polkadot.address, value => {

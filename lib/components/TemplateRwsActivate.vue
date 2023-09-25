@@ -56,22 +56,23 @@
             </robo-grid>
 
             <robo-grid-item>
+
                 <robo-button 
                     @click.prevent="activateRWS()"
-                    :disabled="processing"
-                    :loading="processing"
-                    :type="status ? status : 'primary'"
+                    :disabled="rwsStatus === 'processing'"
+                    :loading="rwsStatus === 'processing'"
+                    :type="buttonstatus"
                     block
                 >
                     {{buttontext}}
                 </robo-button>
                 
-                <robo-text v-if="message" :highlight="status ? status : null">
-                    {{message}}
-                </robo-text>
+                <robo-section offset="x05">
+                    <robo-text v-if="rwsMessage" :highlight="messagestatus">
+                        {{rwsMessage}}
+                    </robo-text>
+                </robo-section>
             </robo-grid-item>
-
-            
         </robo-grid>
     </robo-section>
 
@@ -100,6 +101,14 @@ const props = defineProps({
     },
     available: {
         type: [Number, String]
+    },
+    rwsStatus: {
+        type: String,
+        default: 'new'
+    },
+    rwsMessage: {
+        type: String,
+        default: null
     }
 })
 
@@ -119,32 +128,54 @@ let processing = ref(false)
 let status = ref(null) // ok, error
 let message = ref(null) // string
 
-const emit = defineEmits(['onRwsActivate'])
+const emit = defineEmits(['onActivate'])
 
 let activateRWS = () => {
-    processing.value = true
 
-    emit('onRwsActivate', (status, message) => rwsStatus(status, message))
-}
+    emit('onActivate')
 
-let rwsStatus = (statusFromApp, messageFromApp) => {
-    if(statusFromApp) { 
-        status.value = statusFromApp 
-        processing.value = false
-    }
-    if(messageFromApp) { message.value = messageFromApp }
-
-    if(status.value  === 'ok') {
+    if(props.rwsStatus === 'ok') {
         const rwsAddress = store.state.robonomicsUIvue.polkadot.address
         store.commit('rws/setActive', rwsAddress)
     }
 }
 
+// let rwsStatus = (statusFromApp, messageFromApp) => {
+//     if(statusFromApp) { 
+//         status.value = statusFromApp 
+//         processing.value = false
+//     }
+//     if(messageFromApp) { message.value = messageFromApp }
+
+//     if(status.value  === 'ok') {
+//         const rwsAddress = store.state.robonomicsUIvue.polkadot.address
+//         store.commit('rws/setActive', rwsAddress)
+//     }
+// }
+
 const buttontext = computed( () => {
     return ({
     'ok': 'RWS activated',
-    'error': 'something went wrong'
-    }[status.value] ?? 'Activate RWS')
+    'new': 'Activate RWS',
+    'renew': 'Re-activate RWS',
+    'error': 'Something went wrong'
+    }[props.rwsStatus] ?? 'Activate RWS')
+})
+
+const buttonstatus = computed( () => {
+    return ({
+    'ok': 'ok',
+    'error': 'error'
+    }[props.rwsStatus] ?? 'primary')
+})
+
+const messagestatus = computed( () => {
+    return ({
+    'ok': 'ok',
+    'error': 'error',
+    'renew': 'attention',
+    'new': 'attention'
+    }[props.rwsStatus] ?? null)
 })
 /* - Processing */
 
@@ -156,11 +187,11 @@ let newaccountAddress = ref(null)
 let newaccountJson = ref(null)
 /* - Generate new account */
 
-onMounted( () => {
-    watch( () => store.state.robonomicsUIvue.polkadot.address, () => {
-        status.value = null
-        message.value = null
-    })
-})
+// onMounted( () => {
+//     watch( () => store.state.robonomicsUIvue.polkadot.address, () => {
+//         status.value = null
+//         message.value = null
+//     })
+// })
 
 </script>

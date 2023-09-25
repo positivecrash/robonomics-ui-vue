@@ -1,12 +1,7 @@
 <template>
 
     <robo-layout-section>
-        <robo-template-devices-dashboard
-            :config = "config"
-            :updateTime="updateTime"
-        />
-    
-
+        
         <template v-if="rws?.length < 1">
             <robo-layout-section rwsrecover>
                 <robo-section width="narrow" gcenter>
@@ -16,6 +11,12 @@
         </template>
 
         <template v-if="rws?.length > 0">
+            <robo-template-devices-dashboard
+                v-if="config && updateTime"
+                :config = "config"
+                :updateTime="updateTime"
+            />
+
             <robo-layout-section v-if="!config || !datalog" gcenter>
                 <robo-loader size="2" />
             </robo-layout-section>

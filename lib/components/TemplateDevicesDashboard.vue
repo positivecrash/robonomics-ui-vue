@@ -17,7 +17,7 @@
 
     </robo-details>
 
-    <robo-button class="robo-devices-dashboardicon" v-if="Object.keys(users).length > 0 && store.state.robonomicsUIvue.rws.links.users" :router="store.state.robonomicsUIvue.rws.links.users">
+    <robo-button class="robo-devices-dashboardicon" v-if="users && Object.keys(users).length > 0 && store.state.robonomicsUIvue.rws.links.users" :router="store.state.robonomicsUIvue.rws.links.users">
       <robo-icon icon="user" />
       <template #badge>{{Object.keys(users).length}}</template>
     </robo-button>
@@ -32,8 +32,8 @@
     <robo-template-gateway />
     
     <robo-template-rws-activeselect size="small" />
-
-    <robo-button class="robo-devices-dashboardicon" v-if="Object.keys(users).length > 0 && store.state.robonomicsUIvue.rws.links.users" :router="store.state.robonomicsUIvue.rws.links.users">
+    
+    <robo-button class="robo-devices-dashboardicon" v-if="users && Object.keys(users).length > 0 && store.state.robonomicsUIvue.rws.links.users" :router="store.state.robonomicsUIvue.rws.links.users">
       <robo-icon icon="user" />
       <template #badge>{{Object.keys(users).length}}</template>
     </robo-button>

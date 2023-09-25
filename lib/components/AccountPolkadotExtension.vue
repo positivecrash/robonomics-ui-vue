@@ -96,7 +96,7 @@
             await store.dispatch("polkadot/waitWeb3Injected")
             getExtension.value = window?.injectedWeb3[extensionData.value.extension]
         } catch (e) {
-        console.warn('[robonomics-ui-vue]: no extension found in robo-account-polkadot-extension')
+            console.warn('[robonomics-ui-vue]: no extension found in robo-account-polkadot-extension')
         }
 
         walletInstalled.value = isWalletInstalled()
