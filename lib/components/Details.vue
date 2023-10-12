@@ -627,10 +627,11 @@ onMounted(() => {
   }
 
   .robo-details--summarystyle-select summary {
-    background-color: var(--robo-color-input);
+    --robo-details-summary-background: var(--robo-color-input);
+    --robo-details-summary-color: var(--robo-color-inputcolor);
+    --robo-details-summary-padding: var(--input-padding-v) var(--input-padding-g);
+
     border: 1px solid var(--robo-color-inputborder);
-    color: var(--robo-color-inputcolor);
-    padding: var(--input-padding-v) var(--input-padding-g);
   }
 
   .robo-details--summarystyle-select summary > .robo-grid {

@@ -2,22 +2,13 @@
 
   <header :class="classes">
 
-    <div class="robo-layout-header-grid">
+    <robo-grid type="flex" offset="0" gap="x05" valign="center" galign="stretch" class="robo-layout-header-grid">
 
-      <div class="robo-layout-header-logo-version" v-if="version">
+      <robo-grid type="flex" offset="0" gap="x05" valign="center">
         <a v-if="logoIcon" href="/" class="robo-layout-header-logo"><img :src="logoIcon" /></a>
-
-        <div>
-          <robo-link href="https://github.com/airalab/dapp.robonomics.network">{{version}}</robo-link>
-          <robo-link href="https://v0.dapp.robonomics.network">Old dapp</robo-link>
-        </div>
-      </div>
-      <template v-else>
-        <a v-if="logoIcon" href="/" class="robo-layout-header-logo"><img :src="logoIcon" /></a>
-      </template>
-
-      <div v-if="title" class="robo-layout-header-title">{{title}}</div>
-
+        <b v-if="title" class="robo-layout-header-title">{{title}}</b>
+      </robo-grid>
+  
       <robo-grid type="flex" offset="0" gap="x05" valign="center" class="robo-layout-header-toolbar">
 
         <robo-text size="small">
@@ -27,6 +18,10 @@
               extensionShowIcon
               selectable
           />
+        </robo-text>
+
+        <robo-text size="small">
+            <robo-template-rws-activeselect />
         </robo-text>
 
         <robo-details v-if="navigation" type="tooltip" tooltipRatio="none" class="navigation">
@@ -63,7 +58,7 @@
         </robo-details>
       </robo-grid>
 
-    </div>
+    </robo-grid>
     
   </header>
 
@@ -94,10 +89,6 @@
     
     title: {
       type: String
-    },
-
-    version: {
-      type: String
     }
 
   })
@@ -124,8 +115,6 @@
     --robo-header-background: var(--robo-color-dark);
     --robo-header-color: var(--robo-color-light);
     --robo-header-logo-width: 3rem;
-    --robo-header-section-offset-gorizontal: 2rem;
-    --robo-header-section-offset-vertical: 0.5rem;
   }
 
   .robo-layout-header .robo-account-polkadot {
@@ -137,6 +126,7 @@
     --robo-details-summary-background: var(--robo-color-dark-80);
     --robo-details-summary-color: var(--robo-color-light);
     --robo-details-summary-padding: 0.5rem;
+    font-weight: bold;
   }
 
   @media screen and (max-width: 900px) {
@@ -165,23 +155,9 @@
     position: relative;
   }
 
-  .robo-layout-header-grid {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: var(--robo-header-section-offset-gorizontal);
-    padding-bottom: var(--robo-header-section-offset-vertical);
-    padding-top: var(--robo-header-section-offset-vertical);
-    padding-left: var(--robo-layout-padding);
-    padding-right: var(--robo-layout-padding);
-  }
-
   .robo-layout-header-logo {
-    justify-self: start;
-  }
-
-  .robo-layout-header-toolbar {
-    justify-self: end;
+    background-color: var(--robo-color-dark-80);
+    padding: 0.8rem;
   }
 
   .robo-layout-header--sticky {
@@ -189,18 +165,9 @@
     top: 0;
     z-index: 1000;
   }
-  /* - LAYOUT */
 
-
-  /* + STYLING */
-  .robo-layout-header .robo-layout-header-grid {
-    background-color: var(--robo-header-background);
-    color: var(--robo-header-color);
-  }
-
-  .robo-layout-header-title {
-    text-transform: uppercase;
-    text-align: center;
+  .robo-layout-header-toolbar {
+    margin-right: var(--robo-space);
   }
 
   @media screen and (max-width: 700px) {
@@ -212,7 +179,16 @@
       left: 0;
       background: var(--robo-header-background);
       right: 0;
+      padding: 0 var(--robo-space);
     }
+  }
+  /* - LAYOUT */
+
+
+  /* + STYLING */
+  .robo-layout-header .robo-layout-header-grid {
+    background-color: var(--robo-header-background);
+    color: var(--robo-header-color);
   }
 
   nav {

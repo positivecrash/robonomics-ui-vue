@@ -1,10 +1,10 @@
 <template>
     <div :class="classList" v-if="!timeouttrigger">
         <span v-if="textLeft" v-html="textLeft" />
-        <span class="robob-status-text"><slot name="left" /></span>
+        <span v-if="textLeft" class="robob-status-text"><slot name="left" /></span>
         <robo-icon :icon="icon" :color="color" />
         <span v-if="textRight" v-html="textRight" />
-        <span class="robob-status-text"><slot name="right" /></span>
+        <span v-if="textRight" class="robob-status-text"><slot name="right" /></span>
     </div>
 </template>
 

@@ -8,12 +8,7 @@
         <robo-button><robo-icon icon="gear" /></robo-button>
       </template>
 
-      <robo-grid gap="x05" offset="x0">
-        <robo-template-rws-activeselect size="small" />
-
-        <robo-template-gateway expanded/>
-
-      </robo-grid>
+      <robo-template-gateway expanded/>
 
     </robo-details>
 
@@ -30,8 +25,6 @@
   <robo-grid type="flex" galign="start" gap="x1" offset="x0">
 
     <robo-template-gateway />
-    
-    <robo-template-rws-activeselect size="small" />
     
     <robo-button class="robo-devices-dashboardicon" v-if="users && Object.keys(users).length > 0 && store.state.robonomicsUIvue.rws.links.users" :router="store.state.robonomicsUIvue.rws.links.users">
       <robo-icon icon="user" />

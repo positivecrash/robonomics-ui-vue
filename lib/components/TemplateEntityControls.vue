@@ -165,7 +165,7 @@ onMounted( ()=> {
         }
 
         watch(() => enData.value, () => {
-            console.log('TemplateEntityControls enData.value', enData.value)
+            // console.log('TemplateEntityControls enData.value', enData.value)
 
             // set toggleService from telemetry
             if(enData.value?.state === 'on') {

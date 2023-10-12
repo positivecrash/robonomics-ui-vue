@@ -12,7 +12,6 @@
 
         <template v-if="rws?.length > 0">
             <robo-template-devices-dashboard
-                v-if="config && updateTime"
                 :config = "config"
                 :updateTime="updateTime"
             />

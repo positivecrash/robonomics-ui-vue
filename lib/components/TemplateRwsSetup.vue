@@ -237,11 +237,12 @@ let rwsStatus = (statusFromApp, messageFromApp) => {
     if(messageFromApp) { message.value = messageFromApp }
 
     if(status.value  === 'ok') {
-        if(props.edit) {
-            store.dispatch('rws/edit', pending.value)
-        } else {
-            store.dispatch('rws/add', pending.value)
-        }
+        store.dispatch('rws/save', pending.value)
+        // if(props.edit) {
+        //     store.dispatch('rws/edit', pending.value)
+        // } else {
+        //     store.dispatch('rws/add', pending.value)
+        // }
     }
 }
 

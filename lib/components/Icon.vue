@@ -83,7 +83,7 @@ let svg = defineAsyncComponent(() =>
     --icon-size: v-bind(iconSize);
 
     display: inline-block;
-    line-height: 0;
+    line-height: 1;
     color: var(--icon-color);
     font-size: var(--icon-size);
   }

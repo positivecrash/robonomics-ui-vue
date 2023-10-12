@@ -93,6 +93,13 @@ export default defineComponent({
         type: Boolean,
         default: false
     },
+    lines: {
+        type: String,
+        default: null,
+        validator(value) {
+            return ['dotted', 'dashed', 'solid'].includes(value)
+        }
+    },
     nowrap: {
       type: Boolean,
       default: false
@@ -178,6 +185,7 @@ export default defineComponent({
         [`robo-text--title-${this.title}`]: this.title,
         [`robo-text--paragraphs`]: this.paragraphs,
         [`robo-text--mark-${this.mark}`]: this.mark,
+        [`robo-text--lines-${this.lines}`]: this.lines,
       };
     },
   },
@@ -203,9 +211,17 @@ export default defineComponent({
 </script>
 
 <style>
-  .robo-text--paragraphs p:not(:last-child) {
-    margin-bottom: var(--robo-space);
-  }
+  .robo-text--paragraphs p:not(:last-child) { margin-bottom: var(--robo-space); }
+
+  .robo-text-copy { margin-left: var(--space); }
+
+  .robo-text[class *= 'robo-text--lines-'] > *:not(:last-child) {
+      border-bottom: 1px solid var(--robo-color-dark);
+      margin-bottom: 4px;
+      padding-bottom: 4px;
+    }
+    .robo-text.robo-text--lines-dashed > *:not(:last-child) { border-bottom-style: dashed; }
+    .robo-text.robo-text--lines-dotted > *:not(:last-child) { border-bottom-style: dotted; }
 </style>
 
 <style scoped>
@@ -397,10 +413,4 @@ export default defineComponent({
     .robo-text--title-3 { font-size: calc(var(--robo-fontsize) * 1.2); }
     .robo-text--title-2 { font-size: calc(var(--robo-fontsize) * 1.3); }
     .robo-text--title-1 { font-size: calc(var(--robo-fontsize) * 1.4); }
-</style>
-
-<style>
-  .robo-text-copy {
-    margin-left: var(--space);
-  }
 </style>

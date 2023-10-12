@@ -132,6 +132,7 @@
   :root {
     --robo-button-fontsize: var(--robo-input-fontsize);
     --robo-button-padding: calc(var(--robo-input-padding) * 1.5);
+    --robo-button-outlinewidth: 1.5px;
 
     --robo-button-background: var(--robo-color-blue);
     --robo-button-color: var(--robo-color-light);
@@ -172,7 +173,7 @@
   align-content: center;
   appearance: none;
   border-style: solid;
-  border-width: 1.5px;
+  border-width: var(--robo-button-outlinewidth);
   cursor: pointer;
   display: inline-flex;
   font-family: var(--font-family);
@@ -270,18 +271,6 @@
     --robo-button-background: var(--robo-button-error-background);
     --robo-button-color: var(--robo-button-error-color);
     --robo-button-background-hover: var(--robo-button-error-background-hover);
-  }
-
-  .robo-button-ok.robo-button-outline {
-    --robo-button-background: transparent;
-    --robo-button-color: var(--robo-button-background);
-    --robo-button-background-hover: var(--robo-button-background-hover);
-  }
-
-  .robo-button-error.robo-button-outline {
-    --robo-button-background: transparent;
-    --robo-button-color: var(--robo-button-background-background);
-    --robo-button-background-hover: var(--robo-button-background-hover);
   }
   /* - coloring */
 

@@ -3,20 +3,26 @@
 
     <template #summary>
 
-      <robo-grid v-if="activeAddress" type="flex" offset="0" gap="x025" galign="start">
-        <img v-if="extensionShowIcon && activeExtensionImg" :src="activeExtensionImg" class="robo-account-polkadot-extensionLogo" />
-        <span v-if="activeAccount" v-html="accountTitle" class="robo-account-polkadot-title" />
-        <span v-else>{{shortenAddress(activeAddress)}}</span>
-      </robo-grid>
-
-      <template v-if="!activeAddress">
-        <template v-if="selecttitle">
-          {{selecttitle}}
+      <robo-grid type="flex" offset="0" gap="x05" galign="start">
+        <template v-if="activeAddress">
+          <img v-if="extensionShowIcon && activeExtensionImg" :src="activeExtensionImg" class="robo-account-polkadot-extensionLogo" />
+          <span v-if="activeAccount" v-html="accountTitle" class="robo-account-polkadot-title" />
+          <span v-else>{{shortenAddress(activeAddress)}}</span>
         </template>
         <template v-else>
-          Connect <template v-if="type">{{type}}</template> account
+          
+          <svg class="svginline-polkadot" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 13 17" style="enable-background:new 0 0 13 17;" xml:space="preserve"><path class="st0" d="M6.5,0C2.9,0,0,2.9,0,6.5c0,0.7,0.1,1.4,0.3,2.1C0.5,9,1,9.3,1.5,9.1C1.9,9,2.2,8.5,2,8 C1.9,7.4,1.8,6.9,1.8,6.3c0.1-2.4,2-4.4,4.4-4.5c2.7-0.1,4.9,2,4.9,4.6c0,2.5-1.9,4.5-4.4,4.6c0,0-0.9,0.1-1.3,0.1 c-0.2,0-0.4,0.1-0.5,0.1c-0.1,0-0.1,0-0.1-0.1l0.2-0.8l0.8-3.8c0.1-0.5-0.2-1-0.7-1.1S4.1,5.8,4,6.3c0,0-2,9.4-2,9.5 c-0.1,0.5,0.2,1,0.7,1.1c0.5,0.1,1-0.2,1.1-0.7C3.7,16,4,14.8,4,14.8c0.2-1,1-1.7,1.9-1.8c0.2,0,1-0.1,1-0.1c3.3-0.3,6-3,6-6.4 C12.9,2.9,10,0,6.5,0z"/> <path class="st0" d="M11,14.9c-0.6-0.1-1.1,0.2-1.3,0.8c-0.1,0.6,0.2,1.2,0.8,1.3c0.6,0.1,1.2-0.2,1.3-0.8 C11.9,15.5,11.6,15,11,14.9z"/></svg>
+
+          <span class="robo-account-polkadot-title">
+            <template v-if="selecttitle">
+              {{selecttitle}}
+            </template>
+            <template v-else>
+              Connect <template v-if="type">{{type}}</template> account
+            </template>
+            </span>
         </template>
-      </template>
+      </robo-grid>
 
     </template>
 
@@ -25,7 +31,7 @@
       <robo-status type="warning" textRight="Account not found" v-if="activeExtension && !activeAddress" />
       
       <template v-if="activeAddress">
-        <robo-text class="lines" size="small">
+        <robo-text lines="dotted" size="small">
           <robo-grid type="flex" offset="x0" gap="x025" galign="start" valign="center">
             <span v-html="shortenAddress(activeAddress)"/>
             <robo-copy :text="activeAddress" />
@@ -84,6 +90,7 @@
 <script setup>
   import { defineProps, defineEmits, computed, ref, onMounted, watch } from 'vue'
   import { encodeAddress } from "@polkadot/util-crypto"
+  import { shortenAddress } from '../tools'
 
   import { useStore } from 'vuex'
   const store = useStore()
@@ -257,12 +264,6 @@
     }
   }
 
-  let shortenAddress = address => {
-    const addressArray = address.split('')
-    const result = addressArray.slice(0, 4) + "..." + addressArray.slice(-4)
-    return result.replace(/,/g, '')
-  }
-
   let getAvailableAddresses = (view = 'normal') => {
     let result = []
     let bufer = ''
@@ -402,7 +403,7 @@
     }
 
     .robo-account-polkadot-title {
-      text-transform: uppercase;
+      font-weight: bold;
     }
 
     .robo-account-polkadot-info-section:not(:first-child) {
@@ -423,9 +424,10 @@
       color: var(--color-red)
     }
 
-    .lines > *:not(:last-child) {
-      border-bottom: 1px dotted var(--robo-color-dark);
-      margin-bottom: 4px;
-      padding-bottom: 4px;
+    .svginline-polkadot {
+      display: block;
+      width: 1rem;
     }
+    .svginline-polkadot .st0 { fill:#FFFFFF; }
+
 </style>
