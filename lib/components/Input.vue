@@ -9,10 +9,29 @@
             weight="bold"
         >{{label}}</robo-text>
         
-        <input 
+        <!-- <input 
+            v-bind="$attrs"
             @focus="focused"
             @blur="blurred"
+            @change="first !== inputModel ? changed = true : changed = false"
+            
+            v-model="inputModel"
+            ref="input"
+            :aria-disabled="disabled ? true : null"
+            :tabindex="disabled ? -1 : 0"
+
+            class="robo-input-control"
+            :disabled = "disabled"
+            :placeholder="placeholder ? placeholder : null"
+
+            id="fileupload"
+        /> -->
+
+        <input 
             v-bind="$attrs"
+            @focus="focused"
+            @blur="blurred"
+            
             v-model="inputModel"
             ref="input"
             :aria-disabled="disabled ? true : null"
@@ -34,6 +53,10 @@
             :placeholder="placeholder ? placeholder : null"
             type="text"
         />
+
+        <robo-button class="text-edit" v-if="view=== 'text-edit'" clean @click.prevent="setfocus">
+          <robo-icon icon="pencil" />
+        </robo-button>
 
         <label v-if="inputType === 'file'" for="fileupload">file upload</label>
 
@@ -82,6 +105,10 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
+    fitcontent: {
+      type: Boolean,
+      default: false
+    },
     label: {
         type: String,
         default: null
@@ -105,6 +132,13 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
+    view: {
+      type: String,
+      default: 'classic',
+      validator(value) {
+        return ['classic', 'text', 'text-edit'].includes(value)
+      }
+    },
     tip: {
         type: String,
         default: null
@@ -115,7 +149,8 @@ export default defineComponent({
       return {
           focusedStatus: false,
           inputType: this.$attrs.type,
-          showPasswordPressed: false
+          showPasswordPressed: false,
+          changed: false
       }
   },
 
@@ -132,6 +167,9 @@ export default defineComponent({
         [`robo-input-block`]: this.block,
         [`robo-input--type-${this.inputType}`]: this.inputType,
         [`robo-input--error`]: this.error,
+        ['robo-input-changed']: this.changed,
+        [`robo-input--style-${this.view}`]: this.view,
+        [`robo-input--fitcontent`]: this.fitcontent,
       };
     },
 
@@ -152,6 +190,10 @@ export default defineComponent({
         return this.focusedStatus ? 'small' : 'tiny'
     },
 
+    inputwidth() {
+      return this.modelValue ? this.modelValue.length + 'ch' : 'auto'
+    }
+
   },
 
   methods: {
@@ -170,8 +212,16 @@ export default defineComponent({
         } else {
           this.$refs.input.type = 'password'
         }
+      },
+
+      setfocus() {
+        this.$refs.input.focus()
       }
-  }
+  },
+
+  // mounted() {
+  //   let first = this.modelValue ?? ''
+  // }
 
 })
 </script>
@@ -187,6 +237,32 @@ export default defineComponent({
 
         position: relative;
     }
+
+    .robo-input--fitcontent.robo-input input {
+      width: v-bind(inputwidth);
+    }
+
+    .text-edit {
+      color: var(--robo-color-inputcoloractive);
+      margin-left: var(--robo-space);
+    }
+
+    /* + TEXT VIEW */
+    .robo-input--style-text, .robo-input--style-text-edit {
+      --background: transparent;
+      --border: transparent;
+      --color: var(--robo-color-text);
+    }
+
+    .robo-input.robo-input--style-text input, .robo-input.robo-input--style-text-edit input {
+      border-width: 0 0 1px;
+      padding: 0;
+    }
+
+    .robo-input.robo-input--style-text input:focus, .robo-input.robo-input--style-text-edit input:focus {
+      --border: var(--robo-color-inputborder);
+    }
+    /* - TEXT VIEW */
 
     .robo-input-block {
       display: block;
@@ -237,7 +313,7 @@ export default defineComponent({
     }
     /* - tip */
 
-    /* + disabled */
+    /* + state - disabled */
 
     .robo-input--disabled {
         --border: var(--robo-color-inputborderdisabled);
@@ -248,7 +324,14 @@ export default defineComponent({
     .robo-input--disabled input {
       opacity: var(--robo-opacity-inputdisabled);
     }
-    /* - disabled */
+    /* - state - disabled */
+
+    /* + state - changed */
+    .robo-input-changed {
+      --border: var(--robo-color-inputcoloractive);
+      --label: var(--robo-color-inputcoloractive);
+    }
+    /* - state - changed */
 
     /* + type = color */
     .robo-input--type-color .robo-input-control {

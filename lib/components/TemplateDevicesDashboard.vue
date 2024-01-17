@@ -17,7 +17,6 @@
       <template #badge>{{Object.keys(users).length}}</template>
     </robo-button>
 
-    <robo-template-rws-setup-backup save />
   </robo-grid>
 </div>
 
@@ -31,8 +30,6 @@
       <template #badge>{{Object.keys(users).length}}</template>
     </robo-button>
   </robo-grid>
-
-  <robo-template-rws-setup-backup save />
   
 </robo-grid>
 

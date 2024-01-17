@@ -1,5 +1,6 @@
 <template>
   <section :class="classes">
+    <robo-text v-if="title" title="3">{{title}}</robo-text>
     <template v-if="imaged" >
       <robo-image :src="getImage(`boy-${imaged}.svg`)" max="220px"/>
       <robo-text v-if="imagedtitle" size="small" weight="bold" offset="x05">{{imagedtitle}}</robo-text>
@@ -31,6 +32,11 @@ import { getImage } from '../tools'
 
 const props = defineProps({
     clean: {
+      type: Boolean,
+      default: false
+    },
+
+    disabled: {
       type: Boolean,
       default: false
     },
@@ -73,6 +79,14 @@ const props = defineProps({
             return ['x0', 'x05', 'x1', 'x2', 'x4'].includes(value)
         }
     },
+    sideline: {
+      type: Boolean,
+      default: false
+    },
+    title: {
+      type: String,
+      default: null
+    },
     width: {
       type: String,
       default: 'wide',
@@ -90,6 +104,8 @@ const classes = computed(() => {
     [`robo-section-offset-${props.offset}`]: props.offset,
     [`robo-section--mark-${props.mark}`]: props.mark,
     [`robo-section-width--${props.width}`]: props.width,
+    [`robo-section-sideline`]: props.sideline,
+    [`robo-section-disabled`]: props.disabled,
   }
 })
 
@@ -190,5 +206,16 @@ const classes = computed(() => {
 
     .robo-section-gcenter {
       text-align: center;
+    }
+
+    .robo-section-sideline {
+      border-left: 1px solid var(--robo-color-dark);
+      padding: var(--robo-space) 0 var(--robo-space) calc(var(--robo-space)*2);
+    }
+
+    .robo-section-disabled {
+      opacity: 0.5;
+      filter: grayscale(1);
+      pointer-events: none;
     }
 </style>

@@ -14,11 +14,11 @@
             <template v-if="props.supportMessage">{{props.supportMessage}}</template>
         </video>
 
-        <robo-details v-if="props.script" class="robo-video-script">
+        <robo-details v-if="script" class="robo-video-script">
             <template #summary>
                 <robo-icon icon="text-message" size="medium" />
             </template>
-            <robo-text size="small" paragraphs v-html="props.script" />
+            <robo-text size="small" paragraphs>script</robo-text>
         </robo-details>
     </div>
     

@@ -262,9 +262,9 @@ export default defineComponent({
 
     /* + galign */
     .robo-text[class *= 'robo-text--galign'] { display: flex; }
-    .robo-text--galign-left { align-content: start; }
-    .robo-text--galign-center { align-content: center; }
-    .robo-text--galign-right { align-content: end; }
+    .robo-text--galign-left { align-content: start; justify-content: start; }
+    .robo-text--galign-center { align-content: center; justify-content: center; }
+    .robo-text--galign-right { align-content: end; justify-content: end; }
     /* - galign */
 
     /* + SIZE */

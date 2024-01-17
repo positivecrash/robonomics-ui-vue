@@ -46,10 +46,6 @@
       type: Boolean,
       default: false
     },
-    fitLabeled: {
-      type: Boolean,
-      default: false
-    },
     href: {
       type: String,
       default: null
@@ -70,8 +66,12 @@
       type: String,
       default: 'normal',
       validator: function (value) {
-        return ['small', 'normal', 'large'].indexOf(value) !== -1;
+        return ['tiny', 'small', 'normal', 'large'].indexOf(value) !== -1;
       }
+    },
+    input: {
+      type: Boolean,
+      default: false
     },
     type: {
       type: String,
@@ -83,6 +83,7 @@
   })
 
   const componentType = computed( () => {
+    
     if(props.href) {
       return 'a'
     }
@@ -155,8 +156,12 @@
 
 <style scoped>
 
-.robo-loader {
+.robo-loader:not(:last-child) {
   margin-right: var(--robo-button-padding);
+}
+
+.robo-button-size-tiny {
+  --robo-button-fontsize: calc(var(--robo-input-fontsize) * 0.9);
 }
 
 .robo-button-size-small {
@@ -179,7 +184,7 @@
   font-family: var(--font-family);
   font-size: var(--robo-button-fontsize);
   font-weight: 500;
-  gap: var(--robo-space);
+  gap: var(--robo-button-padding);
   justify-content: center;
   line-height: 1.2;
   padding: var(--robo-button-padding);
@@ -190,7 +195,9 @@
 }
 
 .robo-button-content {
+  align-self: center;
   display: inline-flex;
+  gap: var(--robo-button-padding);
 }
 
 .robo-button-badge {
@@ -273,8 +280,4 @@
     --robo-button-background-hover: var(--robo-button-error-background-hover);
   }
   /* - coloring */
-
-  .robo-button-content {
-    align-self: center;
-  }
 </style>

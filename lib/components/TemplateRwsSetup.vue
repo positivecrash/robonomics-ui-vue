@@ -1,109 +1,71 @@
 <template>
 
-    <robo-section offset="x0" width="narrow">
-        <form>
-        <robo-grid offset="x0" gap="x2" columns="1">
+    <robo-section v-if="create || active === ''" mark="info" marktitle="What is RWS" offset="x0" width="narrow">
+        <p>Robonomics smart home intergration allows you to interact with smart devices and robots. Interaction is carried out by transactions within Robonomics parachain instead of centralized cloud services.</p>
+        <p>The Robonomics RWS subscription guarantees the ability to send transactions stably every block. It is a good choice if you want to receive data from devices and manage them remotely.</p>
+    </robo-section>
 
-            <robo-grid offset="x0" gap="x05" columns="1">
-                <robo-text title="3" offset="x0" v-if="!props.edit">Owner credits</robo-text>
+    <robo-section offset="x2" width="narrow">
 
-                <robo-text size="small" v-if="!props.edit && !getDate">
-                    Don't have owner address? <robo-link :router="rwsLink">Activate RWS subscription</robo-link>
-                </robo-text>
+        <robo-section offset="x2">
+            <robo-template-rws-active :create="newsetup" />
+        </robo-section>
 
-                <robo-text size="small" v-if="!props.edit && getDate">
-                    Active till: {{getDate}}
-                </robo-text>
+        <robo-section offset="x2">
+            <robo-text title="3" v-if="!newsetup">General settings</robo-text>
+            <robo-text title="3" v-else>You can enter settings mannually</robo-text>
+            <robo-template-rws-setup-form :create="newsetup" v-model:result="result" @on-update="onRwsUpdate" />
+        </robo-section>
 
-                <robo-text v-if="props.edit && ownerModel && enddateModel" weight="bold" title="3">
-                    RWS <robo-text :highlight="isActiveColor" inline>{{nameModel}}</robo-text> active till: {{getDate}}
-                </robo-text>
-                
-                <robo-address-polkadot 
-                    v-model:address="ownerModel" 
-                    chain="32" 
-                    label="Owner address (ed25519)"
-                    :disabled="props.edit ? true : false"
-                    :error="ownerModelError"
-                    @click="reset('ownerModelError')"
-                    @change="emit('ownerChanged')"
-                />
 
-            </robo-grid>
+        <template v-if="!newsetup">
+            <robo-section offset="x2">
+                <robo-text title="3" offset="x0">Other users</robo-text>
+                <robo-text offset="x1" weight="normal-italic" size="small">To add/remove users you need owner account connected</robo-text>
 
-            <robo-grid offset="x0" gap="x05" columns="1">
-                <robo-text title="3" offset="x0" v-if="!props.edit">Controller credits</robo-text>
-                <robo-text size="small" v-if="!props.edit">
-                    You need here Polkadot ed25519 address added in RWS subscription. 
-                    <robo-account-polkadot-generate
-                        v-model:name="newaccountName"
-                        v-model:password="newaccountPassword"
-                        v-model:address="newaccountAddress"
-                        v-model:seed="newaccountSeed"
+                <template v-if="rwsnotempty">
+
+                    <robo-section offset="x05">
+                        <robo-loader v-if="!users" />
+                    </robo-section>
+                    
+                    <template v-if="users">
+                        <robo-template-rws-setup-user 
+                        v-for="(user , index) in users" :key="index" 
+                        :useraddress="user" 
+                        @on-user-delete="onUserDelete"
                     />
-                </robo-text>
-                <robo-address-polkadot 
-                    v-model:address="controllerModel" 
-                    chain="32" 
-                    :label="`${controllerLabel} address (ed25519)`"
-                    :error="controllerModelError"
-                    @click="reset('controllerModelError')"
-                />
-                <robo-input 
-                    :label="`${controllerLabel} seed (12 words)`"
-                    v-model="scontrollerModel"
-                    type="password"
-                    :error="scontrollerModelError"
-                    @click="reset('scontrollerModelError')"
-                    tip="The seed phrase provided here is essential for encrypting your data. We understand the sensitivity of this information and therefore, do not share it with any third parties or store it on our servers. As an extra layer of security, we recommend avoiding storing a large number of tokens in this account to reduce the risk of potential unauthorized access."
-                />
-            </robo-grid>
+                    </template>
 
-            <robo-grid offset="x0" gap="x05" columns="1">
-                <robo-text title="3" offset="x0" v-if="!props.edit">Other settings</robo-text>
-                <robo-input 
-                    label="Name of dashboard"
-                    v-model="nameModel"
-                    :error="nameModelError"
-                    @click="reset('nameModelError')"
-                    tip="You can change it later"
-                />
-            </robo-grid>
+                    <robo-template-rws-setup-user-add 
+                        @on-user-add="onUserAdd"
+                    />
+                
+                </template>
+                
+                <template v-else>
+                    <robo-status type="warning">Start by filling the "General settings"</robo-status>
+                </template>
 
-            <robo-input 
-                v-if="ownerModel && enddateModel"
-                disabled
-                hidden
-                label="Active till"
-                v-model="enddateModel"
+                <!-- <robo-text v-if="usersmsg" weight="normal-italic">{{usersmsg}}</robo-text> -->
+            </robo-section>
+        </template>
+
+        <robo-section offset="x2" v-if="!newsetup">
+            <robo-text title="3" offset="x0">Home assistant</robo-text>
+            <robo-text offset="x1" weight="normal-italic" size="small">
+                To login into the Home Assistant application via browser locally 
+                (in the same network where your smart devices work) create here the password for your user. Make sure this user has been added to the RWS subscription.
+            </robo-text>
+
+            
+            <robo-template-rws-setup-ha-pass 
+                v-if="rwsnotempty"
+                @on-save-ha-pass="onSaveHapass"
             />
+            <robo-status type="warning" v-else>Start by filling the "General settings"</robo-status>
+        </robo-section>
 
-            <robo-grid-item>
-
-                <robo-button 
-                @click.prevent="addRWS()"
-                :disabled="processing"
-                :loading="processing"
-                :type="buttonstatus"
-                block
-                >
-                {{buttontext}}
-                </robo-button>
-            </robo-grid-item>
-
-            <robo-grid-item v-if="message">
-                <robo-text :highlight="status ? status : null">{{message}}</robo-text>
-            </robo-grid-item>
-
-            <robo-grid-item v-if="status === 'error' && statustype">
-                <robo-text highlight="error">
-                    <template v-if="statustype === 'missdata'">Oops! Looks like you missed filling in some required fields. Please fill in all required fields and try again.</template>
-                    <template v-if="statustype === 'duplicated'">The RWS you are trying to add is already in your <robo-link :router="store.state.robonomicsUIvue.rws.links.list">list</robo-link></template>
-                </robo-text>
-            </robo-grid-item>
-       
-            </robo-grid>
-        </form>
     </robo-section>
 </template>
 
@@ -112,254 +74,129 @@
 </script>
 
 <script setup>
-import { ref, computed, defineProps, defineEmits, onMounted, watch } from 'vue'
+import { computed, ref, onMounted, watch, defineEmits } from 'vue'
 import { useStore } from 'vuex'
 const store = useStore()
 
 const props = defineProps({
-    owner: {
-        type: String,
-        default: null
-    },
-    controller: {
-        type: String,
-        default: null
-    },
-    scontroller: {
-        type: String,
-        default: null
-    },
-    name: {
-        type: String,
-        default: null
-    },
-    edit: {
+    // component settings
+    create: {
         type: Boolean,
         default: false
     },
-    enddate: {
-        type: [Number, String],
-        default: null
-    }
-})
 
-const emit = defineEmits([
-    'update:owner', 'update:controller', 'update:scontroller', 'update:name', 'update:enddate',
-    'onRwsSetup', 'onRwsEdit',
-    'ownerChanged'
-])
-
-const rwsLink = computed( () => {
-    return store.state.robonomicsUIvue.rws.links.activate
-})
-
-
-let processing = ref(false)
-
-const ownerModel = computed({
-    get: () => {
-      return props.owner
+    // working with data
+    result: {
+        type: Object
     },
-    set: value => {
-        emit('update:owner', value)
-    }
-})
 
-const controllerModel = computed({
-    get: () => {
-      return props.controller
+    onRwsUpdate:{
+        type: Function
     },
-    set: value => {
-        emit('update:controller', value)
-    }
-})
-
-const scontrollerModel = computed({
-    get: () => {
-      return props.scontroller
+    requestUsers: {
+        type: Function
     },
-    set: value => {
-        emit('update:scontroller', value)
-    }
-})
-
-const nameModel = computed({
-    get: () => {
-      return props.name
+    onUserDelete: {
+        type: Function
     },
-    set: value => {
-        emit('update:name', value)
-    }
-})
-
-const enddateModel = computed({
-    get: () => {
-      return props.enddate
+    onUserAdd: {
+        type: Function
     },
-    set: value => {
-        emit('update:enddate', value)
+    onSaveHapass: {
+        type: Function
     }
 })
 
+// const emit = defineEmits([
+//     'requestUsers'
+// ])
 
-let ownerModelError = ref(false)
-let controllerModelError = ref(false)
-let scontrollerModelError = ref(false)
-let nameModelError = ref(false)
+// let test = ref(null)
 
-let status = ref(null) // ok, error, cancel
-let statustype = ref(null) // duplicated, missdata
-let message = ref(null) // string
-let usersFromStorage = ref([])
-
-const pending = computed(() => {
-    let summary = {}
-    summary.owner = ownerModel.value
-    summary.controller = controllerModel.value
-    summary.scontroller = scontrollerModel.value
-    summary.name = nameModel.value
-    summary.enddate = enddateModel.value
-    summary.users = usersFromStorage.value
-    return summary   
+const active = computed( () => {
+  return store.state.robonomicsUIvue.rws.active
+})
+const rws = computed( () => {
+  return store.state.robonomicsUIvue.rws.list
 })
 
-let getUsers = () => {
-    store.dispatch('rws/userslist', ownerModel.value).then( result => {
-        usersFromStorage.value = result
+const newsetup = computed( () => {
+    if(active.value === '') {
+        return true
+    } else {
+        return props.create
+    }
+})
+
+const users = computed( () => {
+    return store.state.robonomicsUIvue.rws.users
+})
+
+// const users = ref(null)
+
+// const users = computed( () => {
+//     // return store.state.robonomicsUIvue.rws.users
+//     store.dispatch('rws/findrws', active.value).then(index => {
+//         console.log('test', rws.value[index])
+//         if(index > -1 && rws.value[index].users) {
+//             return rws.value[index].users
+//         } else {
+//             return null
+//         }
+//     })
+// })
+
+// const usersmsg = computed( () => {
+//     if(users?.value && users?.value.length <= 0) {
+//         return 'No users found for this subscription'
+//     } else {
+//         return null
+//     }
+// })
+
+let rwsnotempty = ref(false)
+
+let isrwsempty = () => {
+    store.dispatch('rws/findrws', active.value).then(index => {
+        if(index > -1 && rws.value[index].owner!=="" && rws.value[index].controller!=="" && rws.value[index].scontroller!=="") {
+            rwsnotempty.value = true
+        } else {
+            rwsnotempty.value = false
+        }
     })
 }
 
-let rwsStatus = (statusFromApp, messageFromApp) => {
-    if(statusFromApp) { 
-        status.value = statusFromApp
-        processing = false
-    }
-    if(messageFromApp) { message.value = messageFromApp }
+// let getusers = userslist => {
+//     users.value = userslist
+// }
 
-    if(status.value  === 'ok') {
-        store.dispatch('rws/save', pending.value)
-        // if(props.edit) {
-        //     store.dispatch('rws/edit', pending.value)
-        // } else {
-        //     store.dispatch('rws/add', pending.value)
-        // }
-    }
-}
+// let removeuser = status => {
+//     console.log('removeuser', status)
+// }
 
-const buttontext = computed( () => {
-    if(!props.edit) {
-        return ({
-        'ok': 'RWS added',
-        'error': 'Something went wrong'
-        }[status.value] ?? '+ Add RWS')
-    } else {
-        return ({
-        'ok': 'RWS saved',
-        'error': 'something went wrong'
-        }[status.value] ?? 'Save')
-    }
-})
+// let deleteUserProcess = () => {
+//     console.log('deleteUserProcess')
+//     emit('onUserDelete', status => removeuser(status))
+//     emit('requestUsers', active.value, userslist => getusers(userslist))
+// }
 
-const buttonstatus = computed( () => {
-    return ({
-    'ok': 'ok',
-    'error': 'error',
-    }[status.value] ?? 'primary')
-})
+onMounted( () => {
+    isrwsempty()
+    // emit('requestUsers', active.value, userslist => getusers(userslist))
 
-let reset = (model) => {
-   message.value = null
-   statustype.value = null
-   status.value = null
-   
-   if(model === 'ownerModelError' ) { ownerModelError.value = false }
-   if(model === 'nameModelError' ) { nameModelError.value = false }
-   if(model === 'controllerModelError' ) { controllerModelError.value = false }
-   if(model === 'scontrollerModelError' ) { scontrollerModelError.value = false }
-}
-
-let addRWS = () => {
-
-    /* If some inputs are not filled, do not do anything */
-    if(!ownerModel.value || !controllerModel.value || !scontrollerModel.value || !nameModel.value) {
-        status.value='error'
-        statustype.value = 'missdata'
-        if(!ownerModel.value) { ownerModelError.value = true }
-        if(!controllerModel.value) { controllerModelError.value = true }
-        if(!scontrollerModel.value) { scontrollerModelError.value = true }
-        if(!nameModel.value) { nameModelError.value = true }
-        return
-    }
-
-    processing = true
-   
-    if(!props.edit) {
-        store.dispatch('rws/rwsexistance', pending.value).then( result => {
-            if(result < 0) {
-                emit('onRwsSetup', (status, message) => rwsStatus(status, message))
-            } else {
-                status.value = 'error'
-                statustype.value = 'duplicated'
-            }
-        })
-    } else {
-        emit('onRwsEdit', (status, message) => rwsStatus(status, message))
-    }
-
-}
-
-const getDate = computed( () => {
-    if(enddateModel.value) {
-        const date = new Date(enddateModel.value)
-        const month = date.getMonth() + 1
-        return date.getDate() + '/' + month + '/' + date.getFullYear()
-    }
-})
-
-/* + Check and set status for date */
-import { checkStatus, setStatusView } from '../tools'
-
-const isActive = computed( () => {
-    return checkStatus(props.enddate)
-})
-
-const isActiveColor = computed( () => {
-    return setStatusView(isActive.value)
-})
-/* - Check and set status for date */
-
-/* Based on the user's role, we require the display of different labels for the seed. 
-This ensures that each user only sees the relevant information necessary for their specific role.  */
-const controllerLabel = computed( () => {
-    if(store.state.robonomicsUIvue.polkadot.address === ownerModel.value) {
-        return 'Controller'
-    } else {
-        return 'Your'
-    }
-})
-
-
-/* + Generate new account */
-let newaccountName = ref(null)
-let newaccountPassword = ref(null)
-let newaccountAddress = ref(null)
-let newaccountSeed = ref(null)
-/* - Generate new account */
-
-onMounted ( ()=> {
-
-    getUsers()
-
-    watch(newaccountAddress, value => {
-      controllerModel.value = newaccountAddress.value
-      scontrollerModel.value = newaccountSeed.value
+    watch(rws.value, () => {
+        isrwsempty()
     })
 
-    /* + Generate new account */
-    watch(ownerModel.value, value => {
-        getUsers()
+    watch(() => active.value, () => {
+        isrwsempty()
+        // emit('requestUsers', active.value, userslist => getusers(userslist))
     })
-    /* - Generate new account */
+
+
+    // store.dispatch('rws/decrypt', 'U2FsdGVkX1+z4eGfx9a02e30an31v1MEvYqD98PuYY7EB20kILPb2U4NtUhYQPfS+Sr49ulZa+o9qh+5cGzgb1jTNWcBQ1H3MzZ001H8Jm5Iptee8L7qUfgMAoHHYuMKPhcfMcVmQ/4P0gs3zjuvlmXgozOYuqiNBBsgekXl2QSdoWceoTGSn/JgSxjnRGwJ4s5250nzzSOy+/dmttFeWsUyl6VE6fpioAoQUVOaObbyVijW09uU69njoDFPIr66Z8cOFY4OxIK9MaMeuTX0wjRemD/9go2ScGbcRo+SE/hUjEW7ZOjAqiQGe3mdG5H/sPNk6UVn2kT2Q4dlxdgPSQlCHww7j56eomXQqenuoHXgWnJopZpKmk2yjYRHzzdauw21cdlHb5W1xONnFUOGDRjlphxyiaGqBDSoVw3LS/8qXoVpkjl6HL91EVR6Xpy8LR+CKAPhLzn1kx47+2qFYl75tZq8lnMcTBAMQwW9P7iDb4LgiJXEwXUtvakVnpPAhyOLZ1QIi8X+PYTIw5wfuOrSaHlEoLObkwa95Mb60yN4P9fPtXgkLST6ot1sL5H6Y9NjTXI40UFWLqjrQ298xWzigtefvEjjpITUbexXe+lMTVXSm10+Qi4ArKgseSANXjwk3R6VeQLacGXMsCmaUFaBWT+HmADZoDuhXwyMUOoiRvlE/H4AXS3oiAg3aqzwz9HEvVsoA2t4a5CTwGwDcQ06HmfqSDmivpPMFL7wLVd3OyKqAfZgBSVGkGHQygOXVoUD5jhICnhNz5dnd1Vh2R6Q5r4X32ZUR5gtxqYcy87puZ6k9NcilYkxZLkifJgXuhXnpyca7RacKumajAYT8wPRTFdLfM0Uy6/OsYYzMPGQt+R2O9GB/1wx3GWGoM0Ndhl1/aoHPmnhd0QutSuEAcWfB0atGrrnWpHB6mbNu2Ah+3K7nt26f/u68R72QWH14P9m6qECXW53hQlOwSGqzQ==').then( list => {
+    //     test.value = list
+    // })
 
 })
 

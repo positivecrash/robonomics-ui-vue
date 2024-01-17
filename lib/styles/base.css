@@ -130,6 +130,7 @@ body {
 
 	--robo-color-red: hsl(0, 61%, 50%);
 
+	--robo-color-text: var(--robo-color-dark-90);
 	--robo-color-link: var(--robo-color-blue);
 	--robo-color-link-hover: var(--robo-color-blue-120);
 
@@ -151,5 +152,7 @@ body {
 		--robo-color-input: var(--robo-color-dark-80);
 		--robo-color-inputcolor: var(--robo-color-light);
 		--robo-color-inputborder: var(--robo-color-light);
+
+		--robo-color-text: var(--robo-color-light);
 	}
 }

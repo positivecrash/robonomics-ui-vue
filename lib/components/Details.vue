@@ -313,11 +313,12 @@ onMounted(() => {
   document.body.onclick = (e) => {
 
       const current = e.target.closest('.robo-details--closeOutOfFocus[tabindex="0"]'); //save clicked element to detect if it is our current detail
-
+      // console.log('!', current.contains(details))
+      // console.log('!', current.tagName)
       document.body.querySelectorAll('.robo-details--closeOutOfFocus[tabindex="0"]')
           .forEach((e) => {
               if(e !== current){ //we need this condition not to break details behavior
-                  e.open = false
+                e.open = false
               }
       })
   }

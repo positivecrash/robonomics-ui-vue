@@ -54,8 +54,8 @@
 
   let activeChain = ref(getActiveChain())
 
-  onMounted(async () => {
-    watch(activeChain, async (value) => {
+  onMounted( () => {
+    watch(() => activeChain.value, value => {
         store.commit('polkadot/setChain', value)
     })
   })

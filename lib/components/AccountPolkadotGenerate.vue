@@ -1,7 +1,9 @@
 <template>
 
-    <robo-details type="popup" summarystyle="link" class="account-polkadot-generate">
-        <template #summary><robo-text size="small" weight="bold"><slot name="summary">Generate new account</slot></robo-text></template>
+    <robo-details class="account-polkadot-generate" block type="popup" summarystyle="link">
+        <template #summary>
+            <robo-text>Generate new account</robo-text>
+        </template>
         <robo-text title="3"><slot name="summary">Generate new account</slot></robo-text>
         <robo-grid offset="x0" gap="x05" columns="1">
             <robo-text size="small">
@@ -146,7 +148,8 @@
             downloadJson(json, filename.value)
             
             generated.value = true
-            passwordmodel.value = null
+            // remove password after generation
+            // passwordmodel.value = null
             filename.value = null
         } else {
             errorpassword.value = true

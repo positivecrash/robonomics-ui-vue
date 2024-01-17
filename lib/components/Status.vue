@@ -1,51 +1,50 @@
 <template>
     <div :class="classList" v-if="!timeouttrigger">
-        <span v-if="textLeft" v-html="textLeft" />
-        <span v-if="textLeft" class="robob-status-text"><slot name="left" /></span>
-        <robo-icon :icon="icon" :color="color" />
-        <span v-if="textRight" v-html="textRight" />
-        <span v-if="textRight" class="robob-status-text"><slot name="right" /></span>
+        <span v-if="slots.left" class="robob-status-text"><slot name="left" /></span>
+
+        <robo-icon v-if="type === 'ok'" icon="circle-check" color="var(--color-green)" />
+        <robo-icon v-if="type === 'info'" icon="circle-info" color="var(--color-blue)" />
+        <robo-icon v-if="type === 'warning'" icon="circle-exclamation" color="var(--color-orange)" />
+        <robo-icon v-if="type === 'error'" icon="circle-xmark" color="var(--color-red)" />
+
+        <span v-if="slots.default" class="robob-status-text"><slot /></span>
     </div>
 </template>
 
 <script>
   export default { name: 'RoboStatus' }
+  /* TODO: доделать цвета */
 </script>
 
 
 <script setup>
-import { defineProps, computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, useSlots } from 'vue'
+
+const slots = useSlots()
 
 const props = defineProps({
-  // replace it with offset
-   gap: {
+    offset: {
       type: String,
-      default: null,
-      validator: function (value) {
-        return ['top', 'right', 'bottom', 'left', 'all'].indexOf(value) !== -1;
+      default: 'x2',
+      validator(value) {
+        return ['x0', 'x025', 'x05', 'x1', 'x2', 'x4'].includes(value)
       }
     },
-    // try to deprecate
-    textRight: {
-      type: String,
-      default: null
-    },
-    // try to deprecate
-    textLeft: {
-      type: String,
-      default: null
+    solid: {
+      type: Boolean,
+      default: false
     },
     timeout: {
       type: Number,
       default: null
     },
-    // deprecate 'success' status
+
     type: {
       type: String,
       default: null,
       required: true,
       validator: function (value) {
-        return ['ok', 'success', 'info', 'warning', 'error', 'none'].indexOf(value) !== -1;
+        return ['ok', 'info', 'warning', 'error', 'none'].indexOf(value) !== -1;
       }
     }
 })
@@ -53,39 +52,23 @@ const props = defineProps({
 const classList = computed (() => {
   return {
     [`robo-status`]: true,
+    [`robo-status--solid`]: props.solid,
     [`robo-status--${props.type}`]: props.type,
-    [`robo-status--gap-${props.gap}`]: props.gap,
   }
 })
 
-const icon = computed (() => {
-  switch(props.type) {
-      case 'success':
-          return 'circle-check'
-      case 'ok':
-          return 'circle-check'
-      case 'info':
-          return 'circle-info'
-      case 'warning':
-          return 'circle-exclamation'
-      case 'error':
-          return 'circle-xmark'
-  }
-})
+let calcGap = gap => 
+  ({
+    'x0': 'none',
+    'x025': 'calc(var(--gap-layout) * 0.25)',
+    'x05': 'calc(var(--gap-layout) * 0.5)',
+    'x1': 'var(--gap-layout)',
+    'x2': 'calc(var(--gap-layout) * 2)',
+    'x4': 'calc(var(--gap-layout) * 4)'
+}[gap] ?? 'none')
 
-const color = computed (() => {
-  switch(props.type) {
-      case 'success':
-          return 'var(--color-green)'
-      case 'ok':
-          return 'var(--color-green)'
-      case 'info':
-          return 'var(--color-blue)'
-      case 'warning':
-          return 'var(--color-orange)'
-      case 'error':
-          return 'var(--color-red)'
-  }
+const offsetFromData = computed( () => {
+  return calcGap(props.offset)
 })
 
 const timeouttrigger = ref(false)
@@ -103,19 +86,23 @@ onMounted(() => {
 <style scoped>
 
     .robo-status {
-        --status-color: var(--color-dark);
         --status-gap: calc(var(--gap-layout) * 0.5);
 
         align-items: center;
         display: inline-flex;
+        font-weight: bold;
         gap: var(--status-gap);
         line-height: 1.2;
     }
-    
-    .robo-status--gap-top { margin-top: var(--status-gap) }
-    .robo-status--gap-right { margin-right: var(--status-gap) }
-    .robo-status--gap-bottom { margin-bottom: var(--status-gap) }
-    .robo-status--gap-left { margin-left: var(--status-gap) }
-    .robo-status--gap-all { margin: var(--status-gap) }
+
+    .robo-status.robo-status--solid.robo-status--error {
+      background-color: var(--robo-color-red);
+      color: var(--robo-color-light);
+      padding: 0.5rem;
+    }
+
+    .robo-status.robo-status--solid.robo-status--error .robo-icon {
+      color: var(--robo-color-light);
+    }
 
 </style>

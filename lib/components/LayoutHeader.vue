@@ -21,7 +21,7 @@
         </robo-text>
 
         <robo-text size="small">
-            <robo-template-rws-activeselect />
+            <robo-template-rws-active select />
         </robo-text>
 
         <robo-details v-if="navigation" type="tooltip" tooltipRatio="none" class="navigation">
@@ -33,10 +33,9 @@
           <robo-grid :columns="navigation.length + 1" offset="x0" gap="x1">
             <nav>
               <h4>Smart home</h4>
-              <div><router-link :to="store.state.robonomicsUIvue.rws.links.activate" exact>Activation</router-link></div>
-              <div><router-link :to="store.state.robonomicsUIvue.rws.links.list" exact>RWS Setups</router-link></div>
-              <div><router-link :to="store.state.robonomicsUIvue.rws.links.hasetup" exact>HA setup</router-link></div>
-              <div><router-link :to="store.state.robonomicsUIvue.rws.links.users" exact>Users</router-link></div>
+              <div><router-link :to="store.state.robonomicsUIvue.rws.links.activate" exact>New subscription</router-link></div>
+              <div><router-link :to="store.state.robonomicsUIvue.rws.links.setupnew" exact>New setup</router-link></div>
+              <div><router-link :to="store.state.robonomicsUIvue.rws.links.setup" exact>Setups</router-link></div>
               <div><router-link :to="store.state.robonomicsUIvue.rws.links.devices" exact>Devices</router-link></div>
             </nav>
 
@@ -209,6 +208,10 @@
 
   nav:last-child, nav:last-child > div:last-child {
     margin-bottom: 0;
+  }
+
+  nav a {
+    white-space: nowrap;
   }
 
   /* - STYLING */

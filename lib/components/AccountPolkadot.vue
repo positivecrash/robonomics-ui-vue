@@ -1,5 +1,5 @@
 <template>
-  <robo-details :type="interact" :class="classes" :closeOutOfFocus="false" :summarystyle="selectstyle ? 'select' : 'text'">
+  <robo-details :type="interact" :class="classes" :summarystyle="selectstyle ? 'select' : 'text'">
 
     <template #summary>
 
@@ -28,7 +28,7 @@
 
     <section v-if="(activeExtension || activeAddress)" class="robo-account-polkadot-info-section">
 
-      <robo-status type="warning" textRight="Account not found" v-if="activeExtension && !activeAddress" />
+      <robo-status type="warning" v-if="activeExtension && !activeAddress">Account not found</robo-status>
       
       <template v-if="activeAddress">
         <robo-text lines="dotted" size="small">
@@ -47,10 +47,11 @@
             <span>{{activeAccount?.type}}</span>
           </robo-grid>
 
-          <robo-grid v-if="activeAccount" type="flex" offset="x0" gap="x025" galign="start" valign="center">
+          <!-- нужно поправить -->
+          <!-- <robo-grid v-if="activeAccount" type="flex" offset="x0" gap="x025" galign="start" valign="center">
             <span>Format:</span>
             <robo-account-polkadot-chain clean />
-          </robo-grid>
+          </robo-grid> -->
 
         </robo-text>
       </template>
@@ -68,15 +69,19 @@
     </section>
 
     <section v-if="extensionAllowShift" class="robo-account-polkadot-info-section">
-      <h4 v-if="activeWallet">Shift extension</h4>
+      <robo-grid v-if="activeWallet" offset="x0" gap="x05" type="flex" valign="center">
+        <robo-text title="4" offset="x0">Shift extension</robo-text>
+        <!-- <robo-button @click.prevent="disconnect()" type="error" size="small" clean>disconnect</robo-button> -->
+      </robo-grid>
 
-      <robo-grid type="grid" offset="x0" gap="x1" :columns="4">
+      <robo-grid type="grid" offset="x05" gap="x1" :columns="4">
         <template v-for="item in extensions" :key="item.id">
           <robo-account-polkadot-extension :wallet="item.wallet" />
         </template>
       </robo-grid>
       
     </section>
+    
   </robo-details>
 
   <robo-text size="tiny" weight="bold" highlight="error" v-if="typeerror">Your account's type is {{activeAccount?.type}}, you need here {{props.type}}. Try another account.</robo-text>
@@ -90,7 +95,7 @@
 <script setup>
   import { defineProps, defineEmits, computed, ref, onMounted, watch } from 'vue'
   import { encodeAddress } from "@polkadot/util-crypto"
-  import { shortenAddress } from '../tools'
+  import { shortenAddress } from '../polkadot/tools'
 
   import { useStore } from 'vuex'
   const store = useStore()
@@ -215,14 +220,14 @@
     if( props.chain && Object.values(chains).indexOf(props.chain) > -1 ) {
       return props.chain
     } else {
-      return store.state.robonomicsUIvue.polkadot.chain ?? '32'
+      return (store.state.robonomicsUIvue.polkadot.chain !== '') ? store.state.robonomicsUIvue.polkadot.chain : '32'
     }
 
   }
 
   let activeChain = ref(getActiveChain())
 
-  let activeAddress = ref(store.state.robonomicsUIvue.polkadot.address ?? '')
+  let activeAddress = ref(store.state.robonomicsUIvue.polkadot.address)
   /* - Init all nessesary variables */
 
 
@@ -306,6 +311,9 @@
   })
   /* - Type error */
 
+  // let disconnect = () => {
+  //   store.dispatch('polkadot/disconnect')
+  // }
   
   onMounted(async () => {
 
@@ -325,7 +333,10 @@
       // reset()
       console.warn('[robonomics-ui-vue]: RoboAccountPolkadot error')
     }
+    
+  })
 
+  onMounted( () => {
     watch(() => store.state.robonomicsUIvue.polkadot.address, value => {
       activeAddress.value = encodeAddress(value, activeChain.value)
     })
@@ -368,7 +379,6 @@
       activeAddress.value = activeAddressRecalculate(activeAddress.value, accounts.value)
 
     })
-    
   })
 
 </script>
@@ -428,6 +438,6 @@
       display: block;
       width: 1rem;
     }
-    .svginline-polkadot .st0 { fill:#FFFFFF; }
+    .svginline-polkadot .st0 { fill: var(--robo-details-summary-color); }
 
 </style>
