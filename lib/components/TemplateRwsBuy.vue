@@ -84,8 +84,12 @@
 import { ref, computed, defineProps, defineEmits, onMounted, watch } from 'vue'
 import { generateAddress } from '../polkadot/tools'
 import { generateName, dateGetRange, dateGetString, setStatusView } from '../tools'
+
 import { useStore } from 'vuex'
 const store = useStore()
+
+import { useRouter } from 'vue-router'
+const router = useRouter()
 
 const props = defineProps({
     price: {
@@ -230,6 +234,10 @@ onMounted( () => {
                 reset()
             }, 2000)
         }
+    })
+
+    watch( store.state.robonomicsUIvue.rws.list , () => {
+        router.push(store.state.robonomicsUIvue.rws.links.setup)
     })
 
 })
