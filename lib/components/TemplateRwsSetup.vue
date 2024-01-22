@@ -1,9 +1,8 @@
 <template>
-
-    <robo-section v-if="create || active === ''" mark="info" marktitle="What is RWS" offset="x0" width="narrow">
-        <p>Robonomics smart home intergration allows you to interact with smart devices and robots. Interaction is carried out by transactions within Robonomics parachain instead of centralized cloud services.</p>
-        <p>The Robonomics RWS subscription guarantees the ability to send transactions stably every block. It is a good choice if you want to receive data from devices and manage them remotely.</p>
-    </robo-section>
+<!-- 
+    <robo-section v-if="create || active === ''" offset="x0" width="narrow">
+        
+    </robo-section> -->
 
     <robo-section offset="x2" width="narrow">
 
@@ -14,7 +13,7 @@
         <robo-section offset="x2">
             <robo-text title="3" v-if="!newsetup">General settings</robo-text>
             <robo-text title="3" v-else>You can enter settings mannually</robo-text>
-            <robo-template-rws-setup-form :create="newsetup" v-model:result="result" @on-update="onRwsUpdate" />
+            <robo-template-rws-setup-form :create="newsetup" @on-update="onRwsUpdate" />
         </robo-section>
 
 
@@ -37,7 +36,7 @@
                     />
                     </template>
 
-                    <robo-template-rws-setup-user-add 
+                    <robo-template-rws-setup-user-add
                         @on-user-add="onUserAdd"
                     />
                 
@@ -83,11 +82,6 @@ const props = defineProps({
     create: {
         type: Boolean,
         default: false
-    },
-
-    // working with data
-    result: {
-        type: Object
     },
 
     onRwsUpdate:{
@@ -179,6 +173,10 @@ let isrwsempty = () => {
 //     emit('onUserDelete', status => removeuser(status))
 //     emit('requestUsers', active.value, userslist => getusers(userslist))
 // }
+
+// const isAdminConnected = computed (() => {
+//     return store.state.robonomicsUIvue.rws.active === 
+// })
 
 onMounted( () => {
     isrwsempty()

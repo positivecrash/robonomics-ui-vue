@@ -1,7 +1,7 @@
 <template>
   <robo-button-delete-approval 
     :action="deleteFunc"
-    :title="rws ? 'Remove this subscription' : 'Remove all subscriptions'"
+    :title="rws ? 'Remove this subscription from dapp' : 'Remove all subscriptions from dapp'"
   >
     <template v-if="rws">Remove this setup</template>
     <template v-else>Remove all setups</template>

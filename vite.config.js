@@ -1,14 +1,11 @@
 const path = require("path")
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-// import resolve from '@rollup/plugin-node-resolve' // not worked
-// import svgLoader from 'vite-svg-loader' // shifted to vue templates
 import copy from 'rollup-plugin-copy' //for copying and transform icons into components
-// import externals from 'rollup-plugin-node-externals' // not worked
-// import commonjs from 'rollup-plugin-commonjs' // not worked
-import peerDepsExternal from 'rollup-plugin-peer-deps-external' // for excluding external plugins
-import replace from '@rollup/plugin-replace'
+import replace from '@rollup/plugin-replace' // for svg icons to code
 
+
+/* + SVG ICONS TO CODE */
 const { optimize } = require('svgo')
 
 const detachNodeFromParent = (node, parentNode) => {
@@ -98,24 +95,30 @@ const svgTrasnform = (svgString) => {
   return result.data
 }
 
+/* - SVG ICONS TO CODE */
+
 // https://vitejs.dev/config/
 export default defineConfig({
   build: {
     lib: {
       entry: path.resolve(__dirname, 'lib/index.js'),
       name: 'RobonomicsUiVue',
-      formats: ['cjs'],
-      // formats: ['cjs', 'umd', 'iife'],
       fileName: () => '[name].js',
     },
     rollupOptions: {
-      external: ['vue', 'vue-router'],
+      // external: ['vue', 'vue-router', 'vuex', 'crypto-js', 'file-saver'],
+      external: ['vue', 'vue-router', 'vuex', 'crypto-js', 'file-saver', '@polkadot/api'],
       output: {
         globals: {
-          vue: 'Vue',
+          vue: 'vue',
+          'crypto-js': 'crypto-js',
+          'vue-router': 'vue-router',
+          vuex: 'vuex',
+          'file-saver': 'file-saver',
+          '@polkadot/api':'@polkadot/api'
         },
         dir: './dist',
-        inlineDynamicImports: true,
+        inlineDynamicImports: true
       },
       // manualChunks: id => path.parse(id).name,
       plugins: [
@@ -135,7 +138,6 @@ export default defineConfig({
   },
 
   plugins: [
-    peerDepsExternal(),
     vue()
   ],
   

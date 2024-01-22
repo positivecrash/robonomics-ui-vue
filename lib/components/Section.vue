@@ -1,23 +1,7 @@
 <template>
   <section :class="classes">
     <robo-text v-if="title" title="3">{{title}}</robo-text>
-    <template v-if="imaged" >
-      <robo-image :src="getImage(`boy-${imaged}.svg`)" max="220px"/>
-      <robo-text v-if="imagedtitle" size="small" weight="bold" offset="x05">{{imagedtitle}}</robo-text>
-      <slot/>
-    </template>
-    <template v-else>
-      <div v-if="mark" class="section-image">
-        <p v-if="marktitle">{{marktitle}}</p>
-        <img :src="getImage(`boy-${mark}.svg`)" />
-      </div>
-      <div class="section-content" v-if="mark">
-        <robo-text size="small" paragraphs weight="normal-italic">
-          <slot/>
-        </robo-text>
-      </div>
-      <slot v-if="!mark" />
-    </template>
+    <slot />
   </section>
 
 </template>
@@ -45,33 +29,7 @@ const props = defineProps({
       type: Boolean,
       default: false
     },
-
-    mark: {
-      type: String,
-      default: null,
-      validator: function (value) {
-        return ['info', 'question'].indexOf(value) !== -1;
-      }
-    },
-
-    marktitle: {
-      type: String,
-      default: null
-    },
-
-    imaged: {
-      type: String,
-      default: null,
-      validator: function (value) {
-        return ['info', 'notfound', 'playing', 'question', 'smarthome', 'users'].indexOf(value) !== -1;
-      }
-    },
-
-    imagedtitle: {
-      type: String,
-      default: null
-    },
-
+    
     offset: {
         type: String,
         default: 'x2',
@@ -102,7 +60,6 @@ const classes = computed(() => {
     [`robo-section-clean`]: props.clean,
     [`robo-section-gcenter`]: props.gcenter,
     [`robo-section-offset-${props.offset}`]: props.offset,
-    [`robo-section--mark-${props.mark}`]: props.mark,
     [`robo-section-width--${props.width}`]: props.width,
     [`robo-section-sideline`]: props.sideline,
     [`robo-section-disabled`]: props.disabled,
@@ -152,57 +109,6 @@ const classes = computed(() => {
       margin: 0;
       --offset: 0;
     }
-
-    /* + MARK (info, question) */
-
-    .robo-section[class *= 'robo-section--mark-'] {
-      display: grid;
-      gap: 30px;
-      grid-template-columns: 1fr 5fr;
-      /* align-items: end; */
-      align-items: stretch;
-      border: 1px solid var(--robo-color-dark);
-      padding: calc(var(--robo-space) * 1.5);
-    }
-
-    .robo-section[class *= 'robo-section--mark-'] .section-image img {
-      max-width: 100%
-    }
-
-    .section-image {
-      display: grid;
-    }
-
-    .section-image img {
-      align-self: end;
-    }
-
-    .section-image p {
-        font-size: 90%;
-        font-weight: bold;
-        line-height: 1.2;
-        margin-bottom: 10px;
-    }
-
-    @media screen and (max-width: 640px) {
-      .robo-section[class *= 'robo-section--mark-'] {
-        grid-template-columns: 1fr 2fr;
-      }
-    }
-
-    @media screen and (max-width: 400px) {
-      .robo-section[class *= 'robo-section--mark-'] {
-        grid-template-columns: 1fr;
-        gap: 0;
-      }
-
-      .robo-section[class *= 'robo-section--mark-'] .section-image img {
-        max-width: 80px;
-      }
-    }
-
-    /* - MARK (info, question) */
-
 
     .robo-section-gcenter {
       text-align: center;

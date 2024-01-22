@@ -1,11 +1,11 @@
 <template>
     <robo-section 
         v-if="!config?.dashboard"
-        imaged="notfound"
-        imagedtitle="You need first configure dashboard in Home Assistant"
         width="narrow" 
         gcenter
-    />
+    >
+        <robo-text weight="bold">You need first configure dashboard in Home Assistant</robo-text>
+    </robo-section>
 
     <template v-else>
         <robo-tabs>

@@ -51,9 +51,8 @@ const props = defineProps({
     }
 })
 
-/* 'update:result' откуда? */
 const emit = defineEmits([
-    'update:result', 'onUpdate'
+    'onUpdate'
 ])
 
 const active = computed( () => {

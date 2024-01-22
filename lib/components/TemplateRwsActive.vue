@@ -2,7 +2,18 @@
   <template v-if="!select">
 
     <template v-if="rws.length < 1 || create">
-      <robo-text title="3">Let's make a subscription</robo-text>
+      <robo-text title="3">
+        New RWS subscription 
+        <robo-details>
+          <template #summary><robo-icon icon="circle-question"/></template>
+          <robo-text weight="bold">What is RWS</robo-text>
+          <robo-text weight="normal">
+            <p>Robonomics smart home intergration allows you to interact with smart devices and robots. Interaction is carried out by transactions within Robonomics parachain instead of centralized cloud services.</p>
+            <p>The Robonomics RWS subscription guarantees the ability to send transactions stably every block. It is a good choice if you want to receive data from devices and manage them remotely.</p>
+          </robo-text>
+        </robo-details>
+      </robo-text>
+      
       <robo-grid type="flex" offset="x0" gap="x1" galign="start">
         <robo-button :router="store.state.robonomicsUIvue.rws.links.activate" size="small" outline><robo-icon icon="wallet" /> <robo-text>Buy</robo-text></robo-button>
         <robo-template-rws-import-upload textlabel size="small" />
