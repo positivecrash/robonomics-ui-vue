@@ -4,9 +4,10 @@
         <robo-button @click.prevent="adduser" size="small" :loading="statuscomp==='loading'" :type="buttontype">
             <robo-icon icon="plus" v-if="statuscomp==='init'" />
             <robo-icon icon="check" v-if="statuscomp==='added'" />
+            <robo-icon icon="bolt" v-if="statuscomp==='cancel'" />
             <robo-icon icon="bolt" v-if="statuscomp==='error'" />
         </robo-button>
-        <robo-status v-if="statuscomp==='error' && statusmsg" type="error">{{statusmsg}}</robo-status>
+        <robo-status v-if="statusmsg" :type="errorStatus">{{statusmsg}}</robo-status>
     </robo-grid>
 </template>
 
@@ -15,16 +16,17 @@
 </script>
 
 <script setup>
-import { defineEmits, ref, computed } from 'vue'
+import { defineEmits, ref, computed, watch } from 'vue'
 
 const statuscomp = ref('init')
 const statusmsg = ref(null)
 const useraddr = ref(null)
 const emit = defineEmits(['onUserAdd'])
+const errorStatus = ref(null)
 
 const buttontype = computed( () => {
     
-    if( statuscomp.value === 'error') {
+    if( statuscomp.value === 'error' || statuscomp.value === 'cancel' ) {
         return 'error'
     }
 
@@ -38,18 +40,39 @@ const buttontype = computed( () => {
 let add = (status, message) => {
     if(status === 'ok') {
         statuscomp.value = 'added'
+        errorStatus.value = 'ok'
     }
 
     if(status === 'error') {
         statuscomp.value = 'error'
-        statusmsg.value = 'Something went wrong, user was not added'
+        errorStatus.value = 'error'
+
+        if(!message) {
+            statusmsg.value = 'Something went wrong, user was not added'
+        } else {
+            statusmsg.value = message
+        }
+    }
+
+    if(status === 'cancel') {
+        statuscomp.value = 'cancel'
+        errorStatus.value = 'warning'
+
+        if(!message) {
+            statusmsg.value = 'The saving process has been canceled'
+        } else {
+            statusmsg.value = message
+        }
     }
 
     setTimeout(() => {
-        clear()
-
         if(status === 'ok') {
+            clear()
             useraddr.value = null
+        } else {
+            watch(() => useraddr.value, () => {
+                clear()
+            })
         }
     }, 3000)
 }

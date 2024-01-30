@@ -103,11 +103,12 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, 'lib/index.js'),
       name: 'RobonomicsUiVue',
-      fileName: () => '[name].js',
+      formats: ['cjs', 'es'],
+      fileName: (format) => (format === 'cjs') ? `[name].js` : `[name].${format}.js`,
     },
     rollupOptions: {
       // external: ['vue', 'vue-router', 'vuex', 'crypto-js', 'file-saver'],
-      external: ['vue', 'vue-router', 'vuex', 'crypto-js', 'file-saver', '@polkadot/api'],
+      external: ['vue', 'vue-router', 'vuex', 'crypto-js', 'file-saver', '@polkadot/util-crypto', '@polkadot/ui-keyring'],
       output: {
         globals: {
           vue: 'vue',
@@ -115,7 +116,8 @@ export default defineConfig({
           'vue-router': 'vue-router',
           vuex: 'vuex',
           'file-saver': 'file-saver',
-          '@polkadot/api':'@polkadot/api'
+          '@polkadot/ui-keyring':'@polkadot/ui-keyring',
+          '@polkadot/util-crypto': '@polkadot/util-crypto'
         },
         dir: './dist',
         inlineDynamicImports: true

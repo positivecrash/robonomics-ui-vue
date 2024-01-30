@@ -20,7 +20,7 @@
 
                 <temlate v-if="statuscomp === 'ok'">Saved</temlate>
             </robo-button>
-            <robo-status v-if="error" type="error" offset="x1">{{error}}</robo-status>
+            <robo-status v-if="error" :type="statuscomp" offset="x1">{{error}}</robo-status>
         </robo-grid>
     </robo-section>
 </template>
@@ -31,7 +31,6 @@
   добавить кнопку генерации имени;
   добавить проверки на формат адресов Полкадот и сидов;
   проверку на дублирование подписки и вопрос перезаписать или нет?
-  если успешно сохранено то выводить соотв кнопку и сообщение из дапп если есть (сейчас выводится только ошибка)
   проверка на то добавлен ли юзер в подиску
    */
 </script>
@@ -135,12 +134,30 @@ let save = (status, msg, type) => {
             statuscomp.value = 'init'
 
             if(type === 'create') {
-                router.push(store.state.robonomicsUIvue.rws.links.setup)
+                if(router) {
+                    router.push({path: store.state.robonomicsUIvue.rws.links.setup})
+                }
             }
         }, 1000 )
-    } else {
+    }
+
+    if(status === 'error') {
         error.value = msg
         statuscomp.value = 'error'
+    }
+
+    if(status === 'cancel') {
+        if(msg) {
+            error.value = msg
+        } else {
+            error.value = 'The saving process has been canceled'
+        }
+        statuscomp.value = 'warning'
+
+        setTimeout( () => {
+            statuscomp.value = 'init'
+            error.value = null
+        }, 3000 )
     }
 }
 

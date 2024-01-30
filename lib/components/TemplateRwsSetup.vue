@@ -19,7 +19,7 @@
 
         <template v-if="!newsetup">
             <robo-section offset="x2">
-                <robo-text title="3" offset="x0">Other users</robo-text>
+                <robo-text title="3" offset="x0">Users in subscription</robo-text>
                 <robo-text offset="x1" weight="normal-italic" size="small">To add/remove users you need owner account connected</robo-text>
 
                 <template v-if="rwsnotempty">

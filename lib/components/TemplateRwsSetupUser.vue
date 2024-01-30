@@ -13,6 +13,7 @@
                 <robo-loader v-if="statuscomp==='loading'" />
             </robo-grid>
         </robo-card>
+        <robo-status v-if="statuscomp==='removecancelled'" type="warning">The removal of the user has been canceled</robo-status>
     </robo-section>
 </template>
 
@@ -36,8 +37,6 @@ const props = defineProps({
     }
 })
 
-// let temp = ref('User name')
-
 let statuscomp = ref('init')
 const emit = defineEmits(['onUserDelete'])
 
@@ -45,10 +44,18 @@ let remove = (status, message) => {
     if(status === 'ok') {
         statuscomp.value = 'removed'
     }
+
+    if(status === 'cancel') {
+        statuscomp.value = 'removecancelled'
+
+        setTimeout( () => {
+            statuscomp.value = 'init'
+        }, 3000)
+    }
 }
 
 let removeuser = () => {
     statuscomp.value = 'loading'
-    emit('onUserDelete', props.useraddr, (status, message) => remove(status, message))
+    emit('onUserDelete', props.useraddress, (status, message) => remove(status, message))
 }
 </script>

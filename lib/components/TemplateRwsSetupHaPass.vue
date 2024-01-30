@@ -11,10 +11,10 @@
             <template v-if="statuscomp === 'process'"><robo-loader /> Saving the password</template>
             <template v-if="statuscomp === 'init'">Create password</template>
             <template v-if="statuscomp === 'ok'">Password saved</template>
-            <template v-if="statuscomp === 'error'">Password not saved</template>
+            <template v-if="statuscomp === 'error' || statuscomp === 'cancel'">Password not saved</template>
         </robo-button>
 
-        <robo-status v-if="msgcomp" type="error" offset="x1">{{msgcomp}}</robo-status>
+        <robo-status v-if="msgcomp" :type="errortype" offset="x1">{{msgcomp}}</robo-status>
     </robo-grid>
 </template>
 
@@ -54,12 +54,16 @@ let responsePass = (savestatus, msg) => {
     statuscomp.value = savestatus
     msgcomp.value = msg
 
-    if(savestatus === 'ok') {
-        
+    if(savestatus !== 'error') {
+        // убираем сообщения и статус дляуспешного сохранения или отмены через какое-то время
         setTimeout( () => {
             statuscomp.value = 'init'
             changed.value = false
         }, 3000)
+    }
+
+    if(savestatus === 'cancel' && !msg) {
+        msgcomp.value = 'The saving process has been canceled'
     }
 }
 
@@ -90,7 +94,7 @@ let saveData = () => {
 
 const buttontype = computed( () => {
     
-    if( statuscomp.value === 'error') {
+    if( statuscomp.value === 'error' || statuscomp.value === 'cancel') {
         return 'error'
     }
 
@@ -104,6 +108,18 @@ const buttontype = computed( () => {
 let clean = () => {
     statuscomp.value = 'init'
     msgcomp.value = null
+}
+
+const errortype = computed( () => {
+  return getErrorType(statuscomp.value)
+})
+
+const getErrorType = (statuscomp) => {
+    return ({
+      'error': 'error',
+      'ok': 'ok',
+      'cancel': 'warning'
+    }[statuscomp] ?? null)
 }
 
 onMounted( () => {
