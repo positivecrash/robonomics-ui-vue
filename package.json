@@ -3,15 +3,16 @@
   "main": "index.js",
   "module": "index.es.js",
   "private": false,
-  "version": "0.2.8",
+  "version": "0.2.9",
   "scripts": {
     "build-clear": "rimraf /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue/lib/icons",
-    "test-clear": "rimraf /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue3-components-guide/node_modules/robonomics-ui-vue",
-    "package-copy": "cp -R /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue/package.json /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue/dist",
-    "test-copy": "cp -R /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue/dist /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue3-components-guide/node_modules/robonomics-ui-vue",
+    "test-clear": "rimraf /Users/nicetea/Projects/Airalab/Frontend/-tmp-dapp/robonomics-ui-vue3-components-guide/node_modules/robonomics-ui-vue",
+    "package-copy": "cp -R /Users/nicetea/Projects/Airalab/Frontend/-tmp-dapp/robonomics-ui-vue/package.json /Users/nicetea/Projects/Airalab/Frontend/-tmp-dapp/robonomics-ui-vue/dist",
+    "test-copy": "cp -R /Users/nicetea/Projects/Airalab/Frontend/-tmp-dapp/robonomics-ui-vue/dist /Users/nicetea/Projects/Airalab/Frontend/-tmp-dapp/robonomics-ui-vue3-components-guide/node_modules/robonomics-ui-vue/",
+    "test-copy-dapp": "cp -R /Users/nicetea/Projects/Airalab/Frontend/-tmp-dapp/robonomics-ui-vue/dist /Users/nicetea/Projects/Airalab/Frontend/dapp.robonomics.network/node_modules/robonomics-ui-vue/",
     "dev": "vite",
     "build": "vite build && yarn package-copy",
-    "build-test": "vite build && yarn package-copy && yarn test-clear && yarn test-copy",
+    "build-test": "vite build && yarn package-copy && yarn test-clear && yarn test-copy && yarn test-copy-dapp",
     "preview": "vite preview"
   },
   "dependencies": {

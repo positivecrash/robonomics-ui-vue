@@ -1,7 +1,6 @@
 <template>
 
   <header :class="classes">
-
     <robo-grid type="flex" offset="0" gap="x05" valign="center" galign="stretch" class="robo-layout-header-grid">
 
       <robo-grid type="flex" offset="0" gap="x05" valign="center">
@@ -33,10 +32,10 @@
           <robo-grid :columns="navigation.length + 1" offset="x0" gap="x1">
             <nav>
               <h4>Smart home</h4>
-              <div><router-link :to="store.state.robonomicsUIvue.rws.links.activate" exact>New subscription</router-link></div>
+              <div><router-link :to="store.state.robonomicsUIvue.rws.links.activate" exact>Buy a subscription</router-link></div>
               <div><router-link :to="store.state.robonomicsUIvue.rws.links.setupnew" exact>New setup</router-link></div>
-              <div><router-link :to="store.state.robonomicsUIvue.rws.links.setup" exact>Setups</router-link></div>
-              <div><router-link :to="store.state.robonomicsUIvue.rws.links.devices" exact>Devices</router-link></div>
+              <div v-if="store.state.robonomicsUIvue.rws.list.length > 0"><router-link :to="store.state.robonomicsUIvue.rws.links.setup" exact>Your setup<template v-if="store.state.robonomicsUIvue.rws.list.length > 1">s</template></router-link></div>
+              <div v-if="store.state.robonomicsUIvue.rws.list.length > 0"><router-link :to="store.state.robonomicsUIvue.rws.links.devices" exact>Devices & Control</router-link></div>
             </nav>
 
             <nav v-for="item in navigation" :key="item.id">
@@ -101,11 +100,17 @@
 
   import { useStore } from 'vuex'
   const store = useStore()
-  import { checkRole } from '../tools'
 
-  const role = computed( () => {
-    return checkRole(store.state.robonomicsUIvue.polkadot.address, store.state.robonomicsUIvue.rws.active)
-  })
+  // const openednav = ref(false)
+
+  // onMounted( ()=> {
+  //   document.querySelectorAll('.robo-layout-header .navigation a').forEach((e) => {
+  //     e.addEventListener('click', ()=>{
+  //       console.log('cl')
+  //       openednav.value = false
+  //     })
+  //   })
+  // })
 </script>
 
 <style>
@@ -126,6 +131,7 @@
     --robo-details-summary-color: var(--robo-color-light);
     --robo-details-summary-padding: 0.5rem;
     font-weight: bold;
+    text-transform: uppercase;
   }
 
   @media screen and (max-width: 900px) {

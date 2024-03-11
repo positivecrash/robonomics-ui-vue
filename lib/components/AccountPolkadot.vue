@@ -18,7 +18,7 @@
               {{selecttitle}}
             </template>
             <template v-else>
-              Connect <template v-if="type">{{type}}</template> account
+              <template v-if="type">{{type}}</template> Account
             </template>
             </span>
         </template>

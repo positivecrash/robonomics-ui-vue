@@ -86,7 +86,7 @@
 
     <robo-button v-else :router="store.state.robonomicsUIvue.rws.links.setup" size="small">
       <robo-icon icon="user" />
-      <robo-text>Setup subscription</robo-text>
+      <robo-text>Subscription</robo-text>
     </robo-button>
   </template>
 

@@ -39,7 +39,7 @@ export default defineComponent({
       type: String,
       default: 'wide',
       validator(value) {
-        return ['wide', 'middle', 'narrow'].includes(value)
+        return ['wide', 'middle-wide', 'middle', 'narrow'].includes(value)
       }
     }
   },
@@ -87,6 +87,10 @@ export default defineComponent({
 
     .robo-layout-section--middle {
       --section-width: 1000px;
+    }
+
+    .robo-layout-section--middle-wide {
+      --section-width: 1300px;
     }
 
     .robo-layout-section--selfcenter {

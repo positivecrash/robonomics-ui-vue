@@ -2,7 +2,7 @@
 
     <robo-layout-section>
         
-        <template v-if="rws?.length < 1">
+        <template v-if="!rws || rws?.length < 1">
             <robo-layout-section rwsrecover>
                 <robo-section width="narrow" gcenter>
                     <robo-template-devices-empty />

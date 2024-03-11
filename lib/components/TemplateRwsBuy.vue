@@ -27,7 +27,7 @@
                                     <template #summary><robo-icon icon="circle-question" /></template>
                                     <robo-grid offset="x0" gap="x05">
                                         <robo-text weight="bold">Where to buy XRT</robo-text>
-                                        <robo-link href="https://app.basilisk.cloud/pools-and-farms">Basilisk</robo-link>
+                                        <robo-link href="https://app.basilisk.cloud/trade">Basilisk</robo-link>
                                         <robo-link href="https://app.solarbeam.io/exchange/swap">Solarbeam</robo-link>
                                         <robo-link href="https://trade.kraken.com/markets/kraken/xrt/usd">Kraken</robo-link>
                                     </robo-grid>
@@ -77,6 +77,7 @@
 <script setup>
 import { ref, computed, defineProps, defineEmits, onMounted, watch } from 'vue'
 import { generateName, dateGetRange, dateGetString, setStatusView } from '../tools'
+import { generateAddress } from '../polkadot/tools'
 
 import { useStore } from 'vuex'
 const store = useStore()
@@ -166,6 +167,11 @@ const message = ref(null) // string
 const localerror = ref(null)
 const emit = defineEmits(['onActivate'])
 
+let newacc = () => {
+    const { mnemonic, json } = generateAddress()
+    return [json.address, mnemonic]
+}
+
 const buttonstatus = computed( () => {
     return ({
     'ok': 'ok',
@@ -235,7 +241,10 @@ onMounted( () => {
                 if(index < 0) {
                     // generate new settings
                     const name = generateName()
-                    store.dispatch('rws/create', { owner, name })
+                    const controller = newacc()
+                    const controlleraddr = controller[0]
+                    const controllerseed = controller[1]
+                    store.dispatch('rws/create', { owner, controller: controlleraddr, scontroller: controllerseed, name })
                 }
             })
 
