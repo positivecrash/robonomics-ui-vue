@@ -1,14 +1,26 @@
 <template>
     <robo-section offset="x05">
         <robo-grid offset="x0" gap="x05" columns="1">
-            <robo-input label="Owner" v-model="owner" :disabled="!create" @input="changecheck('owner', owner)" required />
-            <robo-input label="Name of setup" v-model="name" @input="changecheck('name', name)" required />
-            <robo-input label="Controller (technical account, no tokens required)" v-model="controller" @input="changecheck('controller', controller)" required />
-            <robo-input label="Controller's seed phrase" v-model="controllerseed" @input="changecheck('controllerseed', controllerseed)" required type="password" />
-        
+            
+            <div class="generativeline">
+                <robo-input label="Name of setup" v-model="name" @input="changecheck('name', name)" required />
+                <robo-button clean class="generativeline-tog" @click.prevent="createname"><robo-icon icon="wand-magic"/></robo-button>
+            </div>
+
+            <robo-address-polkadot label="Owner (payable account with tokens)" v-model="owner" :disabled="!create" @input="changecheck('owner', owner)" required placeholder="Polkadot address" />
+
+            <div class="generativeline">
+                <robo-address-polkadot label="Controller (technical account, no tokens required)" v-model="controller" required placeholder="Polkadot address of ed25519 account" />
+                <robo-account-polkadot-generate v-if="!create" v-model:address="controller" beforename="Controller" class="generativeline-tog">
+                    <template #link><robo-icon icon="wand-magic"/></template>
+                    <template #title>Create tech account for the controller</template>
+                    <template #successmsg>Controller address has been set up. Remember to save your password and JSON file for future use. If everything is saved, close this popup to proceed.</template>
+                </robo-account-polkadot-generate>
+            </div>
+
             <robo-button 
                 @click.prevent="submit" 
-                :disabled="changed.length === 0 || error || process" 
+                :disabled="!prechecks || error || process" 
                 block 
                 :loading="process"
                 :type="statuscomp === 'ok' ? 'ok' : 'primary'"
@@ -27,18 +39,14 @@
 
 <script>
   export default { name: 'RoboTemplateRwsSetupForm' }
-  /* TODO:
-  добавить кнопку генерации имени;
-  добавить проверки на формат адресов Полкадот и сидов;
-  проверку на дублирование подписки и вопрос перезаписать или нет?
-  проверка на то добавлен ли юзер в подиску
-   */
 </script>
 
 <script setup>
 import { ref, computed, defineEmits, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
+import { isValidAddress } from '../polkadot/tools'
+import { generateName } from '../tools'
 const store = useStore()
 const router = useRouter()
 
@@ -62,14 +70,13 @@ const rws = computed( () => {
   return store.state.robonomicsUIvue.rws.list
 })
 
-let changed = ref([])
-let rwslist = ref('')
-let owner = ref('')
-let name = ref('')
-let controller = ref('')
-let controllerseed = ref('')
+const changed = ref([])
+const rwslist = ref('')
+const owner = ref('')
+const name = ref('')
+const controller = ref('')
 
-let getrws = () => {
+const getrws = () => {
     if(!props.create) {
         store.dispatch('rws/findrws', active.value).then( index => {
             if(index > -1) {
@@ -77,18 +84,16 @@ let getrws = () => {
                 owner.value = rwslist.value?.owner
                 name.value = rwslist.value?.name
                 controller.value = rwslist.value?.controller
-                controllerseed.value = rwslist.value?.scontroller
             } else {
                 owner.value = ''
                 name.value = ''
                 controller.value = ''
-                controllerseed.value = ''
             }
         })
     }
 }
 
-let changecheck = (field, input) => {
+const changecheck = (field, input) => {
 
     // обновляем статусы ошибок
     error.value = null
@@ -105,13 +110,13 @@ let changecheck = (field, input) => {
     }
 }
 
-let error = ref(null)
-let process = ref(false)
-let rwsbufer = ref({})
-let statuscomp = ref('init')
+const error = ref(null)
+const process = ref(false)
+const rwsbufer = ref({})
+const statuscomp = ref('init')
 
 /*  функция-связь, прокидываемая в основное приложение */
-let save = (status, msg, type) => {
+const save = (status, msg, type) => {
 
     process.value = false
     
@@ -161,7 +166,7 @@ let save = (status, msg, type) => {
     }
 }
 
-let processing = type => {
+const processing = type => {
     
     process.value = true
 
@@ -170,15 +175,14 @@ let processing = type => {
         rwsbufer.value = {}
         Object.assign(rwsbufer.value, 
             {owner: owner.value}, 
-            {controller: controller.value}, 
-            {scontroller: controllerseed.value}, 
+            {controller: controller.value},
             {name: name.value})
 
         emit('onUpdate', rwsbufer.value, (status, msg) => save(status, msg, type))
     }, 1000)
 }
 
-let submit = () => {
+const submit = () => {
     if(props.create) {
         processing('create')
     } else {
@@ -203,6 +207,15 @@ let submit = () => {
     }
 }
 
+const prechecks = computed( () => {
+    return (changed.value.length > 0 && isValidAddress(owner.value) && isValidAddress(controller.value) && name.value.length > 0)
+})
+
+const createname = () => {
+    name.value = generateName()
+    changecheck('name', name.value)
+}
+
 onMounted( () => {
     getrws()
 
@@ -211,9 +224,20 @@ onMounted( () => {
       changed.value = []
     })
 
-    watch(() => props.create, () => {
+    watch(() => props.create, value => {
       getrws()
+
+      if(value) {
+        owner.value = ''
+        controller.value = ''
+        name.value = ''
+      }
     })
+
+    watch( () => controller.value, value => {
+        changecheck('controller', value)
+    })
+
 })
 
 </script>
@@ -223,4 +247,20 @@ onMounted( () => {
         --border: var(--robo-color-blue);
         --label: var(--robo-color-blue);
     }
+
+    .generativeline .robo-input input {
+        padding-right: calc(var(--space) * 3);
+    }
+</style>
+
+<style scoped>
+.generativeline {
+    position: relative;
+}
+
+.generativeline .generativeline-tog {
+    position: absolute;
+    right: 10px;
+    bottom: 15px;
+}
 </style>

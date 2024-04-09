@@ -33,6 +33,7 @@
             @blur="blurred"
             
             v-model="inputModel"
+            :type="$attrs.type ?? 'text'"
             ref="input"
             :aria-disabled="disabled ? true : null"
             :tabindex="disabled ? -1 : 0"
@@ -43,7 +44,6 @@
 
             id="fileupload"
         />
-        
         <input 
             v-if="inputType === 'color'"
             v-model="inputModel"

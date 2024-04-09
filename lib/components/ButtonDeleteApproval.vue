@@ -8,7 +8,7 @@
     :outline="!approve"
   >
 
-    <robo-icon icon="trash-solid" />
+    <robo-icon icon="trash" />
     <robo-text v-if="slots.default && (approve || label)" :class="approve ? 'approval':null">
         <template v-if="approve || label"><slot /></template>
         <template v-if="approve"> ?</template>

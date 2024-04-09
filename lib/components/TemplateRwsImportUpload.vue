@@ -1,19 +1,8 @@
 <template>
   <form enctype="multipart/form-data" @submit.prevent>
-    <!-- <robo-button input outlined @change="importSelected($event)" type="file" accept=".json" name="uploadsettings" id="uploadsettings">
-      <robo-icon icon="file-arrow-up" />
-      <robo-text v-if="textlabel">Import setup</robo-text>
-    </robo-button> -->
-
-    <!-- <label for="uploadsettings">
-        <robo-icon icon="file-arrow-up" />
-        <robo-text v-if="textlabel">Upload setup</robo-text>
-    </label>
-
-    <input @change="importSelected($event)" type="file"  accept=".json" name="uploadsettings" id="uploadsettings" /> -->
-
-    <robo-button outline size="small">
-        <robo-icon icon="file-arrow-up" />
+    <robo-button v-bind="$attrs">
+        <robo-icon v-if="!importProcessing" icon="file-arrow-up" />
+        <robo-loader v-if="importProcessing" />
         <robo-text v-if="textlabel">Import setup</robo-text>
         <input title="Import subscription setup" @change="importSelected($event)" type="file"  accept=".json" name="uploadsettings" id="uploadsettings" />
     </robo-button>
@@ -28,17 +17,17 @@
 import { ref } from 'vue'
 import { useStore } from 'vuex'
 const store = useStore()
-// let importProcessing = ref(false)
+
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
+import { fileupload } from '../tools'
+
+let importProcessing = ref(false)
 let importResult = ref(null)
 
+
 const props = defineProps({
-  size: {
-      type: String,
-      default: 'normal',
-      validator: function (value) {
-        return ['small', 'normal', 'large'].indexOf(value) !== -1;
-      }
-  },
   textlabel: {
     type: Boolean,
     default: false
@@ -46,25 +35,17 @@ const props = defineProps({
 })
 
 let importSelected = e => {
-    let files = e.target.files
-    let file = files[0]
-    let reader = new FileReader()
-    reader.readAsText(file)
-    reader.onload = function() {
-        // importProcessing.value = true
-        importResult.value = store.dispatch('rws/import', reader.result).then( () => {
-          store.dispatch('rws/setChanged', { rwsowner: store.state.robonomicsUIvue.rws.active, value: false })
-        })
-        
-        // setTimeout( () => {
-        //     importProcessing.value = false
-        // }, 1000)
-
-        // setTimeout( () => {
-        //     importResult.value = null
-        // }, 3000)
-
-    }
+  fileupload(e, uploaded => {
+    importProcessing.value = true
+    importResult.value = store.dispatch('rws/import', uploaded).then( () => {
+      store.dispatch('rws/setChanged', { rwsowner: store.state.robonomicsUIvue.rws.active, value: false })
+    })
+    
+    setTimeout( () => {
+      importProcessing.value = false
+      router.push(store.state.robonomicsUIvue.rws.links.setup)
+    }, 500)
+  })
 }
 </script>
 

@@ -1,69 +1,64 @@
 <template>
-
     <robo-section offset="x0" width="narrow">
         <robo-grid offset="x0" gap="x1" columns="1">
 
-                <robo-account-polkadot
-                    extensionAllowShift
-                    extensionShowIcon
-                    selectable
-                    selectstyle
-                    selectblock
-                />
+            <robo-account-polkadot
+                extensionAllowShift
+                extensionShowIcon
+                selectable
+                selectstyle
+                selectblock
+            />
+
+            <template v-if="chainInfoUploaded">
+                <robo-status v-if="expDate && checkaddress" :type="expStatus">Expiration date: {{expDate}}</robo-status>
 
                 <robo-text size="small" weight="normal-italic">
-                    To purchase or renew a subscription, you only need to have apprx. 1.5 - 2 XRT tokens in your account balance. Learn about XRT on Robonomics’ website - https://robonomics.network/xrt/
+                    <robo-grid offset="x0" gap="x05" columns="1">
+                        <robo-grid-item borderbottom>
+                            Price from: <b>~ {{priceRound}} XRT </b> 
+
+                            <robo-details>
+                                <template #summary><robo-icon icon="circle-question" /></template>
+                                <robo-grid offset="x0" gap="x05">
+                                    <robo-text size="tiny">To purchase or renew a subscription, you only need to have apprx. 1.5 - 2 XRT tokens in your account balance. Learn about XRT on Robonomics’ website - https://robonomics.network/xrt/</robo-text>
+                                    <robo-text weight="bold" size="small">Where to buy XRT</robo-text>
+                                    <robo-link href="https://app.basilisk.cloud/trade"><robo-text size="tiny">Basilisk</robo-text></robo-link>
+                                    <robo-link href="https://app.solarbeam.io/exchange/swap"><robo-text size="tiny">Solarbeam</robo-text></robo-link>
+                                    <robo-link href="https://trade.kraken.com/markets/kraken/xrt/usd"><robo-text size="tiny">Kraken</robo-text></robo-link>
+                                </robo-grid>
+                            </robo-details>
+                        </robo-grid-item>
+
+                        <robo-grid-item borderbottom>Activation time <b>~ {{activationtime}} min</b></robo-grid-item>
+
+                        <robo-grid-item>Available subscriptions: <b>{{available}}</b></robo-grid-item>
+                    </robo-grid>
                 </robo-text>
 
-                <template v-if="chainInfoUploaded">
-                    <robo-status v-if="expDate" :type="expStatus">Expiration date: {{expDate}}</robo-status>
+                <robo-button 
+                    @click.prevent="activateRWS()"
+                    :disabled="(status === 'processing') || expPeriod < -1"
+                    :loading="status === 'processing'"
+                    :type="buttonstatus"
+                    block
+                >
+                    {{buttontext}}
+                </robo-button>
 
-                    <robo-text size="small" weight="normal-italic">
-                        <robo-grid offset="x0" gap="x05" columns="1">
-                            <robo-grid-item borderbottom>
-                                Price from: <b>~ {{priceRound}} XRT </b> 
+            </template>
 
-                                <robo-details>
-                                    <template #summary><robo-icon icon="circle-question" /></template>
-                                    <robo-grid offset="x0" gap="x05">
-                                        <robo-text weight="bold">Where to buy XRT</robo-text>
-                                        <robo-link href="https://app.basilisk.cloud/trade">Basilisk</robo-link>
-                                        <robo-link href="https://app.solarbeam.io/exchange/swap">Solarbeam</robo-link>
-                                        <robo-link href="https://trade.kraken.com/markets/kraken/xrt/usd">Kraken</robo-link>
-                                    </robo-grid>
-                                </robo-details>
-                            </robo-grid-item>
+            <template v-if="!chainInfoUploaded">
+                <robo-text weight="normal-italic"><robo-loader size="1.5" /> Loading data from chain</robo-text>
+            </template>
 
-                            <robo-grid-item borderbottom>Activation time <b>~ {{activationtime}} min</b></robo-grid-item>
+            <robo-status v-if="localerror" type="warning">
+                {{localerror}}
+            </robo-status>
 
-                            <robo-grid-item>Available subscriptions: <b>{{available}}</b></robo-grid-item>
-                        </robo-grid>
-                    </robo-text>
-
-                    <robo-button 
-                        @click.prevent="activateRWS()"
-                        :disabled="(status === 'processing') || expPeriod < -1"
-                        :loading="status === 'processing'"
-                        :type="buttonstatus"
-                        block
-                    >
-                        {{buttontext}}
-                    </robo-button>
-
-                </template>
-
-                <template v-if="!chainInfoUploaded">
-                    <robo-text weight="normal-italic"><robo-loader size="1.5" /> Loading data from chain</robo-text>
-                </template>
-
-                <robo-status v-if="localerror" type="warning">
-                    {{localerror}}
-                </robo-status>
-
-                <robo-text v-if="message" :highlight="messagestatus">
-                    {{message}}
-                </robo-text>
-
+            <robo-text v-if="message" :highlight="messagestatus">
+                {{message}}
+            </robo-text>
 
         </robo-grid>
     </robo-section>
@@ -77,7 +72,6 @@
 <script setup>
 import { ref, computed, defineProps, defineEmits, onMounted, watch } from 'vue'
 import { generateName, dateGetRange, dateGetString, setStatusView } from '../tools'
-import { generateAddress } from '../polkadot/tools'
 
 import { useStore } from 'vuex'
 const store = useStore()
@@ -145,11 +139,19 @@ const expStatus = computed( () => {
 
 /* - получение даты окончание подписки */
 
+const checkaddress = computed( () => {
+    return store.state.robonomicsUIvue.polkadot.address !== ''
+})
+
 
 /* + работа с текстом кнопки */
 const defaultbuttontext = computed( () => {
-    if(!props.rwsExpiration) return 'Buy subscription'
-    return props.rwsExpiration < -1 ? 'Your subscription is active' : 'Renew subscription'
+    if(checkaddress.value) {
+        return props.rwsExpiration < -1 ? 'Your subscription is active' : 'Renew subscription'
+    } else {
+        return 'Buy subscription'
+    }
+    
 })
 
 const buttontext = computed( () => {
@@ -166,11 +168,6 @@ const status = ref(null) // ok, error
 const message = ref(null) // string
 const localerror = ref(null)
 const emit = defineEmits(['onActivate'])
-
-let newacc = () => {
-    const { mnemonic, json } = generateAddress()
-    return [json.address, mnemonic]
-}
 
 const buttonstatus = computed( () => {
     return ({
@@ -241,10 +238,7 @@ onMounted( () => {
                 if(index < 0) {
                     // generate new settings
                     const name = generateName()
-                    const controller = newacc()
-                    const controlleraddr = controller[0]
-                    const controllerseed = controller[1]
-                    store.dispatch('rws/create', { owner, controller: controlleraddr, scontroller: controllerseed, name })
+                    store.dispatch('rws/create', { owner, name })
                 }
             })
 

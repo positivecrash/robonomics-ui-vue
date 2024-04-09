@@ -149,6 +149,10 @@
 
 <style scoped>
 
+  .robo-layout-header-title {
+    text-transform: uppercase;
+  }
+
   @media screen and (min-width: 900px) {
     .robo-layout-header {
       --robo-details-tooltip-maxwidth: auto;

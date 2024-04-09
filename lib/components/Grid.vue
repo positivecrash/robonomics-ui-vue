@@ -53,7 +53,7 @@ const props = defineProps({
       type: String,
       default: 'x2',
       validator(value) {
-        return ['x0', 'x025', 'x05', 'x1', 'x2', 'x4'].includes(value)
+        return ['x0', 'x025', 'x05', 'x1', 'x2', 'x3', 'x4'].includes(value)
       }
     },
 
@@ -173,6 +173,7 @@ let calcGap = gap =>
     'x05': 'calc(var(--gap-layout) * 0.5)',
     'x1': 'var(--gap-layout)',
     'x2': 'calc(var(--gap-layout) * 2)',
+    'x3': 'calc(var(--gap-layout) * 3)',
     'x4': 'calc(var(--gap-layout) * 4)'
   }[gap] ?? 'none')
 

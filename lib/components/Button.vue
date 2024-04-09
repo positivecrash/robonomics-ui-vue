@@ -161,7 +161,8 @@
 }
 
 .robo-button-size-tiny {
-  --robo-button-fontsize: calc(var(--robo-input-fontsize) * 0.9);
+  --robo-button-fontsize: calc(var(--robo-input-fontsize) * 0.8);
+  --robo-button-padding: calc(var(--robo-input-padding) * 0.4);
 }
 
 .robo-button-size-small {

@@ -5,7 +5,6 @@
         :name="name" 
         v-bind="$attrs"
         v-model="selected" 
-        ref="select"
         @change="setWidth"
         :disabled="(disabled || options.length < 2) ? true : null"
       >

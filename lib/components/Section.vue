@@ -12,7 +12,6 @@
 
 <script setup>
 import { defineProps, computed } from 'vue'
-import { getImage } from '../tools'
 
 const props = defineProps({
     clean: {
@@ -34,7 +33,7 @@ const props = defineProps({
         type: String,
         default: 'x2',
         validator(value) {
-            return ['x0', 'x05', 'x1', 'x2', 'x4'].includes(value)
+            return ['x0', 'x05', 'x1', 'x2', 'x3', 'x4'].includes(value)
         }
     },
     sideline: {
@@ -85,6 +84,7 @@ const classes = computed(() => {
     .robo-section-offset-x05 { --offset: calc(var(--gap-layout) * 0.5); }
     .robo-section-offset-x1 { --offset: var(--gap-layout); }
     .robo-section-offset-x2 { --offset: calc( var(--gap-layout) * 2); }
+    .robo-section-offset-x3 { --offset: calc( var(--gap-layout) * 3); }
     .robo-section-offset-x4 { --offset: calc( var(--gap-layout) * 4); }
 
     .robo-section--colored {

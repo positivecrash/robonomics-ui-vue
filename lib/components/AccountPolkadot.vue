@@ -58,7 +58,7 @@
     </section>
 
     <section v-if="(accounts?.length > 1) && activeAddress && selectable" class="robo-account-polkadot-info-section">
-      <h4>Connect another account</h4>
+      <robo-text title="5" offset="x0">Connect another account</robo-text>
       <robo-select
           :values="getAvailableAddresses()"
           :options="getAvailableNames()"
@@ -69,10 +69,11 @@
     </section>
 
     <section v-if="extensionAllowShift" class="robo-account-polkadot-info-section">
-      <robo-grid v-if="activeWallet" offset="x0" gap="x05" type="flex" valign="center">
-        <robo-text title="4" offset="x0">Shift extension</robo-text>
-        <!-- <robo-button @click.prevent="disconnect()" type="error" size="small" clean>disconnect</robo-button> -->
+      <robo-grid v-if="activeWallet" offset="x0" gap="x05" type="flex">
+        <robo-text title="5" offset="x0">Shift extension</robo-text>
+        <robo-button v-if="accounts?.length > 0" @click.prevent="disconnect" type="error" size="tiny" clean>Disconnect all</robo-button>
       </robo-grid>
+      <robo-text v-else title="5" offset="x0">Connect Polkadot account</robo-text>
 
       <robo-grid type="grid" offset="x05" gap="x1" :columns="4">
         <template v-for="item in extensions" :key="item.id">
@@ -81,7 +82,7 @@
       </robo-grid>
       
     </section>
-    
+
   </robo-details>
 
   <robo-text size="tiny" weight="bold" highlight="error" v-if="typeerror">Your account's type is {{activeAccount?.type}}, you need here {{props.type}}. Try another account.</robo-text>
@@ -95,7 +96,7 @@
 <script setup>
   import { defineProps, defineEmits, computed, ref, onMounted, watch } from 'vue'
   import { encodeAddress } from "@polkadot/util-crypto"
-  import { shortenAddress } from '../polkadot/tools'
+  import { shortenAddress, isValidAddress } from '../polkadot/tools'
 
   import { useStore } from 'vuex'
   const store = useStore()
@@ -253,7 +254,7 @@
 
   let activeAddressRecalculate = (address, accounts) => {
     if(accounts.length > 0) {
-      if(address === '') {
+      if(address === '' || !isValidAddress(address)) {
         return accounts[0].address
       } else {
         const activeAddressEncoded = encodeAddress(address, activeChain.value)
@@ -311,9 +312,9 @@
   })
   /* - Type error */
 
-  // let disconnect = () => {
-  //   store.dispatch('polkadot/disconnect')
-  // }
+  const disconnect = () => {
+    store.dispatch('polkadot/disconnect')
+  }
   
   onMounted(async () => {
 
@@ -338,7 +339,9 @@
 
   onMounted( () => {
     watch(() => store.state.robonomicsUIvue.polkadot.address, value => {
-      activeAddress.value = encodeAddress(value, activeChain.value)
+      if(isValidAddress(value)) {
+        activeAddress.value = encodeAddress(value, activeChain.value)
+      }
     })
 
     watch(() => store.state.robonomicsUIvue.polkadot.extension, async (value) => {

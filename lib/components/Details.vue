@@ -34,6 +34,10 @@ import { defineProps, computed, ref, onMounted } from 'vue'
 
 const props = defineProps({
 
+  afterCloseDetails: {
+    type: Function
+  },
+
   block: {
     type: Boolean,
     default: false
@@ -302,6 +306,9 @@ const doFixRatio = () => {
 
 const closeDetails = () => {
   details.value.open = false
+  if(props.afterCloseDetails){
+    props.afterCloseDetails()
+  }
 }
 /* - methods */
 
@@ -640,5 +647,14 @@ onMounted(() => {
   }
   /* - summarystyle */
 
-  .robo-details--block { display: block; }
+  .robo-details--block
+  {
+    display: block;
+    --robo-details-popup-maxwidth: 100%;
+    --robo-details-tooltip-maxwidth: 100%;
+  }
+
+  .robo-details--block .robo-details-content {
+    width: 100%;
+  }
 </style>

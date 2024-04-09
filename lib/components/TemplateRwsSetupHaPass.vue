@@ -1,17 +1,15 @@
 <template>
     <robo-grid offset="x0" gap="x05" columns="1">
-        <robo-input label="User (technical account, no tokens required)" v-model="user" required />
-        <robo-input label="User's seed phrase" v-model="userseed" required type="password" />
         <robo-input label="New password" type="password" v-model="passresult" @input="changeWatch" />
         <robo-button 
             :disabled="!changed" 
             @click.prevent="saveData"
             :type="buttontype"
         >
-            <template v-if="statuscomp === 'process'"><robo-loader /> Saving the password</template>
-            <template v-if="statuscomp === 'init'">Create password</template>
-            <template v-if="statuscomp === 'ok'">Password saved</template>
-            <template v-if="statuscomp === 'error' || statuscomp === 'cancel'">Password not saved</template>
+            <template v-if="statuscomp === 'process'"><robo-loader /> Saving</template>
+            <template v-if="statuscomp === 'init'">Save</template>
+            <template v-if="statuscomp === 'ok'">Saved</template>
+            <template v-if="statuscomp === 'error' || statuscomp === 'cancel'">Not saved</template>
         </robo-button>
 
         <robo-status v-if="msgcomp" :type="errortype" offset="x1">{{msgcomp}}</robo-status>
@@ -33,8 +31,6 @@ const props = defineProps({
     }
 })
 
-const user = ref(null)
-const userseed = ref(null)
 const passresult = ref(null)
 const passsaved = ref(null)
 const changed = ref(false)
@@ -51,6 +47,7 @@ let changeWatch = () => {
 }
 
 let responsePass = (savestatus, msg) => {
+
     statuscomp.value = savestatus
     msgcomp.value = msg
 
@@ -76,20 +73,7 @@ let saveData = () => {
     }
 
     statuscomp.value = 'process'
-    emit('onSaveHaPass', user.value, userseed.value, passresult.value, (savestatus, msg) => responsePass(savestatus, msg))
-
-    // store.dispatch('rws/findrws', active.value).then(index => {
-    //     if(index > -1) {
-    //         activeuser.value = store.state.robonomicsUIvue.rws.list[index].user
-    //         if(activeuser.value) {
-    //             statuscomp.value = 'process'
-    //             emit('onSaveHaPass', activeuser.value, passresult.value, (savestatus, msg) => responsePass(savestatus, msg))
-    //         } else {
-    //             msgcomp.value = 'User not found'
-    //             statuscomp.value = 'error'
-    //         }
-    //     }
-    // })
+    emit('onSaveHaPass', passresult.value, (savestatus, msg) => responsePass(savestatus, msg))
 }
 
 const buttontype = computed( () => {

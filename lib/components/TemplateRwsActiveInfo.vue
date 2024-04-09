@@ -1,13 +1,10 @@
 <template>
+
   <robo-text :size="select ? 'tiny' : 'small'" lines="dotted">
-    <robo-text nowrap v-if="rwsName && select">
-      <robo-status v-if="rwsEndDate && rwsEndDate > -1" :type="rwsStatus">{{rwsName}}</robo-status>
-      <span v-else>{{rwsName}}</span>
-    </robo-text>
 
     <robo-grid v-if="rwsEndDate" type="flex" offset="x0" gap="x025" galign="start" valign="center">
       <robo-status v-if="!select" :type="rwsStatus" />
-      <span>Expiration date:</span>
+      <span>Expires on:</span>
       <span>{{dateGetString(rwsEndDate)}}</span>
       <robo-link v-if="expired && isAdmin" :router="store.state.robonomicsUIvue.rws.links.activate"><robo-icon icon="arrow-rotate-left" /></robo-link>
     </robo-grid>
@@ -17,7 +14,7 @@
       <robo-link v-if="expired" :router="store.state.robonomicsUIvue.rws.links.activate"><robo-icon icon="wallet" /></robo-link>
     </robo-grid>
 
-    <robo-grid type="flex" offset="x0" gap="x025" galign="start" valign="center">
+    <robo-grid v-if="select" type="flex" offset="x0" gap="x025" galign="start" valign="center">
       <span>Owner:</span>
       <span>{{shortenAddress(active)}}</span>
       <robo-copy :text="active" />
@@ -47,9 +44,10 @@
 </script>
 
 <script setup>
-import { dateGetRange, dateGetString, setStatusView } from '../tools'
-import { shortenAddress } from '../polkadot/tools'
 import { ref, computed, onMounted, watch } from 'vue'
+import { dateGetRange, dateGetString, setStatusView } from '../tools'
+import { shortenAddress, isOwnerConnected } from '../polkadot/tools'
+
 import { useStore } from 'vuex'
 const store = useStore()
 
@@ -128,15 +126,8 @@ const changed = computed( () => {
   }
 })
 
-const isAdmin = computed (() => {
-    const accs = store.state.robonomicsUIvue.polkadot.accounts
-    const rws = store.state.robonomicsUIvue.rws.active
-
-    if(rws && accs && accs.find(acc => acc.address === rws)) {
-        return true
-    } else {
-      return false
-    }
+const isAdmin = computed ( () => {
+  return isOwnerConnected(store.state.robonomicsUIvue.polkadot.address, store.state.robonomicsUIvue.rws.active)
 })
 
 onMounted( () => {

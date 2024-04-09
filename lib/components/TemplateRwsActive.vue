@@ -2,28 +2,28 @@
   <template v-if="!select">
 
     <template v-if="rws.length < 1 || create">
-      <robo-text title="3">
-        New RWS subscription 
-        <robo-details>
-          <template #summary><robo-icon icon="circle-question"/></template>
-          <robo-text weight="bold">What is RWS</robo-text>
-          <robo-text weight="normal">
-            <p>Robonomics smart home intergration allows you to interact with smart devices and robots. Interaction is carried out by transactions within Robonomics parachain instead of centralized cloud services.</p>
-            <p>The Robonomics RWS subscription guarantees the ability to send transactions stably every block. It is a good choice if you want to receive data from devices and manage them remotely.</p>
-          </robo-text>
-        </robo-details>
-      </robo-text>
+      <robo-section>
+        <robo-text title="3">New subscription</robo-text>
+        <robo-text offset="x1" size="small" paragraphs>
+          <p>Robonomics smart home intergration allows you to interact with smart devices and robots. Interaction is carried out by transactions within Robonomics parachain instead of centralized cloud services.</p>
+          <p>The Robonomics RWS subscription guarantees the ability to send transactions stably every block. It is a good choice if you want to receive data from devices and manage them remotely.</p>
+        </robo-text>
+        <robo-button :router="store.state.robonomicsUIvue.rws.links.activate" block><robo-icon icon="wallet" /> <robo-text>Buy</robo-text></robo-button>
+      </robo-section>
       
-      <robo-grid type="flex" offset="x0" gap="x1" galign="start">
-        <robo-button :router="store.state.robonomicsUIvue.rws.links.activate" size="small" outline><robo-icon icon="wallet" /> <robo-text>Buy</robo-text></robo-button>
-        <robo-template-rws-import-upload textlabel size="small" />
-      </robo-grid>
+      
+     <robo-section>
+      <robo-text title="3">Upload existing subscription</robo-text>
+      <!-- <robo-template-rws-import-upload textlabel block /> -->
+      <robo-file-upload :onloadfunc="upload" title="Upload .json with setup" drop>
+        <template #label>Import setup</template>
+      </robo-file-upload>
+     </robo-section>
     </template>
 
     <template v-else>
       <robo-section offset="x0">
-        <robo-section offset="x05">
-          
+        
           <robo-select
               v-if="rws.length > 1"
               block
@@ -34,9 +34,7 @@
               @change="setActive()"
               v-bind="$attrs"
           />
-          <robo-text title="3" v-else>{{rwsName}}</robo-text>
-
-        </robo-section>
+          <robo-text title="4" offset="x0" v-else>{{rwsName}}</robo-text>
 
         <robo-template-rws-active-info />
       </robo-section>
@@ -76,7 +74,8 @@
 
         <robo-grid type="flex" offset="x0" gap="x05" galign="start" valign="center">
           <robo-button title="Buy a subscription" :router="store.state.robonomicsUIvue.rws.links.activate" size="small" outline><robo-icon icon="wallet" /></robo-button>
-          <robo-template-rws-import-upload size="small" />
+          <!-- <robo-template-rws-import-upload size="small" outline /> -->
+          <robo-file-upload :onloadfunc="upload" title="Upload .json with setup" />
           <robo-button title="Add a subscription" :router="store.state.robonomicsUIvue.rws.links.setupnew" size="small" outline><robo-icon icon="plus" /></robo-button>
           <robo-template-rws-import-delete all v-if="rws.length > 1" />
         </robo-grid>
@@ -100,6 +99,9 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
 const store = useStore()
+
+import { useRouter } from 'vue-router'
+const router = useRouter()
 
 const props = defineProps({
   create: {
@@ -166,6 +168,13 @@ const changed = computed( () => {
     return null
   }
 })
+
+const upload = uploaded => {
+  store.dispatch('rws/import', uploaded).then( () => {
+    store.dispatch('rws/setChanged', { rwsowner: store.state.robonomicsUIvue.rws.active, value: false })
+  })
+  router.push(store.state.robonomicsUIvue.rws.links.setup)
+}
 
 onMounted( () => {
     watch(rws, () => {
