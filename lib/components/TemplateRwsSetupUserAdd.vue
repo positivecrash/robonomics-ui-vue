@@ -1,5 +1,5 @@
 <template>
-    <robo-grid columns="auto 60px" offset="x0" gap="x1">
+    <robo-grid columns="auto 60px" offset="x0" gap="x025">
         <robo-input v-model="useraddr" label="New user" block placeholder="Polkadot address (ed25519)" @input="clear" />
         <robo-button @click.prevent="adduser" size="small" :loading="statuscomp==='loading'" :type="buttontype">
             <robo-icon icon="plus" v-if="statuscomp==='init'" />
@@ -7,8 +7,10 @@
             <robo-icon icon="bolt" v-if="statuscomp==='cancel'" />
             <robo-icon icon="bolt" v-if="statuscomp==='error'" />
         </robo-button>
-        <robo-status v-if="statusmsg" :type="errorStatus">{{statusmsg}}</robo-status>
     </robo-grid>
+   <robo-section offset="x05">
+    <robo-status v-if="statusmsg" :type="errorStatus" solid close>{{statusmsg}}</robo-status>
+   </robo-section>
 </template>
 
 <script>
@@ -17,6 +19,7 @@
 
 <script setup>
 import { defineEmits, ref, computed, watch } from 'vue'
+import { isValidAddress } from '../polkadot/tools'
 
 const statuscomp = ref('init')
 const statusmsg = ref(null)
@@ -69,10 +72,6 @@ let add = (status, message) => {
         if(status === 'ok') {
             clear()
             useraddr.value = null
-        } else {
-            watch(() => useraddr.value, () => {
-                clear()
-            })
         }
     }, 3000)
 }
@@ -81,15 +80,12 @@ let adduser = () => {
     statuscomp.value = 'loading'
     statusmsg.value = null
 
-    if( useraddr.value ) {
+    if( useraddr.value && isValidAddress(useraddr.value) ) {
         emit('onUserAdd', useraddr.value, (status, message) => add(status, message))
     } else {
         statuscomp.value = 'error'
-        statusmsg.value = 'Please, enter the address for user'
-
-        setTimeout(() => {
-            clear()
-        }, 3000)
+        errorStatus.value = 'error'
+        statusmsg.value = 'Please, enter valid address for user'
     }
 }
 

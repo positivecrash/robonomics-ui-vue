@@ -70,9 +70,9 @@ const getColor = computed( () => {
 
 const getSize = computed( () => {
   if(props.size) {
-    return `${1 * props.size}vi`
+    return `${1 * props.size}rem`
   } else {
-    return '1vi'
+    return '1rem'
   }
 })
 </script>
@@ -87,6 +87,7 @@ const getSize = computed( () => {
     width: var(--loader-size);
     height: var(--loader-size);
     color: var(--loader-color);
+    line-height: 1;
   }
 
   .robo-loader svg path {

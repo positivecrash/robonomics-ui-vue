@@ -1,5 +1,6 @@
 <template>
     <robo-button 
+    v-if="(novaDetected && wallet === 'nova') || (!novaDetected)"
     @click="(walletInstalled && !walletConnected) ? enable() : null" 
     :href="(!walletInstalled && !walletConnected) ? extensionData.install : null" 
     :disabled="walletConnected ? 'ok' : null" 

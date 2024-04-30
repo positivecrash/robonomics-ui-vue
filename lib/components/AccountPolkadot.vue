@@ -6,14 +6,14 @@
       <robo-grid type="flex" offset="0" gap="x05" galign="start">
         <template v-if="activeAddress">
           <img v-if="extensionShowIcon && activeExtensionImg" :src="activeExtensionImg" class="robo-account-polkadot-extensionLogo" />
-          <span v-if="activeAccount" v-html="accountTitle" class="robo-account-polkadot-title" />
+          <span v-if="activeAccount" v-html="accountTitle" class="robo-account-polkadot-title robo-line-clipoverflow" />
           <span v-else>{{shortenAddress(activeAddress)}}</span>
         </template>
         <template v-else>
           
           <svg class="svginline-polkadot" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 13 17" style="enable-background:new 0 0 13 17;" xml:space="preserve"><path class="st0" d="M6.5,0C2.9,0,0,2.9,0,6.5c0,0.7,0.1,1.4,0.3,2.1C0.5,9,1,9.3,1.5,9.1C1.9,9,2.2,8.5,2,8 C1.9,7.4,1.8,6.9,1.8,6.3c0.1-2.4,2-4.4,4.4-4.5c2.7-0.1,4.9,2,4.9,4.6c0,2.5-1.9,4.5-4.4,4.6c0,0-0.9,0.1-1.3,0.1 c-0.2,0-0.4,0.1-0.5,0.1c-0.1,0-0.1,0-0.1-0.1l0.2-0.8l0.8-3.8c0.1-0.5-0.2-1-0.7-1.1S4.1,5.8,4,6.3c0,0-2,9.4-2,9.5 c-0.1,0.5,0.2,1,0.7,1.1c0.5,0.1,1-0.2,1.1-0.7C3.7,16,4,14.8,4,14.8c0.2-1,1-1.7,1.9-1.8c0.2,0,1-0.1,1-0.1c3.3-0.3,6-3,6-6.4 C12.9,2.9,10,0,6.5,0z"/> <path class="st0" d="M11,14.9c-0.6-0.1-1.1,0.2-1.3,0.8c-0.1,0.6,0.2,1.2,0.8,1.3c0.6,0.1,1.2-0.2,1.3-0.8 C11.9,15.5,11.6,15,11,14.9z"/></svg>
 
-          <span class="robo-account-polkadot-title">
+          <span class="robo-account-polkadot-title robo-line-clipoverflow">
             <template v-if="selecttitle">
               {{selecttitle}}
             </template>
@@ -70,10 +70,10 @@
 
     <section v-if="extensionAllowShift" class="robo-account-polkadot-info-section">
       <robo-grid v-if="activeWallet" offset="x0" gap="x05" type="flex">
-        <robo-text title="5" offset="x0">Shift extension</robo-text>
-        <robo-button v-if="accounts?.length > 0" @click.prevent="disconnect" type="error" size="tiny" clean>Disconnect all</robo-button>
+        <robo-text title="5" offset="x0" v-if="!novaDetected">Shift extension</robo-text>
+        <robo-button v-if="accounts?.length > 0" @click.prevent="disconnect" type="error" size="tiny" clean>Disconnect</robo-button>
       </robo-grid>
-      <robo-text v-else title="5" offset="x0">Connect Polkadot account</robo-text>
+      <robo-text v-else title="5" offset="x0">Connect account</robo-text>
 
       <robo-grid type="grid" offset="x05" gap="x1" :columns="4">
         <template v-for="item in extensions" :key="item.id">
@@ -177,6 +177,10 @@
       [`robo-polkadot-account--selectblock`]: props.selectblock,
       // [`robo-account--error`]: typeerror.value
     }
+  })
+
+  const novaDetected = computed( () => {
+      return window?.walletExtension?.isNovaWallet
   })
 
   /* + data */
@@ -312,8 +316,8 @@
   })
   /* - Type error */
 
-  const disconnect = () => {
-    store.dispatch('polkadot/disconnect')
+  const disconnect = async () => {
+    await store.dispatch('polkadot/disconnect')
   }
   
   onMounted(async () => {

@@ -182,7 +182,7 @@
   border-width: var(--robo-button-outlinewidth);
   cursor: pointer;
   display: inline-flex;
-  font-family: var(--font-family);
+  font-family: var(--robo-font-family-base);
   font-size: var(--robo-button-fontsize);
   font-weight: 500;
   gap: var(--robo-button-padding);

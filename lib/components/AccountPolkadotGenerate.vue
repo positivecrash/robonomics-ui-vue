@@ -132,11 +132,12 @@
             props.beforegenerating()
 
             /* Generate account */
-            const { json } = generateAccount(pass, filename.value)
+            const { json } = generateAccount(pass)
             addressmodel.value = json.address
             jsonmodel.value = json
 
-            const name = json.address + '-' + Date.now()
+            // const name = json.address + '-' + Date.now()
+            const name = json.address
             if(props.beforename) {
                 filename.value = props.beforename + '-' + name
             } else {

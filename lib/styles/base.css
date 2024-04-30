@@ -1,7 +1,10 @@
+/* @font-face {
+	font-family: 'Roboto Flex';
+	src: url('RobotoFlex-VariableFont.woff2') format("woff2-variations");
+} */
+
 :root {
 	--font-size: 1.2rem;
-    --font-family: 'Roboto Mono', Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
-    --font-family-text: "Roboto",-apple-system,BlinkMacSystemFont,avenir next,avenir,segoe ui,helvetica neue,helvetica,Ubuntu,roboto,noto,arial,sans-serif;
 	
 	--space: 1rem;
 
@@ -95,6 +98,10 @@ body {
 
 /* for outside rewriting */
 :root {
+	/* --robo-font-family-sansserif: 'Roboto Flex', 'Roboto',-apple-system, BlinkMacSystemFont,avenir next,avenir,segoe ui,helvetica neue,helvetica,Ubuntu,roboto,noto,arial,sans-serif; */
+	--robo-font-family-sansserif: 'Roboto Mono', Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
+    --robo-font-family-mono: 'Roboto Mono', Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
+
 	--robo-space: 1rem;
 	--robo-fontsize: var(--robo-space);
 	--robo-lineheight: 1.2;

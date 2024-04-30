@@ -210,10 +210,6 @@ export default defineComponent({
       padding-top: 0;
     }
 
-    .robo-card--simplefont {
-      font-family: var(--font-family-text);
-    }
-
 </style>
 
 <style>

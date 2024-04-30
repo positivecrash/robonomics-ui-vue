@@ -25,16 +25,15 @@
             </robo-grid>
         </robo-card>
         <robo-status v-if="statuscomp==='removecancelled' && canDelete" type="warning">The removal of the user has been canceled</robo-status>
+        <robo-status v-if="statuscomp==='removeerror'" type="error" solid close>
+            <template v-if="statusmsg">{{statusmsg}}</template>
+            <template v-else>User has not been removed, some error occured</template>
+        </robo-status>
     </robo-section>
 </template>
 
 <script>
   export default { name: 'RoboTemplateRwsSetupUser' }
-  /* TODO:
-  обработку ошибок
-  показ сообщений
-  возможноть тегировать именами и сохранять это в локальном хранилище
-   */
 </script>
 
 <script setup>
@@ -55,6 +54,7 @@ const props = defineProps({
 })
 
 const statuscomp = ref('init')
+const statusmsg = ref(null)
 const emit = defineEmits(['onUserDelete'])
 
 const remove = (status, message) => {
@@ -67,7 +67,15 @@ const remove = (status, message) => {
 
         setTimeout( () => {
             statuscomp.value = 'init'
-        }, 3000)
+        }, 5000)
+    }
+
+    if(status === 'error') {
+        statuscomp.value = 'removeerror'
+    }
+
+    if(message) {
+        statusmsg.value = message
     }
 }
 
@@ -131,9 +139,14 @@ const initlabel = () => {
 
 onMounted( () => {
     initlabel()
+    console.log('statuscomp mounted', statuscomp.value)
 
     watch(() => active.value, () => {
         initlabel()
+    })
+
+    watch( () => statuscomp.value, () => {
+        console.log('statuscomp edited', statuscomp.value)
     })
 })
 /* - LABEL */

@@ -17,6 +17,13 @@ const props = defineProps({
       type: Boolean,
       default: false
     },
+
+    divider: {
+      type: String,
+      validator(value) {
+        return ['solid', 'dotted', 'dashed'].includes(value)
+      }
+    },
     
     columns: {
       // 'left-center', 'left-center-right', 'center-right' or integer number
@@ -262,7 +269,9 @@ const valignFromData = computed( () => {
 })
 /* - for styles v-bind */
 
-
+const dividerStyle = computed( () => {
+  return props.divider ?? 'none'
+})
 
 const classes = computed( () => {
     return {
@@ -270,6 +279,7 @@ const classes = computed( () => {
       [`robo-grid-type--${props.type}`]: props.type,
       [`robo-grid-flexfluid`]: props.flexfluid,
       [`robo-grid-disabled`]: props.disabled,
+      [`robo-grid-divider`]: props.divider,
     }
 })
 
@@ -293,6 +303,16 @@ const classes = computed( () => {
     flex-grow: 1;
     flex-basis: calc( 100% / var(--grid-columns) - var(--gap)/2 * (var(--grid-columns) - 1));
   }
+
+  .robo-grid.robo-grid-divider > *:not(:last-child) {
+    border-bottom: 1px v-bind(dividerStyle);
+    padding-bottom: v-bind(gapFromData);
+  }
+
+  /* hack for fluid */
+    .robo-grid > * {
+      min-width: 0;
+    }
 </style>
 
 <style scoped>

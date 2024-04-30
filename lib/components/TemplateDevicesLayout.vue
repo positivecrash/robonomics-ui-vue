@@ -3,28 +3,30 @@
     <robo-layout-section>
         
         <template v-if="!rws || rws?.length < 1">
-            <robo-layout-section rwsrecover>
+            <robo-section rwsrecover>
                 <robo-section width="narrow" gcenter>
                     <robo-template-devices-empty />
                 </robo-section>
-            </robo-layout-section>
+            </robo-section>
         </template>
 
         <template v-if="rws?.length > 0">
             <robo-template-devices-dashboard
                 :config = "config"
+                :datalog = "datalog"
                 :updateTime="updateTime"
+                :connectionrelay="connectionrelay"
             />
 
-            <robo-layout-section v-if="!config || !datalog" gcenter>
+            <robo-section v-if="!config || !datalog" gcenter>
                 <robo-loader size="2" />
-            </robo-layout-section>
+            </robo-section>
 
-            <robo-layout-section v-if="config && datalog">
+            <robo-section v-if="config && datalog">
                 <robo-section offset="x2">
                     <robo-template-devices :config = "config" :launchStatus="launchStatus" />
                 </robo-section>
-            </robo-layout-section>
+            </robo-section>
             
         </template>
 
@@ -53,6 +55,9 @@ const props = defineProps({
     updateTime: {
       type: Number,
       default: null
+    },
+    connectionrelay: {
+      type: Boolean
     }
 })
 

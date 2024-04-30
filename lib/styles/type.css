@@ -3,7 +3,7 @@ html {
 }
 
 body, #app {
-    font-family: var(--font-family);
+    font-family: var(--robo-font-family-mono);
     font-size: var(--font-size);
     line-height: 1.5;
 }
@@ -21,7 +21,7 @@ body *::selection {
 
 @media screen and (max-width: 1000px) {
     html {
-        font-size: 80%;
+        font-size: 85%;
     }
 }
 
@@ -33,4 +33,10 @@ a {
 
 a:hover {
     color: var(--robo-color-link-hover)
+}
+
+.robo-line-clipoverflow {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }

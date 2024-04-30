@@ -1,17 +1,17 @@
 <template>
-
   <details :class="classes" tabindex="0" ref="details" :open="open ? true : null">
     <summary class="robo-details-summary" aria-expanded="false" tabindex="0" role="button" @click="doFixRatio">
       <robo-grid v-if="togglerShow" type="flex" offset="x0" gap="x025" valign="center">
         <slot name="summary" />
-        <robo-icon icon="sort-down" class="robo-details-summary-toggler" />
+        <robo-icon v-if="summarystyle === 'select'" icon="select-arrow" class="robo-details-summary-toggler" />
+        <robo-icon v-if="summarystyle === 'info'" icon="circle-info" class="robo-details-summary-toggler" />
       </robo-grid>
       <slot v-else name="summary" />
     </summary>
     
     <div class="robo-details-content" ref="content">
       <h3 class="robo-details-popup-title" v-if="popupTitle">{{popupTitle}}</h3>
-      <robo-icon class="robo-details-content-close" @click="closeDetails" tabindex="0" icon="xmark" v-if="props.type === 'tooltip' && tooltipCloseButton || props.type === 'popup'" />
+      <robo-icon class="robo-details-content-close" @click="closeDetails" tabindex="0" icon="xmark" v-if="(props.type === 'tooltip' && tooltipCloseButton || props.type === 'popup') && summarystyle !== 'info'" />
       <div class="robo-details-content-inside"><slot/></div>
     </div>
 
@@ -80,7 +80,15 @@ const props = defineProps({
     type: String,
     default: 'text',
     validator: function (value) {
-      return ['text', 'link', 'select'].includes(value)
+      return ['text', 'link', 'select', 'info'].includes(value)
+    }
+  },
+
+  summarysize: {
+    type: String,
+    default: 'normal',
+    validator: function (value) {
+      return ['tiny', 'small', 'normal', 'large'].indexOf(value) !== -1;
     }
   },
 
@@ -138,7 +146,7 @@ const props = defineProps({
 const details = ref(null)
 const content = ref(null)
 let tooltipPlacementValue = ref(props.tooltipPlacement)
-const togglerShow = ref(props.summarystyle == 'select' ? true : props.toggler)
+const togglerShow = ref( (props.summarystyle === 'select' || props.summarystyle === 'info') ? true : props.toggler)
 
 const classes = computed( () => {
   
@@ -151,6 +159,7 @@ const classes = computed( () => {
       [`robo-details--loading`]: props.summaryLoading,
       [`robo-details--textStyle-${props.textStyle}`]: props.textStyle,
       [`robo-details--summarystyle-${props.summarystyle}`]: props.summarystyle,
+      [`robo-details--summarysize-${props.summarysize}`]: props.summarysize,
       [`robo-details--block`]: props.block,
     }  
 
@@ -345,6 +354,7 @@ onMounted(() => {
     --robo-details-summary-background: transparent;
     --robo-details-summary-color: inherit;
     --robo-details-summary-padding: 0;
+    --robo-details-summary-borderw: 1px;
     --robo-details-tooltip-background: var(--robo-color-light);
     --robo-details-tooltip-color: var(--robo-color-dark);
     --robo-details-tooltip-border-color: var(--robo-color-dark);
@@ -377,6 +387,7 @@ onMounted(() => {
   details {
     display: inline-block;
     position: relative;
+    line-height: 1.2;
   }
 
 
@@ -399,16 +410,12 @@ onMounted(() => {
     user-select: none;
     vertical-align: middle;
   }
-
-  .robo-details-summary-toggler {
-    font-size: 40% !important;
-  }
   /* - summary */
 
   /* + content */
   .robo-details-content {
     background-color: var(--robo-details-tooltip-background);
-    border: 1px solid var(--robo-details-tooltip-border-color);
+    outline: 1px solid var(--robo-details-tooltip-border-color);
     color: var(--robo-details-tooltip-color);
   }
 
@@ -434,17 +441,6 @@ onMounted(() => {
   }
   /* - actions */
 
-  /* + tooltip */
-  /* .robo-details--tooltip .robo-details-content {
-    max-height: calc(100vh - var(--robo-details-popup-content-offset)*2); 
-    overflow: auto;
-  }
-
-  .robo-details--tooltip .robo-details-content-inside {
-    max-height: 100%;
-    overflow: auto;
-  } */
-
   .robo-details--tooltip .robo-details-content {
     font-size: initial;
     letter-spacing: 0;
@@ -466,44 +462,47 @@ onMounted(() => {
   /* - tooltip */
 
   /* + tooltip position */
+  .robo-details--tooltip {
+    --tooltip-offset: calc(100% + var(--robo-details-tooltip-content-offset));
+  }
   .robo-details--tooltip--bottom-start .robo-details-content {
-    top: calc(100% + var(--robo-details-tooltip-content-offset));
+    top: var(--tooltip-offset);
     left: 0;
   }
 
   .robo-details--tooltip--bottom-end .robo-details-content {
-    top: calc(100% + var(--robo-details-tooltip-content-offset));
+    top: var(--tooltip-offset);
     right: 0;
   }
 
   .robo-details--tooltip--top-start .robo-details-content {
-    bottom: calc(100% + var(--robo-details-tooltip-content-offset));
+    bottom: var(--tooltip-offset);
     left: 0;
   }
 
   .robo-details--tooltip--top-end .robo-details-content {
-    bottom: calc(100% + var(--robo-details-tooltip-content-offset));
+    bottom: var(--tooltip-offset);
     right: 0;
   }
 
   .robo-details--tooltip--start-top .robo-details-content {
     bottom: 0;
-    right: calc(100% + var(--robo-details-tooltip-content-offset));
+    right: var(--tooltip-offset);
   }
 
   .robo-details--tooltip--start-bottom .robo-details-content {
     top: 0;
-    right: calc(100% + var(--robo-details-tooltip-content-offset));
+    right: var(--tooltip-offset);
   }
   
   .robo-details--tooltip--end-top .robo-details-content {
     bottom: 0;
-    left: calc(100% + var(--robo-details-tooltip-content-offset));
+    left: var(--tooltip-offset);
   }
 
   .robo-details--tooltip--end-bottom .robo-details-content {
     top: 0;
-    left: calc(100% + var(--robo-details-tooltip-content-offset));
+    left: var(--tooltip-offset);
   }
 
   .robo-details--tooltip--fix .robo-details-content {
@@ -631,21 +630,61 @@ onMounted(() => {
   /* + summarystyle */
   .robo-details--summarystyle-link summary {
     color: var(--robo-color-blue);
-    /* border-bottom: 1px dashed var(--robo-color-blue); */
   }
 
-  .robo-details--summarystyle-select summary {
+  .robo-details--summarystyle-select {
+    --tooltip-offset: calc(100% - 1px);
+  }
+
+  .robo-details--summarystyle-select {
     --robo-details-summary-background: var(--robo-color-input);
     --robo-details-summary-color: var(--robo-color-inputcolor);
     --robo-details-summary-padding: var(--input-padding-v) var(--input-padding-g);
-
-    border: 1px solid var(--robo-color-inputborder);
+    border: var(--robo-details-summary-borderw) solid var(--robo-color-inputborder);
   }
 
   .robo-details--summarystyle-select summary > .robo-grid {
     width: 100%;
   }
+
+  .robo-details--summarystyle-info {
+    --robo-details-tooltip-content-offset: -1px;
+    --robo-details-summary-background: var(--robo-color-input);
+    --robo-details-summary-color: var(--robo-color-inputcolor);
+    --robo-details-summary-padding: var(--input-padding-v) calc(var(--input-padding-g) + 15px) var(--input-padding-v) var(--input-padding-g);
+  }
+
+  .robo-details--summarystyle-info summary {
+    display: block;
+    position: relative;
+  }
+
+  .robo-details--summarystyle-info[open] summary{
+    outline: 1px solid var(--robo-color-inputborder);
+  }
+
+  .robo-details--summarystyle-info .robo-details-summary-toggler {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+  }
+
+  .robo-details--summarystyle-info .robo-details-content {
+    max-width: 100%;
+    border-top: none;
+  }
   /* - summarystyle */
+
+  /* + summarysize */
+  .robo-details--summarysize-tiny { --robo-details-summary-padding: calc(var(--robo-input-padding) * 0.4); }
+  .robo-details--summarysize-tiny summary { font-size: calc(var(--robo-input-fontsize) * 0.8); }
+
+  .robo-details--summarysize-small { --robo-details-summary-padding: calc(var(--robo-input-padding) * 0.6); }
+  .robo-details--summarysize-small summary { font-size: var(--robo-input-fontsize); }
+
+  .robo-details--summarysize-large { --robo-details-summary-padding: calc(var(--robo-input-padding)*2); }
+  .robo-details--summarysize-large summary { font-size: calc(var(--robo-input-fontsize)*2); }
+  /* - summarysize */
 
   .robo-details--block
   {
@@ -655,6 +694,7 @@ onMounted(() => {
   }
 
   .robo-details--block .robo-details-content {
+    max-width: 100%;
     width: 100%;
   }
 </style>

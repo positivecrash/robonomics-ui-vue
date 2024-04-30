@@ -117,7 +117,6 @@ const statuscomp = ref('init')
 
 /*  функция-связь, прокидываемая в основное приложение */
 const save = (status, msg, type) => {
-
     process.value = false
     
     if(status === 'ok') {
@@ -167,7 +166,7 @@ const save = (status, msg, type) => {
 }
 
 const processing = type => {
-    
+
     process.value = true
 
     setTimeout(() => {
@@ -186,24 +185,7 @@ const submit = () => {
     if(props.create) {
         processing('create')
     } else {
-        // if only name changed, do not send, only change the name
-        if(changed.value.length === 1 && changed.value[0] === 'name') {
-
-            store.dispatch('rws/findrws', owner.value).then( index => {
-                process.value = true
-                if(index >= 0) {
-                    // если такая подпсика есть, то записываем имя
-                    rws.value[index].name = name.value
-                    store.dispatch('rws/add', rws.value[index])
-                    process.value = false
-                }
-
-                // обнуляем счетчик измнений, submit становится disabled
-                changed.value = []
-            })
-        } else {
-            processing('update')
-        }
+        processing('update')
     }
 }
 

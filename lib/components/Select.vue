@@ -19,7 +19,7 @@
 
       <robo-text v-if="label" size="tiny" weight="bold" class="robo-select-label">{{label}}</robo-text>
 
-      <robo-icon icon="sort-down" v-if="options.length > 1" />
+      <robo-icon icon="select-arrow" v-if="options.length > 1" />
     </div>
 </template>
 
@@ -158,7 +158,6 @@ const selected = computed({
   }
 
   .robo-icon {
-    font-size: 60%;
     pointer-events: none;
     position: absolute;
     right: calc(var(--input-padding-g) * 0.45);
@@ -181,7 +180,7 @@ const selected = computed({
   }
 
   .robo-select--size-small .robo-icon {
-    font-size: 0.6em;
+    /* font-size: 0.6em; */
     top: calc(50% - 0.4em);
   }
 

@@ -5,6 +5,10 @@
       <template #successmsg>User account has been set up. Remember to save your password and JSON file for future use. If everything is saved, close this popup to proceed.</template>
   </robo-account-polkadot-generate>
 
+  <!-- <robo-grid>
+    <robo-input type="checkbox" v-model="keepsigned" /> Keep me signed (Recommended for trusted devices)
+  </robo-grid> -->
+
     <robo-grid offset="x05" gap="x05" columns="1">
       <robo-details v-if="showchoise" summarystyle="select" block class="userlist">
         <template #summary>Choose from uploaded keys</template>
@@ -12,7 +16,7 @@
             <robo-grid type="flex" galign="stretch" valign="center" offset="x0" 
             v-for="(useritem,index) in userslist" :key="index">
               <div>
-                <robo-text weight="bold" v-if="useritem.name">{{useritem.name}}</robo-text>
+                <robo-text v-if="useritem.name" weight="bold" class="robo-line-clipoverflow">{{useritem.name}}</robo-text>
                 <robo-text v-if="useritem.address">{{shortenAddress(useritem.address)}}</robo-text>
               </div>
               <robo-grid type="flex" valign="center" offset="x0" gap="x05" galign="end">
@@ -24,11 +28,11 @@
         </robo-grid>
       </robo-details>
 
-      <robo-card v-if="ukey">
-        <robo-grid type="flex" galign="stretch" valign="center" offset="x0">
+      <robo-card v-if="ukey" class="robo-setup-key-listitem">
+        <robo-grid type="flex" galign="stretch" valign="center" offset="x0" gap="x05">
           <div>
-            <robo-text weight="bold" v-if="uname">{{uname}}</robo-text>
-            <robo-text v-if="uaddress">{{shortenAddress(uaddress)}}</robo-text>
+            <robo-text v-if="uname" weight="bold" class="robo-line-clipoverflow">{{uname}}</robo-text>
+            <robo-text v-if="uaddress">{{shortenAddress(uaddress)}} <robo-copy :text="uaddress" /></robo-text>
           </div>
           <div>
             <robo-button type="error" @click="removeLocal" size="small" clean><robo-icon icon="xmark"/></robo-button>
@@ -74,6 +78,7 @@ import { ref, computed, onMounted, watch, isProxy } from 'vue'
 import { useStore } from 'vuex'
 const store = useStore()
 import {isValidAddress, shortenAddress} from '../polkadot/tools'
+import keyring from '@polkadot/ui-keyring'
 
 const uploadedkey = ref(null)
 const uploadedaddress = ref(null)
@@ -88,6 +93,8 @@ const genaddress = ref(null)
 const genkey = ref(null)
 const genpassword = ref(null)
 
+const keepsigned = ref(true) // next release -> accept choise + pass request in telemetry needed
+
 const activerws = computed( () => {
   return store.state.robonomicsUIvue.rws.list.find(rws => rws.owner === store.state.robonomicsUIvue.rws.active)
 })
@@ -101,7 +108,7 @@ const uname = computed( () => {
 })
 
 const ukey = computed( () => {
-  return allusers.value.find(i => i.address === uaddress.value)?.file || genkey.value
+  return allusers.value.find(i => i.address === uaddress.value)?.account || genkey.value
 })
 
 const userslist = computed( () => {
@@ -160,7 +167,7 @@ const getkey = file => {
   if(validatekey(file)) {
     uploadedkey.value = file
     uploadedaddress.value = JSON.parse(file)?.address
-    uploadedname.value = JSON.parse(file)?.meta?.name
+    uploadedname.value = JSON.parse(file)?.meta?.name || JSON.parse(file)?.address
     needsave.value = true
     errormsg.value = null
   } else {
@@ -168,7 +175,7 @@ const getkey = file => {
   }
 }
 
-const encryptpass = async () => {
+const encryptkey = async keytosave => {
   const webcrypto = window.crypto.subtle || window.crypto.webkitSubtle
 
   if (!webcrypto) {
@@ -188,60 +195,75 @@ const encryptpass = async () => {
   )
 
   const enc = new TextEncoder()
-  const passdata = enc.encode(upassword.value)
+  const keytosaveenc = enc.encode(JSON.stringify(keytosave))
   
-  const encryptedPass = await webcrypto.encrypt(
+  const encryptedKey = await webcrypto.encrypt(
     {
       name: ALGO_NAME,
       iv
     },
     key,
-    passdata
+    keytosaveenc
   )
 
-  return {iv: iv, key: key, encryptedPass: encryptedPass}
+  return {iv: iv, key: key, encryptedKey: encryptedKey}
 }
 
 const savekey = async () => {
-
+  
   const addressbufer = uaddress.value || uploadedaddress.value || genaddress.value
-  const namebufer = uname.value || uploadedname.value || 'User account ' + Date.now() 
+  const namebufer = uname.value || uploadedname.value || 'User_' + shortenAddress(addressbufer)
   let keybufer = ukey.value || uploadedkey.value || genkey.value
-  const password = upassword.value || genpassword.value
-  const {iv, key, encryptedPass} = await encryptpass()
-
   if(isProxy(keybufer)) {
     keybufer = JSON.stringify(keybufer)
   }
-  if( password && addressbufer && namebufer && keybufer && iv && key && encryptedPass) {
-    
-    idbworkflow('users', 'readwrite', table => {
-        const request = table.add({
-          address: addressbufer,
-          name: namebufer,
-          iv: iv,
-          key: key,
-          pass: encryptedPass,
-          file: keybufer
-        })
-        request.onsuccess = () => {
-          console.log('onsuccess')
-          store.dispatch('rws/setUser', { rwsowner: store.state.robonomicsUIvue.rws.active, value: addressbufer })
-          getkeysIDB()
-          needsave.value = false
-          uploadedaddress.value = null
-          uploadedname.value = null
-          uploadedkey.value = null
-        }
-        request.onerror = e => {
-          console.log('onerror', e)
-          if(e.target.error) {
-            errormsg.value = e.target.error
+  let uobjtosave = {}
+
+  if(addressbufer && namebufer && keybufer) {
+
+    uobjtosave.address = addressbufer
+    uobjtosave.name = namebufer
+
+    if(keepsigned.value) {
+      // if true, save decrypted by user pass, encrypted by webcrypto pass
+      // {address,name,iv,key,file}
+      try {
+        const password = upassword.value || genpassword.value
+        const pairFromJSON = keyring.createFromJson(JSON.parse(keybufer))
+        const keytosave = keyring.addPair(pairFromJSON, password)
+        // keytosave.pair.sign("message")
+        const {iv, key, encryptedKey} = await encryptkey(keytosave)
+        uobjtosave.iv = iv
+        uobjtosave.key = key
+        uobjtosave.account = encryptedKey
+
+        idbworkflow('users', 'readwrite', table => {
+          const request = table.add(uobjtosave)
+          request.onsuccess = () => {
+            store.dispatch('rws/setUser', { rwsowner: store.state.robonomicsUIvue.rws.active, value: addressbufer })
+            getkeysIDB()
+            needsave.value = false
+            uploadedaddress.value = null
+            uploadedname.value = null
+            uploadedkey.value = null
           }
-        }
-      
-    })
+          request.onerror = e => {
+            if(e.target.error) {
+              errormsg.value = e.target.error
+            }
+          }
+        })
+      } catch (e) {
+        errormsg.value = e
+      }
+    } else {
+      // if false save encrypted as it goes, iv & key null
+      // {address,name,file}
+      // next release
+    }
+  
   }
+
 }
 
 const removeLocal = () => {
@@ -278,7 +300,7 @@ const getkeysIDB = () => {
     addressIDX.openCursor().addEventListener('success', e => {
         const cursor = e.target.result
         if(cursor){
-          allusers.value.push({address: cursor.key, name: JSON.parse(cursor.value.file)?.meta?.name, file: cursor.value.file})
+          allusers.value.push({address: cursor.key, name: cursor.value.name, account: cursor.value.account})
           cursor.continue()
         }
       })
@@ -308,6 +330,8 @@ const showchoise = computed(() => {
 
 onMounted( () => {
    getkeysIDB()
+
+   // next release: keepsigned watcher
 })
 </script>
 
@@ -321,4 +345,17 @@ onMounted( () => {
   top: var(--robo-space);
   right: 0;
 }
+
+.robo-setup-key-listitem {
+  overflow: hidden;
+}
+
+/* .robo-setup-key-listitem-acc {
+  min-width: 0;
+} */
+
+/* .robo-setup-key-listitem-name {
+  text-overflow: ellipsis;
+  overflow: hidden;
+} */
 </style>

@@ -10,7 +10,7 @@
   
       <robo-grid type="flex" offset="0" gap="x05" valign="center" class="robo-layout-header-toolbar">
 
-        <robo-text size="small">
+        <robo-text size="small" class="robo-header-subselect">
           <robo-account-polkadot
               short 
               extensionAllowShift
@@ -19,7 +19,7 @@
           />
         </robo-text>
 
-        <robo-text size="small">
+        <robo-text size="small" class="robo-header-subselect">
             <robo-template-rws-active select />
         </robo-text>
 
@@ -145,12 +145,20 @@
     color: currentColor;
     text-decoration: underline;
   }
+
+  @media screen and (max-width: 600px) {
+    .robo-header-subselect .robo-details-summary .robo-line-clipoverflow {
+      max-width: 120px;
+    }
+  }
 </style>
 
 <style scoped>
 
   .robo-layout-header-title {
     text-transform: uppercase;
+    font-weight: 800;
+    /* font-variation-settings: "wght" 100, "wdth" 100, "opsz" 20, "YTUC" 700; */
   }
 
   @media screen and (min-width: 900px) {
@@ -162,6 +170,7 @@
   /* + LAYOUT */
   .robo-layout-header {
     position: relative;
+    font-family: var(--robo-font-family-sansserif);
   }
 
   .robo-layout-header-logo {
@@ -186,9 +195,10 @@
       position: absolute;
       bottom: -2rem;
       left: 0;
-      background: var(--robo-header-background);
       right: 0;
-      padding: 0 var(--robo-space);
+      background: var(--robo-header-background);
+      padding: 0 var(--robo-layout-padding);
+      text-align: center;
     }
   }
   /* - LAYOUT */

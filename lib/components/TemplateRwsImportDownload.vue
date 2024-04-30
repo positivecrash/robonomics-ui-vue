@@ -52,16 +52,6 @@ let exportSettings = () => {
       element.click()
       document.body.removeChild(element)
       store.dispatch('rws/setChanged', { rwsowner: rwsobj.owner, value: false })
-    // store.dispatch('rws/encrypt', JSON.stringify(rwsobj)).then( value => {
-    //   let element = document.createElement('a')
-    //   element.setAttribute('href', 'data:application/json;charset=utf-8,' + encodeURIComponent(value))
-    //   element.setAttribute('download', filename)
-    //   element.style.display = 'none'
-    //   document.body.appendChild(element)
-    //   element.click()
-    //   document.body.removeChild(element)
-    //   store.dispatch('rws/setChanged', { rwsowner: rwsobj.owner, value: false })
-    // })
   } 
 }
 

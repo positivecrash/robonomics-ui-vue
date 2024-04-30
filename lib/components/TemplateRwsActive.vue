@@ -47,7 +47,7 @@
       <template #summary>
           <robo-grid type="flex" offset="0" gap="x05">
             <robo-icon icon="user" />
-            <span>{{rwsName}}</span>
+            <span class="robo-line-clipoverflow">{{rwsName}}</span>
           </robo-grid>
       </template>
 

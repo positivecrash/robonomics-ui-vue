@@ -1,13 +1,15 @@
 <template>
-    <div :class="classList" v-if="!timeouttrigger">
-        <span v-if="slots.left" class="robob-status-text"><slot name="left" /></span>
+    <div :class="classList" v-if="!timeouttrigger && !closethis">
+        <span v-if="slots.left" class="robo-status-text"><slot name="left" /></span>
 
-        <robo-icon v-if="type === 'ok'" icon="circle-check" color="var(--color-green)" />
-        <robo-icon v-if="type === 'info'" icon="circle-info" color="var(--color-blue)" />
-        <robo-icon v-if="type === 'warning'" icon="circle-exclamation" color="var(--color-orange)" />
-        <robo-icon v-if="type === 'error'" icon="circle-xmark" color="var(--color-red)" />
+        <robo-icon v-if="type === 'ok'" icon="circle-check" color="var(--color-accent)" />
+        <robo-icon v-if="type === 'info'" icon="circle-info" color="var(--color-accent)" />
+        <robo-icon v-if="type === 'warning'" icon="circle-exclamation" color="var(--color-accent)" />
+        <robo-icon v-if="type === 'error'" icon="circle-xmark" color="var(--color-accent)" />
 
-        <span v-if="slots.default" class="robob-status-text"><slot /></span>
+        <span v-if="slots.default" class="robo-status-text"><slot /></span>
+
+        <robo-button v-if="close" @click="closesubmit" clean class="robo-status-close"><robo-icon icon="xmark" /></robo-button>
     </div>
 </template>
 
@@ -23,6 +25,10 @@ import { computed, ref, onMounted, useSlots } from 'vue'
 const slots = useSlots()
 
 const props = defineProps({
+    close: {
+      type: Boolean,
+      default: false
+    },
     offset: {
       type: String,
       default: 'x2',
@@ -72,6 +78,11 @@ const offsetFromData = computed( () => {
 })
 
 const timeouttrigger = ref(false)
+const closethis = ref(false)
+
+const closesubmit = () => {
+  closethis.value = true
+}
 
 onMounted(() => {
   if(props.timeout) {
@@ -87,22 +98,37 @@ onMounted(() => {
 
     .robo-status {
         --status-gap: calc(var(--gap-layout) * 0.5);
+        --status-padding: 0;
 
         align-items: center;
         display: inline-flex;
         font-weight: bold;
         gap: var(--status-gap);
         line-height: 1.2;
+        position: relative;
+        padding: var(--status-padding);
     }
 
-    .robo-status.robo-status--solid.robo-status--error {
-      background-color: var(--robo-color-red);
+    .robo-status.robo-status--ok { --color-accent: var(--color-green) }
+    .robo-status.robo-status--info { --color-accent: var(--color-blue) }
+    .robo-status.robo-status--warning { --color-accent: var(--color-orange) }
+    .robo-status.robo-status--error { --color-accent: var(--color-red) }
+
+    .robo-status.robo-status--solid {
+      display: flex;
+      background-color: var(--color-accent);
       color: var(--robo-color-light);
-      padding: 0.5rem;
+      --status-padding: 0.5rem;
     }
 
-    .robo-status.robo-status--solid.robo-status--error .robo-icon {
+    .robo-status.robo-status--solid .robo-icon {
       color: var(--robo-color-light);
+    }
+
+    .robo-status-close {
+      position: absolute;
+      top: var(--status-padding);
+      right: var(--status-padding);
     }
 
 </style>

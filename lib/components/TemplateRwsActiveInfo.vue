@@ -29,7 +29,7 @@
 
   </robo-text>
 
-  <robo-grid type="flex" offset="x1" gap="x05" galign="space-between" valign="center">
+  <robo-grid type="flex" offset="x05" gap="x05" galign="space-between" valign="center">
     <robo-button title="View devices" :router="store.state.robonomicsUIvue.rws.links.devices" size="small" outline><robo-icon icon="house-signal-solid" /></robo-button>
     <robo-button v-if="select" title="Edit subscription" :router="store.state.robonomicsUIvue.rws.links.setup" size="small" outline><robo-icon icon="pencil" /></robo-button>
     <robo-template-rws-import-download :status="changed" />

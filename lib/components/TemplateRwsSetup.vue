@@ -20,7 +20,7 @@
                     <robo-text weight="normal" paragraphs>
                     <p>To decode data from the chain, the private key for the user account is required.</p>
                     <p><b>Please note:</b> do not store tokens on this account.</p>
-                    <p><b>For enhanced privacy:</b> we employ end-to-end encryption, the password stored encrypted only on your device.</p>
+                    <p><b>For enhanced privacy:</b> we employ end-to-end encryption, sensitive data stored encrypted only on your device.</p>
                     </robo-text>
                 </robo-details>
             </robo-text>
@@ -66,7 +66,7 @@
             <robo-text title="3" offset="x0">Home assistant</robo-text>
             <robo-text offset="x1" weight="normal-italic" size="small">
                 To login into the Home Assistant application via browser locally 
-                (in the same network where your smart devices work) create here the password for your user. Make sure this user has been added to the RWS subscription.
+                (in the same network where your smart devices work) create here the password for your user. Make sure this user has been added to the RWS subscription. <robo-link href="https://www.home-assistant.io/getting-started/onboarding/">More info</robo-link>
             </robo-text>
             
             <robo-template-rws-setup-ha-pass 
@@ -75,7 +75,7 @@
             />
             <robo-status type="warning" v-else>
                 <template v-if="!rwsnotempty">Start by filling the general settings</template>
-                <template v-if="!rwsuser">First upload user</template>
+                <template v-if="!rwsuser">Upload user account to proceed</template>
             </robo-status>
         </robo-section>
 
