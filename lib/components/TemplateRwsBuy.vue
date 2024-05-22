@@ -146,7 +146,7 @@ const checkaddress = computed( () => {
 
 /* + работа с текстом кнопки */
 const defaultbuttontext = computed( () => {
-    if(checkaddress.value) {
+    if(checkaddress.value && props.rwsExpiration) {
         return props.rwsExpiration < -1 ? 'Your subscription is active' : 'Renew subscription'
     } else {
         return 'Buy subscription'

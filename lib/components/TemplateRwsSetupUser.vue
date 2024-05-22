@@ -19,7 +19,7 @@
                 </robo-grid>
                 
                 <template v-if="canDelete">
-                    <robo-button-delete-approval v-if="statuscomp!=='loading'" :action="removeuser">Delete this user</robo-button-delete-approval>
+                    <robo-button-delete-approval v-if="statuscomp!=='loading'" :action="removeuser">Delete</robo-button-delete-approval>
                     <robo-loader v-if="statuscomp==='loading'" />
                 </template>
             </robo-grid>

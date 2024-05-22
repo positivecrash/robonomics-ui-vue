@@ -1,6 +1,6 @@
 <template>
     <robo-grid columns="auto 60px" offset="x0" gap="x025">
-        <robo-input v-model="useraddr" label="New user" block placeholder="Polkadot address (ed25519)" @input="clear" />
+        <robo-input v-model="useraddr" label="Add a user" block placeholder="Polkadot address (ed25519)" @input="clear" />
         <robo-button @click.prevent="adduser" size="small" :loading="statuscomp==='loading'" :type="buttontype">
             <robo-icon icon="plus" v-if="statuscomp==='init'" />
             <robo-icon icon="check" v-if="statuscomp==='added'" />

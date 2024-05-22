@@ -8,24 +8,6 @@
             :size="labelSize"
             weight="bold"
         >{{label}}</robo-text>
-        
-        <!-- <input 
-            v-bind="$attrs"
-            @focus="focused"
-            @blur="blurred"
-            @change="first !== inputModel ? changed = true : changed = false"
-            
-            v-model="inputModel"
-            ref="input"
-            :aria-disabled="disabled ? true : null"
-            :tabindex="disabled ? -1 : 0"
-
-            class="robo-input-control"
-            :disabled = "disabled"
-            :placeholder="placeholder ? placeholder : null"
-
-            id="fileupload"
-        /> -->
 
         <input 
             v-bind="$attrs"
@@ -38,11 +20,8 @@
             :aria-disabled="disabled ? true : null"
             :tabindex="disabled ? -1 : 0"
 
-            class="robo-input-control"
             :disabled = "disabled"
             :placeholder="placeholder ? placeholder : null"
-
-            id="fileupload"
         />
         <input 
             v-if="inputType === 'color'"
@@ -81,6 +60,8 @@
           <div v-html="tip" />
         </robo-details>
 
+        <robo-loader v-if="loading" />
+
     </div>
     
 </template>
@@ -113,9 +94,13 @@ export default defineComponent({
         type: String,
         default: null
     },
+    loading: {
+        type: Boolean,
+        default: false
+    },
     offset: {
       type: String,
-      default: 'x2',
+      default: 'x1',
       validator(value) {
         return ['x0', 'x05', 'x1', 'x2', 'x4'].includes(value)
       }
@@ -238,6 +223,16 @@ export default defineComponent({
         position: relative;
     }
 
+    .robo-loader {
+      position: absolute;
+      top: calc(var(--robo-input-padding) * .3);
+      right: calc(var(--robo-input-padding) * .3);
+    }
+
+    /* .robo-input:not(:last-child):not([type="checkbox"]) {
+      margin-bottom: var(--offset);
+    } */
+
     .robo-input--fitcontent.robo-input input {
       width: v-bind(inputwidth);
     }
@@ -353,10 +348,11 @@ export default defineComponent({
 
     /* + Offset */
     .robo-input-offset-x0 { --offset: 0; }
-    .robo-input-offset-x05 { --offset: calc(var(--gap-layout) * 0.25); }
-    .robo-input-offset-x1 { --offset: calc(var(--gap-layout) * 0.5); }
-    .robo-input-offset-x2 { --offset: var(--gap-layout); }
-    .robo-input-offset-x4 { --offset: calc( var(--gap-layout) * 2); }
+    .robo-input-offset-x025 { --offset: calc(var(--gap-layout) * 0.25); }
+    .robo-input-offset-x05 { --offset: calc(var(--gap-layout) * 0.5); }
+    .robo-input-offset-x1 { --offset: var(--gap-layout) }
+    .robo-input-offset-x2 { --offset: calc( var(--gap-layout) * 2); }
+    .robo-input-offset-x4 { --offset: calc( var(--gap-layout) * 4); }
     /* - Offset */
 
     .robo-input--error {

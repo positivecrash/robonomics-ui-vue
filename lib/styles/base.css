@@ -95,6 +95,11 @@ body {
 	backdrop-filter: blur(2px);
 }
 
+label {
+	font-weight: bold;
+	text-align: left;
+}
+
 
 /* for outside rewriting */
 :root {

@@ -13,7 +13,11 @@
             <robo-input label="Password *" type="password" v-model="passwordmodel" :error="errorpassword" @click="errorpassword = false" />
             <robo-button @click="generate()" :type="buttontype">{{buttontitle}}</robo-button>
             <robo-text highlight="error" v-if="errorpassword">Create password and store it savely</robo-text>
-            <robo-text highlight="ok" v-if="generated"><slot name="successmsg">To start using your account, import it into a Polkadot extension using the downloaded JSON file and the password you provided</slot></robo-text>
+            <robo-section v-if="generated" offset="x1">
+                <robo-text highlight="ok" weight="bold" class="robo-line-clipoverflow" offset="x05">{{addressmodel}}</robo-text>
+                <robo-text size="small" weight="bold" offset="x05">Remember to save your password and JSON file securely. If everything is saved, close this popup to proceed.</robo-text>
+                <robo-text size="small" weight="bold" offset="x05"><slot name="successmsg" /></robo-text>
+            </robo-section>
         </robo-grid>
     </robo-details>
 
@@ -39,7 +43,7 @@
         },
         beforename: {
             type: String,
-            default: 'Generated account'
+            default: false
         },
         password: {
             type: String,
@@ -61,34 +65,46 @@
     const filename = ref(false)
     const generated = ref(false)
 
-    // const passlocal = ref(null)
+    const passlocal = ref(null)
+    const addresslocal = ref(null)
 
     const passwordmodel = computed({
-        // get: () => {
-        //     return props.password || passlocal.value
-        // },
-        // set: value => {
-        //     if(props.password) {
-        //         emit('update:password', value)
-        //     } else {
-        //         passlocal.value = value
-        //     }
-        // }
         get: () => {
-            return props.password
+            return props.password || passlocal.value
         },
         set: value => {
-            emit('update:password', value)
+            if(props.password) {
+                emit('update:password', value)
+            } else {
+                passlocal.value = value
+            }
         }
+        // get: () => {
+        //     return props.password
+        // },
+        // set: value => {
+        //     emit('update:password', value)
+        // }
     })
 
     const addressmodel = computed({
         get: () => {
-            return props.address
+            return props.address || addresslocal.value
         },
         set: value => {
-            emit('update:address', value)
+            if(props.address) {
+                emit('update:address', value)
+            } else {
+                addresslocal.value = value
+            }
         }
+
+        // get: () => {
+        //     return props.address
+        // },
+        // set: value => {
+        //     emit('update:address', value)
+        // }
     })
 
     const jsonmodel = computed({
@@ -129,7 +145,9 @@
 
         if(pass) {
 
-            props.beforegenerating()
+            if(props.beforegenerating) {
+                props.beforegenerating()
+            }
 
             /* Generate account */
             const { json } = generateAccount(pass)
@@ -149,16 +167,32 @@
             generated.value = true
             filename.value = null
 
-            props.aftergenerating()
+            if(props.aftergenerating) {
+                props.aftergenerating()
+            }
         } else {
             errorpassword.value = true
         }
     }
 
     const clear = () => {
+        addressmodel.value = null
         passwordmodel.value = null
         errorpassword.value = false
         generated.value = false
     }
 
 </script>
+
+<style scoped>
+.robo-line-clipoverflow {
+    display: block;
+    max-width: 100%;
+}
+</style>
+
+<style>
+.account-polkadot-generate .robo-details-summary > *:not(:last-child){
+    margin-right: var(--robo-space);
+}
+</style>

@@ -1,6 +1,6 @@
 <template>
   <details :class="classes" tabindex="0" ref="details" :open="open ? true : null">
-    <summary class="robo-details-summary" aria-expanded="false" tabindex="0" role="button" @click="doFixRatio">
+    <summary class="robo-details-summary" :aria-expanded="open ? true : false" tabindex="0" role="button" @click="doFixRatio">
       <robo-grid v-if="togglerShow" type="flex" offset="x0" gap="x025" valign="center">
         <slot name="summary" />
         <robo-icon v-if="summarystyle === 'select'" icon="select-arrow" class="robo-details-summary-toggler" />
@@ -351,6 +351,7 @@ onMounted(() => {
     --robo-details-popup-color: var(--robo-color-dark);
     --robo-details-popup-content-offset: 3rem;
     --robo-details-popup-maxwidth: 650px;
+    --robo-details-popup-maxheight: 85vh;
     --robo-details-summary-background: transparent;
     --robo-details-summary-color: inherit;
     --robo-details-summary-padding: 0;
@@ -590,7 +591,9 @@ onMounted(() => {
     background-color: var(--robo-details-popup-background);
     color: var(--robo-details-popup-color);
     left: calc(50% - var(--robo-details-popup-maxwidth)/2);
+    max-height: var(--robo-details-popup-maxheight);
     opacity: 0;
+    overflow: auto;
     padding: var(--robo-details-content-padding) calc(var(--robo-details-content-padding)/2) var(--robo-details-content-padding);
     position: fixed;
     top: var(--robo-details-popup-content-offset);

@@ -1,4 +1,9 @@
 <template>
+  <robo-grid v-if="narrowscreen" offset="x0" gap="x025" type="flex" galign="start">
+      <robo-icon icon="user" />
+      <robo-text size="small" weight="bold">{{shortenAddress(useraccount)}}</robo-text>
+      <robo-button @click.prevent="logout" size="small" clean aria-label="Logout"><robo-icon icon="arrow-up-right-from-square" aria-hidden="true"/></robo-button>
+  </robo-grid>
   <div v-if="narrowscreen"><robo-text size="tiny" weight="bold" inline>Last telemetry update <template v-if="telemetryupd">{{telemetryupd}}</template></robo-text> <robo-loader v-if="!telemetryupd" /></div>
   <robo-grid type="flex" offset="x0" gap="x1" class="robo-rws-devices-dashboard">
     <robo-grid type="flex" galign="start" gap="x1" offset="x0">
@@ -7,8 +12,14 @@
           <robo-text v-if="connection === 'libp2p' && connectionrelay" size="tiny" highlight="ok" weight="bold" inline>Relay</robo-text>
         </robo-text>
         <robo-grid type="flex" galign="start" gap="x0" offset="x0">
-          <robo-button :type="connection === 'parachain' ? 'ok' : 'primary'" @click.prevent="setconnection('parachain')" size="small">Parachain</robo-button>
-          <robo-button :type="connection === 'libp2p' ? 'ok' : 'primary'" @click.prevent="setconnection('libp2p')" size="small">Libp2p</robo-button>
+          <robo-button :type="connection === 'parachain' ? 'ok' : 'primary'" :disabled="connection === 'parachain' ? true : false" @click.prevent="setconnection('parachain')" size="small">
+            <robo-icon icon="check" v-if="connection === 'parachain'" />
+            Parachain
+          </robo-button>
+          <robo-button :type="connection === 'libp2p' ? 'ok' : 'primary'" :disabled="connection === 'libp2p' ? true : false" @click.prevent="setconnection('libp2p')" size="small">
+            <robo-icon icon="check" v-if="connection === 'libp2p'" />
+            Libp2p
+          </robo-button>
         </robo-grid>
         <robo-text v-if="narrowscreen && connection === 'libp2p' && connectionrelay" size="tiny" highlight="ok" weight="bold" align="right">Relay</robo-text>
       </div>
@@ -20,8 +31,14 @@
         </robo-template-gateway>
       </div>
     </robo-grid>
-
+    
     <div>
+      <robo-grid v-if="useraccount && userkey && !narrowscreen" offset="x0" gap="x025" type="flex">
+          <robo-icon icon="user" />
+          <robo-text size="small" weight="bold">{{shortenAddress(useraccount)}}</robo-text>
+        <robo-button @click.prevent="logout" size="small" clean aria-label="Logout"><robo-icon icon="arrow-up-right-from-square" aria-hidden="true" /></robo-button>
+      </robo-grid>
+
       <div v-if="!narrowscreen">
         <robo-text size="tiny">Last telemetry update</robo-text>
         <robo-text size="tiny" weight="bold" class="robo-devices-dashboard-updatedate">
@@ -29,8 +46,7 @@
           <robo-loader v-else />
         </robo-text>
       </div>
-
-      <robo-details :type="narrowscreen ? 'popup' : 'tooltip'" summarystyle="link" class="robo-devices-dashboard-advanced">
+      <robo-details v-if="useraccount && userkey" :type="narrowscreen ? 'popup' : 'tooltip'" summarystyle="link" class="robo-devices-dashboard-advanced">
         <template #summary>
           <robo-text v-if="!narrowscreen" size="small"><robo-icon icon="expand-all"/> Advanced</robo-text>
           <robo-button size="small" v-else><robo-icon icon="expand-all"/></robo-button>
@@ -62,6 +78,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useStore } from 'vuex'
 const store = useStore()
 import {downloadJson} from '../tools'
+import {shortenAddress} from '../../lib/polkadot/tools'
 
 const props = defineProps({
     config: {
@@ -79,6 +96,19 @@ const props = defineProps({
       type: Boolean
     }
 })
+
+const useraccount = computed( () => {
+  return store.state.robonomicsUIvue.rws.user.account
+})
+
+const userkey = computed( () => {
+  return store.state.robonomicsUIvue.rws.user.key
+})
+
+const logout = () => {
+  store.commit('rws/setUser', '' )
+  store.commit('rws/setUserKey', '' )
+}
 
 const telemetryupd = computed( () => {
   if(!props.updateTime) {

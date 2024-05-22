@@ -310,9 +310,9 @@ const classes = computed( () => {
   }
 
   /* hack for fluid */
-    .robo-grid > * {
-      min-width: 0;
-    }
+  /* .robo-grid > * {
+    min-width: 0;
+  } */
 </style>
 
 <style scoped>

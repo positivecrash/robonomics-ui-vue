@@ -58,15 +58,21 @@ const upload = e => {
     const files = e.target.files
     const file = files[0]
     const reader = new FileReader()
-    reader.readAsText(file)
-    load.value = true
 
-    reader.onload = function() {
-        props.onloadfunc(reader.result)
-        setTimeout( () => {
-            load.value = false
-        }, 500)
+    try{
+        reader.readAsText(file)
+        load.value = true
+
+        reader.onload = function() {
+            props.onloadfunc(reader.result)
+            setTimeout( () => {
+                load.value = false
+            }, 500)
+        }
+    } catch(e) {
+        console.log(e)
     }
+    
 }
 
 const droppable = () => {
@@ -90,16 +96,20 @@ onMounted( () => {
 
         form.addEventListener('drop', e => {
             
-            if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
-                const item = e.dataTransfer.items[0]
-                if(item.kind === 'file' && item.type === 'application/json') {
-                    const file = item.getAsFile()
-                    const reader = new FileReader()
-                    reader.readAsText(file)
-                    reader.onload = function() {
-                        props.onloadfunc(reader.result)
-                    }
-                }  
+            try{
+                if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+                    const item = e.dataTransfer.items[0]
+                    if(item.kind === 'file' && item.type === 'application/json') {
+                        const file = item.getAsFile()
+                        const reader = new FileReader()
+                        reader.readAsText(file)
+                        reader.onload = function() {
+                            props.onloadfunc(reader.result)
+                        }
+                    }  
+                }
+            } catch(e) {
+                console.log(e)
             }
         })
 

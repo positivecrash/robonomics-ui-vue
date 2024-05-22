@@ -18,6 +18,7 @@
       <robo-file-upload :onloadfunc="upload" title="Upload .json with setup" drop>
         <template #label>Import setup</template>
       </robo-file-upload>
+      <robo-status v-if="errormsg" type="error">{{errormsg}}</robo-status>
      </robo-section>
     </template>
 
@@ -46,7 +47,7 @@
     <robo-details v-if="rws.length > 0" :class="changed ? 'rws-active-changed' : null">
       <template #summary>
           <robo-grid type="flex" offset="0" gap="x05">
-            <robo-icon icon="user" />
+            <robo-icon icon="house-signal-solid" />
             <span class="robo-line-clipoverflow">{{rwsName}}</span>
           </robo-grid>
       </template>
@@ -69,6 +70,7 @@
             v-model="rwsactiveModel" 
             @change="setActive()"
             v-bind="$attrs"
+            class="selectrws"
           />
         </robo-section>
 
@@ -169,11 +171,20 @@ const changed = computed( () => {
   }
 })
 
+const errormsg = ref(null)
 const upload = uploaded => {
-  store.dispatch('rws/import', uploaded).then( () => {
+
+  errormsg.value = null
+
+  store.dispatch('rws/import', uploaded).then( e => {
     store.dispatch('rws/setChanged', { rwsowner: store.state.robonomicsUIvue.rws.active, value: false })
+    if(e) {
+      router.push(store.state.robonomicsUIvue.rws.links.setup)
+    } else {
+      errormsg.value = 'Something went wrong while uploading'
+    }
   })
-  router.push(store.state.robonomicsUIvue.rws.links.setup)
+  
 }
 
 onMounted( () => {
@@ -207,7 +218,8 @@ onMounted( () => {
 </style>
 
 <style scoped>
-  .robo-select { min-width: 8rem; }
+  .selectrws, .robo-line-clipoverflow
+  { max-width: 250px; }
   
   details {
     --robo-details-tooltip-minwidth: 300px;

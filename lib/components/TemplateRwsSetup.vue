@@ -12,27 +12,13 @@
             <robo-template-rws-setup-form :create="newsetup" @on-update="onRwsUpdate" />
         </robo-section>
 
-        <robo-section class="usersetup" offset="x05" v-if="!newsetup">
-            <robo-text title="3" offset="x0">
-                Your user account
-                <robo-details>
-                    <template #summary><robo-icon icon="circle-question"/></template>
-                    <robo-text weight="normal" paragraphs>
-                    <p>To decode data from the chain, the private key for the user account is required.</p>
-                    <p><b>Please note:</b> do not store tokens on this account.</p>
-                    <p><b>For enhanced privacy:</b> we employ end-to-end encryption, sensitive data stored encrypted only on your device.</p>
-                    </robo-text>
-                </robo-details>
-            </robo-text>
-            <robo-text size="small" weight="normal-italic">Technical account, no tokens required</robo-text>
-
-            <robo-template-rws-setup-key />
-        </robo-section>
-
         <template v-if="!newsetup">
-            <robo-section offset="x3">
+            <robo-section offset="x3" id="userslist">
                 <robo-text title="3" offset="x0">Users in subscription</robo-text>
-                <robo-text offset="x1" weight="normal-italic" size="small">To add/remove users you need owner account connected</robo-text>
+                <robo-text offset="x1" weight="normal-italic" size="small">
+                    <template v-if="!isAdmin">To add/remove users you need the owner account connected.</template> 
+                    User account recommendations: technical ed25519 Polkadot account, no tokens required.
+                </robo-text>
 
                 <template v-if="rwsnotempty">
 
@@ -59,6 +45,14 @@
                 <template v-else>
                     <robo-status type="warning">Start by filling the "General settings"</robo-status>
                 </template>
+
+                <robo-account-polkadot-generate>
+                    <template #link><robo-icon icon="wand-magic"/> <robo-text weight="bold" size="small">Create an account</robo-text></template>
+                    <template #successmsg>Now you may
+                        <template v-if="!isAdmin">ask the owner to </template>
+                        add this address as a user to the subscription.
+                    </template>
+                </robo-account-polkadot-generate>
             </robo-section>
         </template>
 
@@ -173,9 +167,3 @@ onMounted( () => {
 })
 
 </script>
-
-<style scoped>
-.usersetup {
-    position: relative;
-}
-</style>

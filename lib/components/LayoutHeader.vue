@@ -23,6 +23,9 @@
             <robo-template-rws-active select />
         </robo-text>
 
+        <robo-rws-user-keys />
+
+        
         <robo-details v-if="navigation" type="tooltip" tooltipRatio="none" class="navigation">
 
           <template #summary>
@@ -101,16 +104,6 @@
   import { useStore } from 'vuex'
   const store = useStore()
 
-  // const openednav = ref(false)
-
-  // onMounted( ()=> {
-  //   document.querySelectorAll('.robo-layout-header .navigation a').forEach((e) => {
-  //     e.addEventListener('click', ()=>{
-  //       console.log('cl')
-  //       openednav.value = false
-  //     })
-  //   })
-  // })
 </script>
 
 <style>

@@ -6,7 +6,7 @@
         v-bind="$attrs"
         v-model="selected" 
         @change="setWidth"
-        :disabled="(disabled || options.length < 2) ? true : null"
+        :disabled="disabled ? true : null"
       >
         <option 
           v-for="(option,index) in options" 
@@ -19,7 +19,7 @@
 
       <robo-text v-if="label" size="tiny" weight="bold" class="robo-select-label">{{label}}</robo-text>
 
-      <robo-icon icon="select-arrow" v-if="options.length > 1" />
+      <robo-icon icon="select-arrow" />
     </div>
 </template>
 
@@ -53,6 +53,13 @@ const props = defineProps({
   name: {
     type: String
   },
+  offset: {
+    type: String,
+    default: 'x1',
+    validator(value) {
+      return ['x0', 'x05', 'x1', 'x2', 'x4'].includes(value)
+    }
+  },
   options: {
     type: [Array, Object],
     default: null,
@@ -77,12 +84,26 @@ const classList = computed( () => {
       [`robo-select--clean`]: props.clean,
       [`robo-select--block`]: props.block,
       [`robo-select--disabled`]: props.disabled,
-      [`robo-select--single`]: props.options.length < 2,
+      // [`robo-select--single`]: props.options.length < 2,
       [`robo-select--size-${props.size}`]: props.size,
       [`robo-select--labeled`]: props.label,
     }
 })
 
+const calcOffset = gap => 
+  ({
+    'x0': 'none',
+    'x025': 'calc(var(--gap-layout) * 0.25)',
+    'x05': 'calc(var(--gap-layout) * 0.5)',
+    'x1': 'var(--gap-layout)',
+    'x2': 'calc(var(--gap-layout) * 2)',
+    'x3': 'calc(var(--gap-layout) * 3)',
+    'x4': 'calc(var(--gap-layout) * 4)'
+  }[gap] ?? 'none')
+
+const offsetFromData = computed( () => {
+  return calcOffset(props.offset)
+})
 
 const emit = defineEmits(['update:modelValue'])
 
@@ -116,13 +137,18 @@ const selected = computed({
     --label: var(--robo-color-inputcolor);
     --border-active: var(--robo-color-inputcoloractive);
     --label-active: var(--robo-color-inputcoloractive);
+    --offset: v-bind(offsetFromData);
 
     --select-tog-size: 0.65rem;
     position: relative;
     line-height: 1;
   }
 
-  .robo-select {
+  .robo-select:not(:last-child) {
+    margin-bottom: var(--offset);
+  }
+
+  .robo-select--disabled {
     --border: var(--robo-color-inputborderdisabled);
   }
 
@@ -138,7 +164,8 @@ const selected = computed({
     font-weight: bold;
     line-height: 2;
     padding-right: calc(var(--input-padding-g) * 1.5 + var(--select-tog-size));
-    min-width: 100%;
+    /* min-width: 100%; */
+    width: 100%;
   }
 
   .robo-select--block {
@@ -164,15 +191,14 @@ const selected = computed({
     top: calc(50% - var(--select-tog-size) * 0.5);
   }
 
-  .robo-select--disabled, .robo-select--disabled select,
-  .robo-select--single, .robo-select--single select {
+  .robo-select--disabled, .robo-select--disabled select {
     cursor: not-allowed;
     opacity: var(--robo-opacity-inputdisabled);
   }
 
-  .robo-select--single select {
+  /* .robo-select--single select {
     padding-right: var(--input-padding-g);
-  }
+  } */
 
   .robo-select--size-small {
     --input-padding-v: calc(var(--input-padding-g) * 0.5);
@@ -197,6 +223,7 @@ const selected = computed({
 
   .robo-select--labeled select {
     --input-padding-g: var(--space);
+    padding-top: calc(var(--input-padding-v) - var(--space)/2) !important;
   }
 
   .robo-select--clean .robo-select-label {
