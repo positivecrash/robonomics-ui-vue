@@ -18,15 +18,19 @@
                 :connectionrelay="connectionrelay"
             />
 
-            <robo-section v-if="!config || !datalog" gcenter>
-                <robo-loader size="2" />
+            <robo-section offset="x2">
+                <robo-template-devices :config = "config" :launchStatus="launchStatus" />
             </robo-section>
 
-            <robo-section v-if="config && datalog">
+            <!-- <robo-section v-if="!config || !datalog" gcenter>
+                <robo-loader size="2" />
+            </robo-section> -->
+
+            <!-- <robo-section v-if="config && datalog">
                 <robo-section offset="x2">
                     <robo-template-devices :config = "config" :launchStatus="launchStatus" />
                 </robo-section>
-            </robo-section>
+            </robo-section> -->
             
         </template>
 

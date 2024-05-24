@@ -97,7 +97,7 @@ const enSettings = computed(() => {
 })
 
 const enData = computed(() => {
-    return telemetry.value.entities[props.entity] ?? null
+    return telemetry.value?.entities[props.entity] ?? null
 
     // if(props.entity && telemetry.value && telemetry.value?.entities && telemetry.value?.entities[props.entity]){
     //     return telemetry.value.entities[props.entity]
