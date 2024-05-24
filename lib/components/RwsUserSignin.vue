@@ -16,8 +16,8 @@
             <robo-select v-model="useraccount" @change="errormsg = null" :options="shortennedusers" :values="users" label="Select a user" block />
             <robo-input :disabled="pairdb" v-model="userseed" @input="errormsg = null" type="password" placeholder="The mnemonic phrase for the account" label="Pass phrase" block />
             <robo-text v-if="pairdb" weight="bold" size="small">Your key has been already saved locally, you may sign in</robo-text>
-            <robo-grid type="flex" galign="start" gap="x05" offset="x1">
-                <robo-input type="checkbox" id="keepsigned" v-if="webcrypto" v-model="keepsigned" /> 
+            <robo-grid v-if="webcrypto" type="flex" galign="start" gap="x05" offset="x1">
+                <robo-input type="checkbox" id="keepsigned" v-model="keepsigned" /> 
                 <label for="keepsigned">Keep me signed in (only for trusted devices)</label>
             </robo-grid>
             <!-- <robo-select v-if="webcryptosupport" label="Keep me signed in (only for trusted devices)" v-model="expire" :options="expireoptions" :values="expireoptions" block /> -->
