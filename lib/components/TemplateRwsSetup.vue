@@ -64,12 +64,12 @@
             </robo-text>
             
             <robo-template-rws-setup-ha-pass 
-                v-if="rwsnotempty && rwsuser"
+                v-if="rwsnotempty && users"
                 @on-save-ha-pass="onSaveHapass"
             />
             <robo-status type="warning" v-else>
                 <template v-if="!rwsnotempty">Start by filling the general settings</template>
-                <template v-if="!rwsuser">Upload user account to proceed</template>
+                <template v-if="!users">First please add a user to the subscription</template>
             </robo-status>
         </robo-section>
 
@@ -81,7 +81,7 @@
 </script>
 
 <script setup>
-import { computed, ref, onMounted, watch, defineEmits } from 'vue'
+import { computed, ref, onMounted, watch } from 'vue'
 import { isOwnerConnected } from '../polkadot/tools'
 import { useStore } from 'vuex'
 const store = useStore()

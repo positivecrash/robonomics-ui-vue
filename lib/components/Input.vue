@@ -100,7 +100,7 @@ export default defineComponent({
     },
     offset: {
       type: String,
-      default: 'x1',
+      default: 'x0',
       validator(value) {
         return ['x0', 'x05', 'x1', 'x2', 'x4'].includes(value)
       }
@@ -229,9 +229,9 @@ export default defineComponent({
       right: calc(var(--robo-input-padding) * .3);
     }
 
-    /* .robo-input:not(:last-child):not([type="checkbox"]) {
+    .robo-input:not(:last-child):not([type="checkbox"]) {
       margin-bottom: var(--offset);
-    } */
+    }
 
     .robo-input--fitcontent.robo-input input {
       width: v-bind(inputwidth);

@@ -36,7 +36,6 @@ const userkey = computed( () => {
 })
 
 const deleteuser = address => {
-    console.log('deleteuser', address)
 
     IDBworkflow('dbrws', 1, 'dbrwsuser', 'readwrite', store => {
             const request = store.delete(address)

@@ -1,7 +1,7 @@
 <template>
     <template v-if="!users || users.length < 1">
-        <robo-text title="3">Almost there...</robo-text>
-        <robo-text offset="x1" size="small">You need to add users in the subscription, wich accounts can see and control subscription's smart panel.</robo-text>
+        <!-- <robo-text title="3">Almost there...</robo-text> -->
+        <robo-text offset="x1" size="small" galign="left">You need to add users in the subscription, wich accounts can see and control subscription's smart panel.</robo-text>
         <robo-button :router="store.state.robonomicsUIvue.rws.links.setup" size="small">
             <robo-icon icon="user" />
             <robo-text>Add users</robo-text>
@@ -10,8 +10,9 @@
     <form v-else @submit.prevent="signin">
         <robo-grid offset="x0" gap="x025" columns="1">
             <div>
-                <robo-text title="3">Almost there...</robo-text>
-                <robo-text offset="x1" size="small">For the datalog decryption we need the key of the user added in the subscription.</robo-text>
+                <!-- <robo-text title="3">Almost there...</robo-text>
+                <robo-text offset="x1" size="small">For the datalog decryption we need the key of the user added in the subscription.</robo-text> -->
+                <robo-text offset="x1" size="small" galign="left">Please sign in with a user account first.</robo-text>
             </div>
             <robo-select v-model="useraccount" @change="errormsg = null" :options="shortennedusers" :values="users" label="Select a user" block />
             <robo-input :disabled="pairdb" v-model="userseed" @input="errormsg = null" type="password" placeholder="The mnemonic phrase for the account" label="Pass phrase" block />
@@ -44,9 +45,11 @@ const users = computed( () => {
 })
 
 const shortennedusers = computed( () => {
-    return users.value.map(i => {
-        return shortenAddress(i)
-    })
+    if(users.value) {
+        return users.value.map(i => {
+            return shortenAddress(i)
+        })
+    }
 })
 
 const useraccount = ref(store.state.robonomicsUIvue.rws.user.account)
@@ -152,7 +155,6 @@ const signin = async () => {
     } else {
         pair = pairdb.value
     }
-    
 
     store.commit('rws/setUser', useraccount.value)
     store.commit('rws/setUserKey', pair)
@@ -195,11 +197,11 @@ const signin = async () => {
                 idbchanged()
             }
 
-            request.onerror = e => {
-                if(e.target.error) {
-                    errormsg.value = e.target.error
-                }
-            }
+            // request.onerror = e => {
+            //     if(e.target.error) {
+            //         errormsg.value = e.target.error
+            //     }
+            // }
         }, {index: 'user', autoIncrement: false}, [{index: 'user', unique: true}])
     }
 }
@@ -212,9 +214,9 @@ const checkKeys = async () => {
 
         savedusers.forEach(async (e) => {
             if(e.user === useraccount.value){
-                const pair = await decrypt(e.iv, e.key, e.pair, true)
-                pairdb.value = pair
-                console.log(pairdb.value.publicKey)
+                const pair = await decrypt(e.iv, e.key, e.pair);
+                pairdb.value = pair;
+                keepsigned.value = true;
             }
         })
     }
@@ -229,7 +231,7 @@ onMounted(async () => {
         await checkKeys()
     })
 
-    watch(() => users.value, () =>{
+    watch(() => store.state.robonomicsUIvue.rws.active, () =>{
         useraccount.value = ''
         store.commit('rws/setUser', useraccount.value)
     })

@@ -35,7 +35,7 @@
 <style scoped>
 
 .robo-layout-footer {
-  padding: var(--robo-space);
+  padding: calc(var(--robo-space) * 6) var(--robo-space) var(--robo-space);
 }
 
 .robo-layout-footer > .robo-grid {

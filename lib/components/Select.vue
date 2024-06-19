@@ -55,7 +55,7 @@ const props = defineProps({
   },
   offset: {
     type: String,
-    default: 'x1',
+    default: 'x0',
     validator(value) {
       return ['x0', 'x05', 'x1', 'x2', 'x4'].includes(value)
     }

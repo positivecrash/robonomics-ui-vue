@@ -11,7 +11,7 @@
 
             <div class="generativeline">
                 <robo-address-polkadot label="Controller (technical account, no tokens required)" v-model="controller" required placeholder="Polkadot address of ed25519 account" />
-                <robo-account-polkadot-generate v-if="!create" v-model:address="controller" beforename="Controller" class="generativeline-tog">
+                <robo-account-polkadot-generate v-if="!create" beforename="Controller" class="generativeline-tog" @on-generate="setcontroller">
                     <template #link><robo-icon icon="wand-magic"/></template>
                     <template #title>Create tech account for the controller</template>
                     <template #successmsg>Controller address has been set up. Remember to save your password and JSON file for future use. If everything is saved, close this popup to proceed.</template>
@@ -196,6 +196,10 @@ const prechecks = computed( () => {
 const createname = () => {
     name.value = generateName()
     changecheck('name', name.value)
+}
+
+const setcontroller = (address) => {
+    controller.value = address;
 }
 
 onMounted( () => {

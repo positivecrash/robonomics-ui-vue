@@ -10,12 +10,15 @@
                     You can create here Polkadot ecosystem account ed25519 type in one click. Don't forget to save your password!
                 </slot>
             </robo-text>
-            <robo-input label="Password *" type="password" v-model="passwordmodel" :error="errorpassword" @click="errorpassword = false" />
+            <robo-input label="Password *" type="password" v-model="password" :error="errorpassword" @click="errorpassword = false" />
             <robo-button @click="generate()" :type="buttontype">{{buttontitle}}</robo-button>
             <robo-text highlight="error" v-if="errorpassword">Create password and store it savely</robo-text>
             <robo-section v-if="generated" offset="x1">
-                <robo-text highlight="ok" weight="bold" class="robo-line-clipoverflow" offset="x05">{{addressmodel}}</robo-text>
-                <robo-text size="small" weight="bold" offset="x05">Remember to save your password and JSON file securely. If everything is saved, close this popup to proceed.</robo-text>
+                <robo-text v-if="address" weight="bold" offset="x0" size="small">Your new account:</robo-text>
+                <robo-text v-if="address" highlight="ok" weight="bold" class="robo-line-clipoverflow" offset="x05">{{address}}</robo-text>
+                <robo-text v-if="seed" weight="bold" offset="x0" size="small">Remember to save the seed:</robo-text>
+                <robo-text v-if="seed" highlight="ok" weight="bold" offset="x05">{{seed}}</robo-text>
+                <robo-text size="small" weight="bold" offset="x05">Please, save your password, it's seed phrase and it's JSON file securely. If everything is saved, close this popup to proceed.</robo-text>
                 <robo-text size="small" weight="bold" offset="x05"><slot name="successmsg" /></robo-text>
             </robo-section>
         </robo-grid>
@@ -33,21 +36,8 @@
     import { downloadJson } from '../tools'
 
     const props = defineProps({
-        address: {
-            type: String,
-            default: null
-        },
-        json: {
-            type: String,
-            default: null
-        },
         beforename: {
-            type: String,
-            default: false
-        },
-        password: {
-            type: String,
-            default: null
+            type: String
         },
         aftergenerating: {
             type: Function
@@ -57,64 +47,15 @@
         }
     })
 
-    const emit = defineEmits([
-        'update:address', 'update:json', 'update:password'
-    ])
+    const emit = defineEmits(['onGenerate']);
 
-    const errorpassword = ref(false)
-    const filename = ref(false)
-    const generated = ref(false)
+    const address = ref('');
+    const password = ref('');
+    const seed = ref('');
 
-    const passlocal = ref(null)
-    const addresslocal = ref(null)
-
-    const passwordmodel = computed({
-        get: () => {
-            return props.password || passlocal.value
-        },
-        set: value => {
-            if(props.password) {
-                emit('update:password', value)
-            } else {
-                passlocal.value = value
-            }
-        }
-        // get: () => {
-        //     return props.password
-        // },
-        // set: value => {
-        //     emit('update:password', value)
-        // }
-    })
-
-    const addressmodel = computed({
-        get: () => {
-            return props.address || addresslocal.value
-        },
-        set: value => {
-            if(props.address) {
-                emit('update:address', value)
-            } else {
-                addresslocal.value = value
-            }
-        }
-
-        // get: () => {
-        //     return props.address
-        // },
-        // set: value => {
-        //     emit('update:address', value)
-        // }
-    })
-
-    const jsonmodel = computed({
-        get: () => {
-            return props.json
-        },
-        set: value => {
-            emit('update:json', value)
-        }
-    })
+    const errorpassword = ref(null);
+    const filename = ref(null);
+    const generated = ref(null);
 
     const buttontype = computed( () => {
         if (generated.value) {
@@ -141,45 +82,44 @@
     })
 
     const generate = () => {
-        const pass = passwordmodel.value
 
-        if(pass) {
+        if(password.value) {
 
             if(props.beforegenerating) {
-                props.beforegenerating()
+                props.beforegenerating();
             }
 
             /* Generate account */
-            const { json } = generateAccount(pass)
-            addressmodel.value = json.address
-            jsonmodel.value = json
+            const { mnemonic, json } = generateAccount(password.value);
+            address.value = json.address;
+            seed.value  = mnemonic;
 
-            // const name = json.address + '-' + Date.now()
-            const name = json.address
+            const name = json.address;
             if(props.beforename) {
-                filename.value = props.beforename + '-' + name
+                filename.value = props.beforename + '-' + name;
             } else {
-                filename.value = name
+                filename.value = name;
             }
 
-            downloadJson(json, filename.value)
+            downloadJson(json, filename.value);
+            emit('onGenerate', address.value);
             
-            generated.value = true
-            filename.value = null
+            generated.value = true;
+            filename.value = null;
 
             if(props.aftergenerating) {
-                props.aftergenerating()
+                props.aftergenerating();
             }
         } else {
-            errorpassword.value = true
+            errorpassword.value = true;
         }
     }
 
     const clear = () => {
-        addressmodel.value = null
-        passwordmodel.value = null
-        errorpassword.value = false
-        generated.value = false
+        address.value = null
+        password.value = null
+        errorpassword.value = null
+        generated.value = null
     }
 
 </script>
@@ -187,7 +127,7 @@
 <style scoped>
 .robo-line-clipoverflow {
     display: block;
-    max-width: 100%;
+    max-width: 80vw;
 }
 </style>
 

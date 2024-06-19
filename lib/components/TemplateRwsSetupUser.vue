@@ -139,15 +139,14 @@ const initlabel = () => {
 
 onMounted( () => {
     initlabel()
-    console.log('statuscomp mounted', statuscomp.value)
 
     watch(() => active.value, () => {
         initlabel()
     })
 
-    watch( () => statuscomp.value, () => {
-        console.log('statuscomp edited', statuscomp.value)
-    })
+    // watch( () => statuscomp.value, () => {
+    //     console.log('statuscomp edited', statuscomp.value)
+    // })
 })
 /* - LABEL */
 </script>
