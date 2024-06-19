@@ -35,9 +35,9 @@
           <robo-grid :columns="navigation.length + 1" offset="x0" gap="x1">
             <nav>
               <h4>Smart home</h4>
-              <div><router-link :to="store.state.robonomicsUIvue.rws.links.activate" exact>Buy a subscription</router-link></div>
-              <div><router-link :to="store.state.robonomicsUIvue.rws.links.setupnew" exact>New setup</router-link></div>
-              <div v-if="store.state.robonomicsUIvue.rws.list.length > 0"><router-link :to="store.state.robonomicsUIvue.rws.links.setup" exact>Your setup<template v-if="store.state.robonomicsUIvue.rws.list.length > 1">s</template></router-link></div>
+              <div><router-link :to="store.state.robonomicsUIvue.rws.links.activate" exact>Your subscription</router-link></div>
+              <div><router-link :to="store.state.robonomicsUIvue.rws.links.setupnew" exact>New configuration</router-link></div>
+              <div v-if="store.state.robonomicsUIvue.rws.list.length > 0"><router-link :to="store.state.robonomicsUIvue.rws.links.setup" exact>Your configuration<template v-if="store.state.robonomicsUIvue.rws.list.length > 1">s</template></router-link></div>
               <div v-if="store.state.robonomicsUIvue.rws.list.length > 0"><router-link :to="store.state.robonomicsUIvue.rws.links.devices" exact>Devices & Control</router-link></div>
             </nav>
 
@@ -206,17 +206,16 @@
   nav {
     font-size: 90%;
     font-weight: bold;
-    margin-bottom: calc(var(--space)*2);
   }
 
   nav h4 {
-    margin-bottom: calc(var(--space)*0.5);
+    margin-bottom: calc(var(--space)*0.7);
     text-transform: uppercase;
     white-space: nowrap;
   }
 
   nav > div {
-    margin-bottom: calc(var(--space)*0.5);
+    margin-bottom: calc(var(--space)*0.7);
   }
 
   nav:last-child, nav:last-child > div:last-child {
