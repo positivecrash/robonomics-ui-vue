@@ -1,21 +1,66 @@
 <template>
+    <robo-grid type="flex" galign="stretch" offset="x05" gap="x05" valign="center">
+        <robo-text title="3" offset="x0">
+            <template v-if="create">Manual configuration for existing subscription</template>
+            <template v-else>Subscription settings</template>
+        </robo-text>
+
+        <robo-details popupMaxHeight="fit-content">
+            <template #summary><robo-button outline size="tiny">Download backup</robo-button></template>
+
+            <robo-grid offset="x0" gap="x05" columns="1">
+                <robo-text offset="x025" weight="normal-italic" size="small">Share easy setup settings for the application with users in your subscription or setup new settings for uploading on your home server.</robo-text>
+                <robo-button @click.prevent="exportSettingsUser()" title="Share Subscription Settings with a user" size="small" block><robo-icon icon="arrow-down" /> For users</robo-button>
+                <robo-account-polkadot-generate 
+                class="generativeline-tog" 
+                beforename="Controller" 
+                labelpassword="A password for new Controller account *" 
+                labelbutton="Download new settings" 
+                @on-generate="exportSettingsServer">
+                    <template #link><robo-button title="Import settings into the server (for admins only). Requires resetting of Controller!" type="error" size="small" block><robo-icon icon="arrow-down" /> For the server</robo-button></template>
+                    <template #title>New settings for the server</template>
+                    <template #description>
+                        <robo-text offset="x05" weight="normal-italic">Mind please, by clicking the "Download new settings" button <b>you will reset a Controller</b> for your subscription here and you will need to upload this settings file with new Controller to your home server.</robo-text>
+                    </template>
+                    <template #successmsg>Controller address has been set up. Remember to save your password and JSON file. If everything is saved, close this popup to proceed.</template>
+                </robo-account-polkadot-generate>
+            </robo-grid>
+        </robo-details>
+    </robo-grid>
+
     <robo-section offset="x05">
         <robo-grid offset="x0" gap="x05" columns="1">
             
             <div class="generativeline">
-                <robo-input label="Name of setup" v-model="name" @input="changecheck('name', name)" required />
+                <robo-input 
+                    label="Name of setup" 
+                    v-model="name" 
+                    @input="changesave('name', name)" 
+                    :tipchanged="namechanged" 
+                    required 
+                />
                 <robo-button clean class="generativeline-tog" @click.prevent="createname"><robo-icon icon="wand-magic"/></robo-button>
             </div>
 
-            <robo-address-polkadot label="Owner (payable account with tokens)" v-model="owner" :disabled="!create" @input="changecheck('owner', owner)" required placeholder="Polkadot address" />
+            <robo-address-polkadot 
+                label="Owner (payable account with tokens)" 
+                v-model="owner" 
+                :disabled="!create" 
+                @input="changesave('owner', owner)"  
+                :tipchanged="ownerchanged" 
+                placeholder="Polkadot address"
+                required
+            />
 
             <div class="generativeline">
-                <robo-address-polkadot label="Controller (technical account, no tokens required)" v-model="controller" required placeholder="Polkadot address of ed25519 account" />
-                <robo-account-polkadot-generate v-if="!create" beforename="Controller" class="generativeline-tog" @on-generate="setcontroller">
-                    <template #link><robo-icon icon="wand-magic"/></template>
-                    <template #title>Create tech account for the controller</template>
-                    <template #successmsg>Controller address has been set up. Remember to save your password and JSON file for future use. If everything is saved, close this popup to proceed.</template>
-                </robo-account-polkadot-generate>
+                <robo-address-polkadot 
+                    label="Controller (technical account, no tokens required)" 
+                    v-model="controller" 
+                    @input="changesave('controller', controller)" 
+                    :tipchanged="controllerchanged"
+                    placeholder="Polkadot address of ed25519 account" 
+                    required
+                />
             </div>
 
             <robo-button 
@@ -46,7 +91,7 @@ import { ref, computed, defineEmits, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { isValidAddress } from '../polkadot/tools'
-import { generateName } from '../tools'
+import { generateName, downloadJson } from '../tools'
 const store = useStore()
 const router = useRouter()
 
@@ -93,7 +138,9 @@ const getrws = () => {
     }
 }
 
-const changecheck = (field, input) => {
+
+/* + CHANGE */
+const changesave = (field, input) => {
 
     // обновляем статусы ошибок
     error.value = null
@@ -109,6 +156,27 @@ const changecheck = (field, input) => {
         }
     }
 }
+
+const changecheck = (field, input) => {
+    if(changed.value.indexOf(`${field}`) !== -1) {
+        return true;
+    }
+    return false;
+}
+
+const namechanged = computed(() => {
+    return changecheck('name', name.value);
+});
+
+const ownerchanged = computed(() => {
+    return changecheck('owner', owner.value);
+});
+
+const controllerchanged = computed(() => {
+    return changecheck('controller', controller.value);
+});
+
+/* - CHANGE */
 
 const error = ref(null)
 const process = ref(false)
@@ -195,15 +263,46 @@ const prechecks = computed( () => {
 
 const createname = () => {
     name.value = generateName()
-    changecheck('name', name.value)
+    changesave('name', name.value)
+}
+
+
+/* + IMPORTS */
+
+const exportSettingsUser = () => {
+  let rwsobj = {}
+  Object.assign(rwsobj, store.state.robonomicsUIvue.rws.list.find(item => item.owner === store.state.robonomicsUIvue.rws.active))
+  const filename = 'robonomics.app-settings-' + rwsobj.name.replace(/ /g, '-') + '-user'
+  downloadJson(rwsobj, filename);
 }
 
 const setcontroller = (address) => {
     controller.value = address;
+    // changesave('controller', controller.value);
 }
+
+const exportSettingsServer = (address, json) => {
+    setcontroller(address);
+
+    const rwsname = store.state.robonomicsUIvue.rws.list.find(item => item.owner === store.state.robonomicsUIvue.rws.active).name;
+    const rwsowner = store.state.robonomicsUIvue.rws.list.find(item => item.owner === store.state.robonomicsUIvue.rws.active).owner;
+    const rwscontroller = address;
+    const rwscontrollerkey = JSON.stringify(json);
+
+    const rwsobj = {'name': rwsname, 'owner': rwsowner, 'controller': rwscontroller, 'controllerkey': rwscontrollerkey};
+    const filename = 'robonomics.app-settings-' + rwsobj.name.replace(/ /g, '-') + '-server';
+    downloadJson(rwsobj, filename);
+}
+
+/* - IMPORTS */
 
 onMounted( () => {
     getrws()
+
+    console.log('changed.value', changed.value)
+    watch(() => changed.value, () => {
+      console.log('changed.value', changed.value)
+    })
 
     watch(() => active.value, () => {
       getrws()
@@ -221,7 +320,7 @@ onMounted( () => {
     })
 
     watch( () => controller.value, value => {
-        changecheck('controller', value)
+        changesave('controller', value)
     })
 
 })

@@ -174,7 +174,7 @@
   .robo-layout-header--sticky {
     position: sticky;
     top: 0;
-    z-index: 1000;
+    z-index: 99;
   }
 
   .robo-layout-header-toolbar {

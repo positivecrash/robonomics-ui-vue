@@ -4,7 +4,7 @@
 
     <robo-grid v-if="rwsEndDate" type="flex" offset="x0" gap="x025" galign="start" valign="center">
       <robo-status v-if="!select" :type="rwsStatus" />
-      <span>Expires on:</span>
+      <span>Expiration date:</span>
       <span>{{dateGetString(rwsEndDate)}}</span>
       <robo-link v-if="expired && isAdmin" :router="store.state.robonomicsUIvue.rws.links.activate"><robo-icon icon="arrow-rotate-left" /></robo-link>
     </robo-grid>
@@ -25,22 +25,44 @@
       <robo-status type="error">No subscription with this owner found</robo-status>
     </robo-text>
 
-    <robo-status v-if="changed && rwsEndDate > -1" type="warning">Don't forget to download setup recovery kit</robo-status>
-
   </robo-text>
+<!-- 
+  <robo-grid v-if="!select" type="flex" galign="start" offset="x05" gap="x05" valign="center">
+    <robo-button :router="store.state.robonomicsUIvue.rws.links.devices" size="tiny"><robo-icon icon="house-signal-solid" /> Devices</robo-button>
+    <robo-button @click.prevent="exportSettingsUser()" title="Share Subscription Settings with a user" size="tiny"><robo-icon icon="house-signal-solid" /> Settings for users</robo-button>
 
-  <robo-grid type="flex" offset="x05" gap="x05" galign="space-between" valign="center">
+    <robo-account-polkadot-generate 
+      class="generativeline-tog" 
+      beforename="Controller" 
+      labelpassword="A password for new Controller account *" 
+      labelbutton="Download new settings" 
+      @on-generate="setcontroller">
+        <template #link><robo-button title="Import settings into the server (for admins only). Requires resetting of Controller!" type="error" size="tiny"><robo-icon icon="house-signal-solid" /> Settings for server</robo-button></template>
+        <template #title>New settings for the server</template>
+        <template #description>
+          <robo-text offset="x05"><b>Mind please, by clicking the "Download new settings" button you will reset a Controller for your subscruption.</b></robo-text>
+          <robo-text offset="x05">Don't forget to save new Controller's backup. New Controller's address here in the application will be automatically reset, for correct work you will need to upload new settings on the Home Assistant server.</robo-text>
+        </template>
+        <template #successmsg>Controller address has been set up. Remember to save your password and JSON file for future use. If everything is saved, close this popup to proceed.</template>
+    </robo-account-polkadot-generate>
+  </robo-grid> -->
+
+  <robo-grid v-if="select" type="flex" galign="start" valign="center" offset="x05" gap="x05">
+    <robo-button :router="store.state.robonomicsUIvue.rws.links.devices" size="tiny" outline><robo-icon icon="house-signal-solid" /> Devices</robo-button>
+    <robo-button title="Edit subscription" :router="store.state.robonomicsUIvue.rws.links.setup" size="tiny" outline><robo-icon icon="pencil" /> Settings</robo-button>
+  </robo-grid>
+
+  <!-- <robo-grid type="flex" offset="x05" gap="x05" valign="center">
     <robo-button title="View devices" :router="store.state.robonomicsUIvue.rws.links.devices" size="small" outline><robo-icon icon="house-signal-solid" /></robo-button>
     <robo-button v-if="select" title="Edit subscription" :router="store.state.robonomicsUIvue.rws.links.setup" size="small" outline><robo-icon icon="pencil" /></robo-button>
-    <robo-template-rws-import-download :status="changed" />
+    <robo-template-rws-import-download />
     <robo-template-rws-import-delete :rws="active" />
-  </robo-grid>
+  </robo-grid> -->
 
 </template>
 
 <script>
   export default { name: 'RoboTemplateRwsActiveInfo' }
-  /* TODO: добавить кнопку принудительного обновления для Expiration date */
 </script>
 
 <script setup>
@@ -114,21 +136,52 @@ const rwsStatus = computed( () => {
   return setStatusView(dateGetRange(rwsEndDate.value))
 })
 
-let setActive = () => {
-  store.commit('rws/setActive', rwsactiveModel.value)
-}
-
-const changed = computed( () => {
-  if(rws.value && rws.value.length > 0) {
-    return rws.value.find(item => item.owner === store.state.robonomicsUIvue.rws.active).changed
-  } else {
-    return null
-  }
-})
-
 const isAdmin = computed ( () => {
   return isOwnerConnected(store.state.robonomicsUIvue.polkadot.address, store.state.robonomicsUIvue.rws.active)
 })
+
+const setActive = () => {
+  store.commit('rws/setActive', rwsactiveModel.value)
+}
+
+
+/* + IMPORTS */
+// const downloadfile = (obj, filename) => {
+
+//   if(!obj) {
+//     console.warn('Data for downloading not found');
+//     return;
+//   }
+
+//   let createfilename = 'Robonomics.app-imported-settings.json';
+
+//   if(filename) {
+//     createfilename = filename;
+//   }
+
+//   const data = JSON.stringify(obj);
+//   let element = document.createElement('a')
+//     element.setAttribute('href', 'data:application/json;charset=utf-8,' + encodeURIComponent(data))
+//     element.setAttribute('download', createfilename)
+//     element.style.display = 'none'
+//     document.body.appendChild(element)
+//     element.click()
+//     document.body.removeChild(element);
+// }
+
+// const exportSettingsUser = () => {
+//   let rwsobj = {}
+//   Object.assign(rwsobj, store.state.robonomicsUIvue.rws.list.find(item => item.owner === store.state.robonomicsUIvue.rws.active))
+//   const filename = 'robonomics.app-settings-' + rwsobj.name.replace(/ /g, '-') + '-user.json'
+//   downloadfile(rwsobj, filename);
+// }
+
+// const controller = ref(null);
+// const setcontroller = (address) => {
+//     controller.value = address;
+// }
+
+/* - IMPORTS */
 
 onMounted( () => {
     watch(rws, () => {

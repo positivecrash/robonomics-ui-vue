@@ -10,7 +10,7 @@
                     You can create here Polkadot ecosystem account ed25519 type in one click. Don't forget to save your password!
                 </slot>
             </robo-text>
-            <robo-input label="Password *" type="password" v-model="password" :error="errorpassword" @click="errorpassword = false" />
+            <robo-input :label="labelpassword" type="password" v-model="password" :error="errorpassword" @click="errorpassword = false" />
             <robo-button @click="generate()" :type="buttontype">{{buttontitle}}</robo-button>
             <robo-text highlight="error" v-if="errorpassword">Create password and store it savely</robo-text>
             <robo-section v-if="generated" offset="x1">
@@ -44,7 +44,15 @@
         },
         beforegenerating: {
             type: Function
-        }
+        },
+        labelpassword: {
+            type: String,
+            default: 'Password *'
+        },
+        labelbutton: {
+            type: String,
+            default: 'Create'
+        },
     })
 
     const emit = defineEmits(['onGenerate']);
@@ -71,12 +79,12 @@
 
     const buttontitle = computed( () => {
         if (generated.value) {
-            return 'Created, check json in downloads'
+            return 'Created, check downloads'
         } else {
             if(errorpassword.value) {
                 return 'Error, not generated'
             } else {
-                return 'Create'
+                return props.labelbutton
             }
         }
     })
@@ -102,7 +110,7 @@
             }
 
             downloadJson(json, filename.value);
-            emit('onGenerate', address.value);
+            emit('onGenerate', address.value, json);
             
             generated.value = true;
             filename.value = null;

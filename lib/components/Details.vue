@@ -66,6 +66,10 @@ const props = defineProps({
     default: false
   },
 
+  popupMaxHeight: {
+    type: String
+  },
+
   popupOverlay: {
     type: Boolean,
     default: true
@@ -272,6 +276,10 @@ const doFixRatio = () => {
                 tipContent.style.width =  window.innerWidth - bound.left - 40 + 'px'
               }
 
+            }
+
+            if(props.popupMaxHeight) {
+              tipContent.style.maxHeight = props.popupMaxHeight
             }
           }
 
@@ -522,7 +530,8 @@ onMounted(() => {
   /* + tooltip position animation */
   .robo-details--tooltip--bottom-start .robo-details-content,
   .robo-details--tooltip--bottom-end .robo-details-content {
-    transform: translateY(5%);
+    /* transform: translateY(5%); */
+    margin-top: 5%;
     opacity: 0;
   }
 
@@ -534,13 +543,15 @@ onMounted(() => {
   @keyframes TooltipBottom {
     to {
       opacity: 1;
-      transform: translateY(0);
+      /* transform: translateY(0); */
+      margin-top: 0;
     }
   }
 
   .robo-details--tooltip--top-start .robo-details-content,
   .robo-details--tooltip--top-end .robo-details-content {
-    transform: translateY(-5%);
+    /* transform: translateY(-5%); */
+    margin-top: -5%;
     opacity: 0;
   }
 
@@ -552,13 +563,15 @@ onMounted(() => {
   @keyframes TooltipTop {
     to {
       opacity: 1;
-      transform: translateY(0);
+      /* transform: translateY(0); */
+      margin-top: 0;
     }
   }
 
   .robo-details--tooltip--start-top .robo-details-content,
   .robo-details--tooltip--start-bottom .robo-details-content {
-    transform: translateX(5%);
+    /* transform: translateX(5%); */
+    margin-left: 5%;
     opacity: 0;
   }
 
@@ -569,7 +582,8 @@ onMounted(() => {
 
   .robo-details--tooltip--end-top .robo-details-content,
   .robo-details--tooltip--end-bottom .robo-details-content {
-    transform: translateX(-5%);
+    /* transform: translateX(-5%); */
+    margin-left: -5%;
     opacity: 0;
   }
 
@@ -581,7 +595,8 @@ onMounted(() => {
   @keyframes TooltipStartEnd {
     to {
       opacity: 1;
-      transform: translateX(0);
+      /* transform: translateX(0); */
+      margin-left: 0;
     }
   }
   /* - tooltip position animation */
@@ -597,12 +612,14 @@ onMounted(() => {
     padding: var(--robo-details-content-padding) calc(var(--robo-details-content-padding)/2) var(--robo-details-content-padding);
     position: fixed;
     top: var(--robo-details-popup-content-offset);
-    transform: translateY(-50%);
-    width: var(--robo-details-popup-maxwidth);
+    /* transform: translateY(-50%); */
+    margin-top: -50%;
+    width: 100%;
+    max-width: var(--robo-details-popup-maxwidth);
     z-index: 1001;
   }
 
-  @media screen and (max-width: 470px) {
+  @media screen and (max-width: 670px) {
     .robo-details--popup .robo-details-content {
       left: var(--space);
       right: var(--space);
@@ -625,7 +642,8 @@ onMounted(() => {
   @keyframes popup {
     to {
       opacity: 1;
-      transform: translateY(0);
+      /* transform: translateY(0); */
+      margin-top: 0;
     }
   }
   /* - popup animation */

@@ -14,7 +14,6 @@
       
      <robo-section>
       <robo-text title="3">Upload existing subscription</robo-text>
-      <!-- <robo-template-rws-import-upload textlabel block /> -->
       <robo-file-upload :onloadfunc="upload" title="Upload .json with setup" drop>
         <template #label>Import setup</template>
       </robo-file-upload>
@@ -44,7 +43,7 @@
 
 
   <template v-else>
-    <robo-details v-if="rws.length > 0" :class="changed ? 'rws-active-changed' : null">
+    <robo-details v-if="rws.length > 0">
       <template #summary>
           <robo-grid type="flex" offset="0" gap="x05">
             <robo-icon icon="house-signal-solid" />
@@ -163,21 +162,12 @@ let setActive = () => {
   store.commit('rws/setActive', rwsactiveModel.value)
 }
 
-const changed = computed( () => {
-  if(rws.value && rws.value.length > 0) {
-    return rws.value.find(item => item.owner === store.state.robonomicsUIvue.rws.active).changed
-  } else {
-    return null
-  }
-})
-
 const errormsg = ref(null)
 const upload = uploaded => {
 
   errormsg.value = null
 
   store.dispatch('rws/import', uploaded).then( e => {
-    store.dispatch('rws/setChanged', { rwsowner: store.state.robonomicsUIvue.rws.active, value: false })
     if(e) {
       router.push(store.state.robonomicsUIvue.rws.links.setup)
     } else {
@@ -198,24 +188,6 @@ onMounted( () => {
 })
 
 </script>
-
-<style>
-  .rws-active-changed {
-    position: relative;
-  }
-
-  .rws-active-changed summary {
-    animation: Blink 0.6s cubic-bezier(0.075, 0.82, 0.165, 1) 1;
-  }
-
-  .rws-active-changed summary:after {
-    background-color: var(--robo-color-orange);
-    border-radius: 4px;
-    content: "";
-    height: 8px;
-    width: 8px;
-  }
-</style>
 
 <style scoped>
   .selectrws, .robo-line-clipoverflow

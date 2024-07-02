@@ -7,8 +7,6 @@
         </robo-section>
 
         <robo-section offset="x3">
-            <robo-text title="3" v-if="newsetup">Manual configuration for existing subscription</robo-text>
-            <robo-text title="3" v-else>Subscription settings</robo-text>
             <robo-template-rws-setup-form :create="newsetup" @on-update="onRwsUpdate" />
         </robo-section>
 

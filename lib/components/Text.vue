@@ -74,7 +74,7 @@ export default defineComponent({
       type: String,
       default: null,
       validator: function (value) {
-        return ['success', 'error', 'link'].indexOf(value) !== -1;
+        return ['success', 'error', 'link', 'attention'].indexOf(value) !== -1;
       }
     },
     highlightLabelClose: {
@@ -342,12 +342,16 @@ export default defineComponent({
       --color-text: var(--color-light);
       border-radius: var(--border-radius);
       color: var(--color-light);
-      padding: calc(var(--space) * 0.4);
+      padding: 0.2rem calc(var(--space) * 0.4);
       max-width: 100%;
     }
 
     .robo-text--highlight-label-success {
       background-color: var(--color-green)
+    }
+
+    .robo-text--highlight-label-attention {
+      background-color: var(--color-orange)
     }
 
     .robo-text--highlight-label-error {

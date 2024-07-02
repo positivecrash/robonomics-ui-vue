@@ -60,6 +60,8 @@
           <div v-html="tip" />
         </robo-details>
 
+        <robo-text v-if="tipchanged" highlightLabel="attention" size="tiny" class="tip-changed" weight="bold">not saved</robo-text>
+
         <robo-loader v-if="loading" />
 
     </div>
@@ -127,6 +129,10 @@ export default defineComponent({
     tip: {
         type: String,
         default: null
+    },
+    tipchanged: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -155,6 +161,7 @@ export default defineComponent({
         ['robo-input-changed']: this.changed,
         [`robo-input--style-${this.view}`]: this.view,
         [`robo-input--fitcontent`]: this.fitcontent,
+        [`robo-input--changed`]: this.tipchanged,
       };
     },
 
@@ -366,6 +373,18 @@ export default defineComponent({
       width: 0 !important;
       border: 0 !important;
       padding: 0 !important;
+    }
+
+    .tip-changed {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      border-radius: 0.2rem;
+      display: block;
+    }
+
+    .robo-input--changed {
+      --border: var(--robo-color-orange);
     }
 </style>
 
