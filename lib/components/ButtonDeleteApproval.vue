@@ -3,7 +3,7 @@
     v-bind="$attrs"
     @blur="approve = false" 
     @click.prevent="approve ? deleteAction() : approve = true"
-    size="small" 
+    size="tiny" 
     type="error"
     :outline="!approve"
   >

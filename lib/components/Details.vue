@@ -3,8 +3,7 @@
     <summary class="robo-details-summary" :aria-expanded="open ? true : false" tabindex="0" role="button" @click="doFixRatio">
       <robo-grid v-if="togglerShow" type="flex" offset="x0" gap="x025" valign="center">
         <slot name="summary" />
-        <robo-icon v-if="summarystyle === 'select'" icon="select-arrow" class="robo-details-summary-toggler" />
-        <robo-icon v-if="summarystyle === 'info'" icon="circle-info" class="robo-details-summary-toggler" />
+        <robo-icon :icon="(summarystyle === 'info') ? 'circle-info' : 'select-arrow'" class="robo-details-summary-toggler" />
       </robo-grid>
       <slot v-else name="summary" />
     </summary>
@@ -150,7 +149,7 @@ const props = defineProps({
 const details = ref(null)
 const content = ref(null)
 let tooltipPlacementValue = ref(props.tooltipPlacement)
-const togglerShow = ref( (props.summarystyle === 'select' || props.summarystyle === 'info') ? true : props.toggler)
+const togglerShow = ref( (props.summarystyle === 'select' || props.summarystyle === 'info') ? true : props.toggler || props.toggler)
 
 const classes = computed( () => {
   
@@ -375,6 +374,10 @@ onMounted(() => {
     --robo-details-summary-toggler-size: 80%;
   }
 
+  .robo-details--initial {
+    --robo-details-content-padding: 0;
+  }
+
   @media (prefers-color-scheme: dark){
     :root {
       --robo-details-tooltip-background: var(--robo-color-light-95);
@@ -413,7 +416,6 @@ onMounted(() => {
     cursor: pointer;
     display: flex;
     fill: var(--robo-details-summary-color); /* for svgs inside */
-    height: 100%;
     padding: var(--robo-details-summary-padding);
     transition: 0.2s linear all;
     user-select: none;
@@ -422,10 +424,16 @@ onMounted(() => {
   /* - summary */
 
   /* + content */
-  .robo-details-content {
+  .robo-details--tooltip .robo-details-content {
     background-color: var(--robo-details-tooltip-background);
     outline: 1px solid var(--robo-details-tooltip-border-color);
     color: var(--robo-details-tooltip-color);
+  }
+
+  .robo-details--popup .robo-details-content {
+    background-color: var(--robo-details-popup-background);
+    outline: 1px solid var(--robo-details-popup-border-color);
+    color: var(--robo-details-popup-color);
   }
 
   .robo-details-content-inside {
@@ -449,6 +457,13 @@ onMounted(() => {
     z-index: 10;
   }
   /* - actions */
+
+  /* + INITIAL */
+  .robo-details--initial summary {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  /* - INITIAL */
 
   .robo-details--tooltip .robo-details-content {
     font-size: initial;

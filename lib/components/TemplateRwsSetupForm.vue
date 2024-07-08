@@ -5,7 +5,7 @@
             <template v-else>Subscription settings</template>
         </robo-text>
 
-        <robo-details popupMaxHeight="fit-content">
+        <robo-details popupMaxHeight="fit-content" v-if="!create">
             <template #summary><robo-button outline size="tiny">Download backup</robo-button></template>
 
             <robo-grid offset="x0" gap="x05" columns="1">
@@ -61,7 +61,64 @@
                     placeholder="Polkadot address of ed25519 account" 
                     required
                 />
+                <robo-account-polkadot-generate  
+                    @on-generate="setcontroller"
+                    beforename="Controller" 
+                    class="generativeline-tog"
+                >
+                    <template #link><robo-icon icon="wand-magic"/></template>
+                    <template #title>Create tech account for the controller</template>
+                    <template #successmsg>Controller address has been set up. Remember to save your password and JSON file for future use. If everything is saved, close this popup to proceed.</template>
+                </robo-account-polkadot-generate>
             </div>
+
+            <robo-input 
+                label="Sending interval (in minutes)"
+                type="number" 
+                v-model="datalogtimeout" 
+                @input="changesave('datalogtimeout', datalogtimeout)" 
+                :tipchanged="datalogtimeoutchanged" 
+                required 
+            />
+
+            <robo-details type="initial" toggler :contentCloseOutOfFocus="false" :open="(pinatapublic !== 'undefined' && pinatapublic !== '') || (pinataprivate !== 'undefined' && pinataprivate !== '')">
+                <template #summary>Pinata credentials (optional)</template>
+                
+                <robo-grid offset="x0" gap="x05" columns="1">
+                    <robo-input 
+                        label="Pinata public key"
+                        v-model="pinatapublic" 
+                        @input="changesave('pinatapublic', pinatapublic)" 
+                        :tipchanged="pinatapublicchanged"  
+                    />
+                    <robo-input 
+                        label="Pinata private key"
+                        v-model="pinataprivate" 
+                        @input="changesave('pinataprivate', pinataprivate)" 
+                        :tipchanged="pinataprivatechanged"  
+                    />
+                </robo-grid>
+            </robo-details>
+
+            <robo-details type="initial" toggler :contentCloseOutOfFocus="false" :open="(ipfsurl !== 'undefined' && ipfsurl !== '') || (ipfsport !== 'undefined' && ipfsport !== '')">
+                <template #summary>IPFS gateway (optional)</template>
+
+                <robo-grid offset="x0" gap="x05" columns="1">
+                    <robo-input 
+                        label="IPFS gateway url"
+                        v-model="ipfsurl" 
+                        @input="changesave('ipfsurl', ipfsurl)" 
+                        :tipchanged="ipfsurlchanged"  
+                    />
+
+                    <robo-input 
+                        label="IPFS gateway port"
+                        v-model="ipfsport" 
+                        @input="changesave('ipfsport', ipfsport)" 
+                        :tipchanged="ipfsportchanged"  
+                    />
+                </robo-grid>
+            </robo-details>
 
             <robo-button 
                 @click.prevent="submit" 
@@ -115,11 +172,20 @@ const rws = computed( () => {
   return store.state.robonomicsUIvue.rws.list
 })
 
+const activerws = computed( () => {
+    return store.state.robonomicsUIvue.rws.list.find(item => item.owner === store.state.robonomicsUIvue.rws.active);
+})
+
 const changed = ref([])
 const rwslist = ref('')
 const owner = ref('')
 const name = ref('')
 const controller = ref('')
+const datalogtimeout = ref(10)
+const pinatapublic = ref('')
+const pinataprivate = ref('')
+const ipfsurl = ref('')
+const ipfsport = ref('')
 
 const getrws = () => {
     if(!props.create) {
@@ -129,10 +195,20 @@ const getrws = () => {
                 owner.value = rwslist.value?.owner
                 name.value = rwslist.value?.name
                 controller.value = rwslist.value?.controller
+                datalogtimeout.value = rwslist.value?.datalogtimeout || 10
+                pinatapublic.value = rwslist.value?.pinatapublic || ''
+                pinataprivate.value = rwslist.value?.pinataprivate || ''
+                ipfsurl.value = rwslist.value?.ipfsurl || ''
+                ipfsport.value = rwslist.value?.ipfsport || ''
             } else {
                 owner.value = ''
                 name.value = ''
                 controller.value = ''
+                datalogtimeout.value = ''
+                pinatapublic.value = ''
+                pinataprivate.value = ''
+                ipfsurl.value = ''
+                ipfsport.value = ''
             }
         })
     }
@@ -174,6 +250,26 @@ const ownerchanged = computed(() => {
 
 const controllerchanged = computed(() => {
     return changecheck('controller', controller.value);
+});
+
+const datalogtimeoutchanged = computed(() => {
+    return changecheck('datalogtimeout', datalogtimeout.value);
+});
+
+const pinatapublicchanged = computed(() => {
+    return changecheck('pinatapublic', pinatapublic.value);
+});
+
+const pinataprivatechanged = computed(() => {
+    return changecheck('pinataprivate', pinataprivate.value);
+});
+
+const ipfsurlchanged = computed(() => {
+    return changecheck('ipfsurl', ipfsurl.value);
+});
+
+const ipfsportchanged = computed(() => {
+    return changecheck('ipfsport', ipfsport.value);
 });
 
 /* - CHANGE */
@@ -243,7 +339,13 @@ const processing = type => {
         Object.assign(rwsbufer.value, 
             {owner: owner.value}, 
             {controller: controller.value},
-            {name: name.value})
+            {name: name.value},
+            {datalogtimeout: datalogtimeout.value},
+            {pinatapublic: pinatapublic.value},
+            {pinataprivate: pinataprivate.value},
+            {ipfsurl: ipfsurl.value},
+            {ipfsport: ipfsport.value}
+        )
 
         emit('onUpdate', rwsbufer.value, (status, msg) => save(status, msg, type))
     }, 1000)
@@ -278,18 +380,36 @@ const exportSettingsUser = () => {
 
 const setcontroller = (address) => {
     controller.value = address;
-    // changesave('controller', controller.value);
 }
 
 const exportSettingsServer = (address, json) => {
     setcontroller(address);
 
-    const rwsname = store.state.robonomicsUIvue.rws.list.find(item => item.owner === store.state.robonomicsUIvue.rws.active).name;
-    const rwsowner = store.state.robonomicsUIvue.rws.list.find(item => item.owner === store.state.robonomicsUIvue.rws.active).owner;
+    /* save controller */
+    // processing('update');
+
+
+    const rwsname = activerws.value?.name;
+    const rwsowner = activerws.value?.owner;
     const rwscontroller = address;
     const rwscontrollerkey = JSON.stringify(json);
+    const datalogtimeout = activerws.value?.datalogtimeout;
+    const pinatapublic = activerws.value?.pinatapublic;
+    const pinataprivate = activerws.value?.pinataprivate;
+    const ipfsurl = activerws.value?.ipfsurl;
+    const ipfsport = activerws.value?.ipfsport;
 
-    const rwsobj = {'name': rwsname, 'owner': rwsowner, 'controller': rwscontroller, 'controllerkey': rwscontrollerkey};
+    const rwsobj = {
+        'name': rwsname, 
+        'owner': rwsowner, 
+        'controller': rwscontroller, 
+        'controllerkey': rwscontrollerkey,
+        'datalogtimeout': datalogtimeout,
+        'pinatapublic': pinatapublic,
+        'pinataprivate': pinataprivate,
+        'ipfsurl': ipfsurl,
+        'ipfsport': ipfsport
+    };
     const filename = 'robonomics.app-settings-' + rwsobj.name.replace(/ /g, '-') + '-server';
     downloadJson(rwsobj, filename);
 }
@@ -298,11 +418,6 @@ const exportSettingsServer = (address, json) => {
 
 onMounted( () => {
     getrws()
-
-    console.log('changed.value', changed.value)
-    watch(() => changed.value, () => {
-      console.log('changed.value', changed.value)
-    })
 
     watch(() => active.value, () => {
       getrws()
@@ -316,6 +431,11 @@ onMounted( () => {
         owner.value = ''
         controller.value = ''
         name.value = ''
+        datalogtimeout.value = ''
+        pinatapublic.value = ''
+        pinataprivate.value = ''
+        ipfsurl.value = ''
+        ipfsport.value = ''
       }
     })
 
@@ -347,5 +467,9 @@ onMounted( () => {
     position: absolute;
     right: 10px;
     bottom: 15px;
+}
+
+.robo-details--initial {
+    margin: var(--space) 0;
 }
 </style>
