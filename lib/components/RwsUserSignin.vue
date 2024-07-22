@@ -34,7 +34,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import {ed25519PairFromSeed, mnemonicToMiniSecret, encodeAddress, mnemonicValidate} from "@polkadot/util-crypto"
-import { shortenAddress } from '../polkadot/tools'
+import { shortenAddress, getpair } from '../polkadot/tools'
 import { dateGetString } from '../tools'
 import { IDBworkflow, IDBgettable, decrypt } from '../idb'
 import { useStore } from 'vuex'
@@ -131,6 +131,7 @@ const signin = async () => {
         try {
             seed = mnemonicToMiniSecret(userseed.value)
             pair = ed25519PairFromSeed(seed)
+            // console.log('test', getpair(userseed.value, 'ed25519'), getpair(userseed.value, 'sr25519'))
             addedaccount = encodeAddress(pair.publicKey)
         } catch(e) {
             errormsg.value = e

@@ -2,20 +2,16 @@
   <template v-if="!select">
 
     <template v-if="rws.length < 1 || create">
-      <robo-section>
-        <robo-text title="3">New subscription</robo-text>
-        <robo-text offset="x1" size="small" paragraphs>
-          <p>Robonomics smart home intergration allows you to interact with smart devices and robots. Interaction is carried out by transactions within Robonomics parachain instead of centralized cloud services.</p>
-          <p>The Robonomics RWS subscription guarantees the ability to send transactions stably every block. It is a good choice if you want to receive data from devices and manage them remotely.</p>
-        </robo-text>
-        <robo-button :router="store.state.robonomicsUIvue.rws.links.activate" block><robo-icon icon="wallet" /> <robo-text>Buy</robo-text></robo-button>
-      </robo-section>
       
-      
+      <robo-text offset="x1" size="small" paragraphs>
+        <p>Robonomics smart home intergration allows you to interact with smart devices and robots. Interaction is carried out by transactions within Robonomics parachain instead of centralized cloud services.</p>
+        <p>The Robonomics Subscription guarantees the ability to send transactions stably every block. It is a good choice if you want to receive data from devices and manage them remotely.</p>
+        <p>You may buy new subscription or renew your subscription <robo-link :router="store.state.robonomicsUIvue.rws.links.activate">here</robo-link>.</p>
+      </robo-text>
+
      <robo-section>
-      <robo-text title="3">Upload existing subscription</robo-text>
       <robo-file-upload :onloadfunc="upload" title="Upload .json with setup" drop>
-        <template #label>Import setup</template>
+        <template #label>Upload an existing subscription</template>
       </robo-file-upload>
       <robo-status v-if="errormsg" type="error">{{errormsg}}</robo-status>
      </robo-section>
@@ -34,7 +30,7 @@
               @change="setActive()"
               v-bind="$attrs"
           />
-          <robo-text title="4" offset="x0" v-else>{{rwsName}}</robo-text>
+          <robo-text title="4" offset="x0" break v-else>{{rwsName}}</robo-text>
 
         <robo-template-rws-active-info />
       </robo-section>

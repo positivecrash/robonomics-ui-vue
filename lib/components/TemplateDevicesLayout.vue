@@ -15,7 +15,6 @@
                 :config = "config"
                 :datalog = "datalog"
                 :updateTime="updateTime"
-                :connectionrelay="connectionrelay"
             />
 
             <robo-section offset="x2">
@@ -59,9 +58,6 @@ const props = defineProps({
     updateTime: {
       type: Number,
       default: null
-    },
-    connectionrelay: {
-      type: Boolean
     }
 })
 

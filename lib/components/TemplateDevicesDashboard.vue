@@ -4,28 +4,11 @@
       <robo-text size="small" weight="bold">{{shortenAddress(useraccount)}}</robo-text>
       <robo-button @click.prevent="logout" size="small" clean aria-label="Logout"><robo-icon icon="arrow-up-right-from-square" aria-hidden="true"/></robo-button>
   </robo-grid>
-  <div v-if="narrowscreen"><robo-text size="tiny" weight="bold" inline>Last telemetry update <template v-if="telemetryupd">{{telemetryupd}}</template></robo-text> <robo-loader v-if="!telemetryupd" /></div>
+  <div v-if="narrowscreen"><robo-text size="tiny" weight="bold" inline>Last data update <template v-if="telemetryupd">{{telemetryupd}}</template></robo-text> <robo-loader v-if="!telemetryupd" /></div>
   <robo-grid type="flex" offset="x0" gap="x1" class="robo-rws-devices-dashboard">
     <robo-grid type="flex" galign="start" gap="x1" offset="x0">
       <div>
-        <robo-text size="tiny" v-if="!narrowscreen">Connection via 
-          <robo-text v-if="connection === 'libp2p' && connectionrelay" size="tiny" highlight="ok" weight="bold" inline>Relay</robo-text>
-        </robo-text>
-        <robo-grid type="flex" galign="start" gap="x0" offset="x0">
-          <robo-button :type="connection === 'parachain' ? 'ok' : 'primary'" :disabled="connection === 'parachain' ? true : false" @click.prevent="setconnection('parachain')" size="small">
-            <robo-icon icon="check" v-if="connection === 'parachain'" />
-            Parachain
-          </robo-button>
-          <robo-button :type="connection === 'libp2p' ? 'ok' : 'primary'" :disabled="connection === 'libp2p' ? true : false" @click.prevent="setconnection('libp2p')" size="small">
-            <robo-icon icon="check" v-if="connection === 'libp2p'" />
-            Libp2p
-          </robo-button>
-        </robo-grid>
-        <robo-text v-if="narrowscreen && connection === 'libp2p' && connectionrelay" size="tiny" highlight="ok" weight="bold" align="right">Relay</robo-text>
-      </div>
-
-      <div>
-        <robo-text size="tiny" v-if="!narrowscreen">Ipfs gateway</robo-text>
+        <robo-text size="tiny" offset="x025" v-if="!narrowscreen">Ipfs gateway</robo-text>
         <robo-template-gateway :type="narrowscreen ? 'popup' : 'tooltip'">
           <template #summary v-if="narrowscreen">IPFS</template>
         </robo-template-gateway>
@@ -33,14 +16,14 @@
     </robo-grid>
     
     <div>
-      <robo-grid v-if="useraccount && userkey && !narrowscreen" offset="x0" gap="x025" type="flex">
+      <robo-grid v-if="useraccount && userkey && !narrowscreen" offset="x025" gap="x025" type="flex" valign="center">
           <robo-icon icon="user" />
           <robo-text size="small" weight="bold">{{shortenAddress(useraccount)}}</robo-text>
         <robo-button @click.prevent="logout" size="small" clean aria-label="Logout"><robo-icon icon="arrow-up-right-from-square" aria-hidden="true" /></robo-button>
       </robo-grid>
 
       <div v-if="!narrowscreen">
-        <robo-text size="tiny">Last telemetry update</robo-text>
+        <robo-text size="tiny">Last data update</robo-text>
         <robo-text size="tiny" weight="bold" class="robo-devices-dashboard-updatedate">
           <template v-if="telemetryupd">{{telemetryupd}}</template>
           <robo-loader v-else />
@@ -92,9 +75,6 @@ const props = defineProps({
       type: Number,
       default: null
     },
-    connectionrelay: {
-      type: Boolean
-    }
 })
 
 const useraccount = computed( () => {
@@ -143,21 +123,6 @@ const setError = () => {
   store.dispatch('app/setStatus', {value: msg, timeout: 10000})
 }
 
-const setconnection = type => {
-  if(type === 'libp2p') {
-    if(props.config && props.config?.peer_id) { 
-      store.commit('rws/setConnection', type)
-    } else {
-      setError()
-      return
-    }
-  }
-
-  if(type === 'parachain') {
-    store.commit('rws/setConnection', type)
-  }
-}
-
 const screenw = ref(0)
 const setw = () => {
   screenw.value = window.innerWidth
@@ -169,13 +134,6 @@ const narrowscreen = computed( () =>{
 onMounted( () => {
   setw()
   window.addEventListener('resize', setw)
-
-  if(connection.value === 'libp2p') {
-    if(!props.config || !props.config?.peer_id) {
-      setError()
-      store.commit('rws/setConnection', 'parachain')
-    }
-  }
 })
 
 onUnmounted( () => {

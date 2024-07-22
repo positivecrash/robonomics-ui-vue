@@ -1,7 +1,7 @@
 <template>
     <robo-grid type="flex" galign="stretch" offset="x05" gap="x05" valign="center">
         <robo-text title="3" offset="x0">
-            <template v-if="create">Manual configuration for existing subscription</template>
+            <template v-if="create">Enter data of an existing subscription mannually</template>
             <template v-else>Subscription settings</template>
         </robo-text>
 

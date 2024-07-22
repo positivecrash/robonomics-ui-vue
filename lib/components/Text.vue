@@ -269,11 +269,13 @@ export default defineComponent({
 
     /* + SIZE */
     .robo-text--tiny {
-        font-size: calc(var(--font-size) * 0.7);
+        font-size: calc(var(--font-size) * 0.6);
+        line-height: 1;
     }
 
     .robo-text--small {
         font-size: calc(var(--font-size) * 0.8);
+        line-height: 1;
     }
 
     .robo-text--medium {

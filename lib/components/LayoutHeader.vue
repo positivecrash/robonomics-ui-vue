@@ -4,8 +4,33 @@
     <robo-grid type="flex" offset="0" gap="x05" valign="center" galign="stretch" class="robo-layout-header-grid">
 
       <robo-grid type="flex" offset="0" gap="x05" valign="center">
-        <a v-if="logoIcon" href="/" class="robo-layout-header-logo"><img :src="logoIcon" /></a>
-        <b v-if="title" class="robo-layout-header-title">{{title}}</b>
+        <a v-if="logoIcon" :href="gethost" class="robo-layout-header-logo"><img :src="logoIcon" /></a>
+        <!-- <b v-if="title" class="robo-layout-header-title">{{title}}</b> -->
+        
+        <div class="connection" :class="(store.state.robonomicsUIvue.app.libp2p.connected === null && store.state.robonomicsUIvue.app.parachain.connected === null) ? 'waiting' : 'connected' ">
+          <robo-text size="small" weight="bold">
+            <template v-if="store.state.robonomicsUIvue.app.libp2p.connected === null && store.state.robonomicsUIvue.app.parachain.connected === null">
+              connecting
+            </template>
+             <template v-else>
+              connected
+            </template>
+          </robo-text>
+          <robo-text size="tiny">
+            <template v-if="store.state.robonomicsUIvue.app.libp2p.connected && !store.state.robonomicsUIvue.app.parachain.connected">
+              libp2p
+            </template>
+            <template v-if="!store.state.robonomicsUIvue.app.libp2p.connected && store.state.robonomicsUIvue.app.parachain.connected">
+              parachain
+            </template>
+          </robo-text>
+          <robo-text size="tiny">
+            <template v-if="store.state.robonomicsUIvue.app.relay.connected">
+              via relay
+            </template>
+          </robo-text>
+        </div>
+
       </robo-grid>
   
       <robo-grid type="flex" offset="0" gap="x05" valign="center" class="robo-layout-header-toolbar">
@@ -72,7 +97,7 @@
 </script>
 
 <script setup>
-  import { defineProps, computed } from 'vue'
+  import { defineProps, computed, onMounted, ref } from 'vue'
 
   const props = defineProps({
     logoIcon: {
@@ -88,9 +113,9 @@
       default: true
     },
     
-    title: {
-      type: String
-    }
+    // title: {
+    //   type: String
+    // }
 
   })
 
@@ -103,6 +128,12 @@
 
   import { useStore } from 'vuex'
   const store = useStore()
+
+  const gethost = ref('/');
+
+  onMounted(() => {
+    gethost.value = window.location.origin
+  })
 
 </script>
 
@@ -148,11 +179,35 @@
 
 <style scoped>
 
-  .robo-layout-header-title {
+  .connection {
+    position: relative;
+    margin-left: 10px;
+  }
+
+  .connection:before {
+    content: "";
+    background-color: var(--robo-color-light-80);
+    border-radius: 10px;
+    display: block;
+    height: 5px;
+    width: 5px;
+    position: absolute;
+    top: 6px;
+    left: -10px;
+  }
+
+  .connection.connected:before {
+    background-color: var(--robo-color-green);
+  }
+
+  .connection.waiting:before {
+    animation: Blink 2s linear infinite;
+  }
+
+  /* .robo-layout-header-title {
     text-transform: uppercase;
     font-weight: 800;
-    /* font-variation-settings: "wght" 100, "wdth" 100, "opsz" 20, "YTUC" 700; */
-  }
+  } */
 
   @media screen and (min-width: 900px) {
     .robo-layout-header {
@@ -184,7 +239,7 @@
   @media screen and (max-width: 700px) {
     .robo-layout-header-grid { grid-template-columns: auto auto; }
 
-    .robo-layout-header-title {
+    /* .robo-layout-header-title {
       position: absolute;
       bottom: -2rem;
       left: 0;
@@ -192,7 +247,7 @@
       background: var(--robo-header-background);
       padding: 0 var(--robo-layout-padding);
       text-align: center;
-    }
+    } */
   }
   /* - LAYOUT */
 
