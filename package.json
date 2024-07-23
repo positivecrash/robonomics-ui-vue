@@ -3,7 +3,7 @@
   "main": "index.js",
   "module": "index.es.js",
   "private": false,
-  "version": "0.5.1",
+  "version": "0.5.2",
   "scripts": {
     "build-clear": "rimraf /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue/lib/icons",
     "test-clear": "rimraf /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue3-components-guide/node_modules/robonomics-ui-vue",

@@ -15,6 +15,7 @@
                 <robo-text offset="x1" size="small" galign="left">Please sign in with a user account first.</robo-text>
             </div>
             <robo-select v-model="useraccount" @change="errormsg = null" :options="shortennedusers" :values="users" label="Select a user" block />
+            <robo-select v-model="acctype" :options="['ed25519', 'sr25519']" :values="['ed25519', 'sr25519']" label="Type of account" block />
             <robo-input :disabled="pairdb" v-model="userseed" @input="errormsg = null" type="password" placeholder="The mnemonic phrase for the account" label="Pass phrase" block />
             <robo-text v-if="pairdb" weight="bold" size="small">Your key has been already saved locally, you may sign in</robo-text>
             <robo-grid v-if="webcrypto" type="flex" galign="start" gap="x05" offset="x1">
@@ -33,7 +34,7 @@
 </script>
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import {ed25519PairFromSeed, mnemonicToMiniSecret, encodeAddress, mnemonicValidate} from "@polkadot/util-crypto"
+import {encodeAddress, mnemonicValidate} from "@polkadot/util-crypto"
 import { shortenAddress, getpair } from '../polkadot/tools'
 import { dateGetString } from '../tools'
 import { IDBworkflow, IDBgettable, decrypt } from '../idb'
@@ -57,6 +58,7 @@ const userseed = ref(null)
 const errormsg = ref(null)
 const keepsigned = ref(false)
 const savedusers = ref(false)
+const acctype = ref('ed25519')
 
 const webcrypto = ref(window.crypto.subtle || window.crypto.webkitSubtle)
 // const expireoptions = ['Never', '1 day', '1 month', '1 year']
@@ -116,31 +118,30 @@ const signin = async () => {
         return
     }
 
-    if(userseed.value){
-        if(!mnemonicValidate(userseed.value)) {
-            errormsg.value = 'Please, enter a correct pass phrase'
-            return
-        }
-    }
+    // if(userseed.value){
+    //     if(!mnemonicValidate(userseed.value)) {
+    //         errormsg.value = 'Please, enter a correct pass phrase'
+    //         return
+    //     }
+    // }
 
-    let seed = null
     let pair = null
     let addedaccount = null
 
     if(!pairdb.value){
         try {
-            seed = mnemonicToMiniSecret(userseed.value)
-            pair = ed25519PairFromSeed(seed)
-            // console.log('test', getpair(userseed.value, 'ed25519'), getpair(userseed.value, 'sr25519'))
+            pair = await getpair(userseed.value, acctype.value)
             addedaccount = encodeAddress(pair.publicKey)
         } catch(e) {
+            console.log('error here')
             errormsg.value = e
             return
         }
 
         if(encodeAddress(addedaccount) !== encodeAddress(useraccount.value)) {
 
-            errormsg.value = "This pass phrase doesn't match to user account or you are trying to add not ed25519 key"
+            errormsg.value = "This pass phrase doesn't match to user account or maybe wrong type of account selected"
+            // errormsg.value = "This pass phrase doesn't match to user account or you are trying to add not ed25519 key"
             return
             // useraccount.value = ''
             // users.value.forEach(i => {

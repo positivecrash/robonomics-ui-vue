@@ -1,5 +1,4 @@
 <template>
-
     <robo-section v-if="!users || users.length < 1" width="narrow" gcenter>
         <robo-text weight="bold">Please, <robo-link :router="store.state.robonomicsUIvue.rws.links.setup">add users</robo-link> to the subscription first</robo-text>
     </robo-section>
