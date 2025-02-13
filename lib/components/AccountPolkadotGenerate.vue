@@ -1,24 +1,31 @@
 <template>
-    <robo-details class="account-polkadot-generate" type="popup" summarystyle="link" :afterCloseDetails="clear">
+    <robo-details class="account-polkadot-generate" block :type="detailstype" summarystyle="link" :afterCloseDetails="clear" :contentCloseOutOfFocus="false">
         <template #summary>
             <slot name="link" />
         </template>
-        <robo-text title="3"><slot name="title">Generate new account</slot></robo-text>
-        <robo-grid offset="x0" gap="x05" columns="1">
+        <robo-text title="5"><slot name="title" /></robo-text>
+        <robo-grid gap="x05" columns="1">
             <robo-text size="small">
-                <slot name="description">
-                    You can create here Polkadot ecosystem account ed25519 type in one click. Don't forget to save your password!
-                </slot>
+                <slot name="description" />
             </robo-text>
-            <robo-input :label="labelpassword" type="password" v-model="password" :error="errorpassword" @click="errorpassword = false" />
-            <robo-button @click="generate()" :type="buttontype">{{buttontitle}}</robo-button>
+
+            <robo-input-new 
+                width="wide" 
+                :label="labelpassword" 
+                type="password" 
+                v-model="password" 
+                :error="errorpassword" 
+                @click="errorpassword = false" 
+                placeholder="Create a password"
+            />
+            
+            <robo-button @click="generate()" :type="buttontype" block :disabled="generated">{{buttontitle}}</robo-button>
             <robo-text highlight="error" v-if="errorpassword">Create password and store it savely</robo-text>
             <robo-section v-if="generated" offset="x1">
-                <robo-text v-if="address" weight="bold" offset="x0" size="small">Your new account:</robo-text>
+                <robo-text v-if="address" weight="bold" size="small">Account generated:</robo-text>
                 <robo-text v-if="address" highlight="ok" weight="bold" class="robo-line-clipoverflow" offset="x05">{{address}}</robo-text>
-                <robo-text v-if="seed" weight="bold" offset="x0" size="small">Remember to save the seed:</robo-text>
+                <robo-text v-if="seed" weight="bold" size="small">Remember to save the seed:</robo-text>
                 <robo-text v-if="seed" highlight="ok" weight="bold" offset="x05">{{seed}}</robo-text>
-                <robo-text size="small" weight="bold" offset="x05">Please, save your password, it's seed phrase and it's JSON file securely. If everything is saved, close this popup to proceed.</robo-text>
                 <robo-text size="small" weight="bold" offset="x05"><slot name="successmsg" /></robo-text>
             </robo-section>
         </robo-grid>
@@ -31,7 +38,7 @@
 </script>
 
 <script setup>
-    import { defineProps, defineEmits, computed, ref } from 'vue'
+    import { computed, ref } from 'vue'
     import { generateAccount } from '../polkadot/tools'
     import { downloadJson } from '../tools'
 
@@ -44,6 +51,13 @@
         },
         beforegenerating: {
             type: Function
+        },
+        detailstype: {
+            type: String,
+            default: 'popup',
+            validator: function (value) {
+                return ['tooltip', 'popup', 'inital'].indexOf(value) !== -1;
+            }
         },
         labelpassword: {
             type: String,

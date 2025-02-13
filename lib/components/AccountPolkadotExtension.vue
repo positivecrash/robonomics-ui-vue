@@ -9,12 +9,12 @@
     clean>
         <img :src="getImageUrl(extensionData.picture)" />
 
-        <span v-if="!walletInstalled" class="label">
-            <robo-icon icon="arrow-down" size="tiny" />
+        <span v-if="!walletInstalled" class="robo-dotlabel">
+            <robo-icon icon="arrow-down" size="supertiny" />
         </span>
 
-        <span v-if="walletConnected" class="label green">
-            <robo-icon icon="check" size="tiny" />
+        <span v-if="walletConnected" class="robo-dotlabel green">
+            <robo-icon icon="check" size="supertiny" />
         </span>
     </robo-button>
 </template>
@@ -24,7 +24,7 @@
 </script>
 
 <script setup>
-    import { defineProps, computed, ref, onMounted, watch } from 'vue'
+    import {computed, ref, onMounted, watch } from 'vue'
 
     import { useStore } from 'vuex'
     const store = useStore()
@@ -135,27 +135,6 @@
 </style>
 
 <style scoped>
-
-.label {
-    align-items: center;
-    background: var(--robo-color-link);
-    border-radius: var(--robo-account-polkadot-extension-label-size);
-    color: var(--robo-color-light);
-    display: block;
-    display: flex;
-    height: var(--robo-account-polkadot-extension-label-size);
-    justify-content: center;
-    padding-left: 0 !important;
-    position: absolute;
-    right: -0.3rem;
-    top: -0.3rem;
-    width: var(--robo-account-polkadot-extension-label-size);
-}
-
-.label.green {
-    background: var(--robo-color-green);
-}
-
 img {
     display: block;
     width: var(--robo-account-polkadot-extension-img-size);

@@ -1,10 +1,10 @@
 <template>
     
-    <robo-section class="entity" clean>
+    <robo-section class="entity">
 
         <template v-if="card?.entities || card?.entity">
             <template v-if="card?.type === 'glance' && enIcon">
-                <robo-grid type="grid" offset="x0" gap="x0" galign="center" :title="entity ?? null">
+                <robo-grid type="grid" galign="center" :title="entity ?? null">
                     <robo-icon v-if="enIcon" :icon="enIcon" :key="iconChange" :color="enData?.attributes?.rgb_color ? `rgb${enData.attributes.rgb_color}` : null" />
                     <robo-template-entity-controls 
                         :config="config" 
@@ -16,8 +16,8 @@
             </template>
 
             <template v-else>
-                <robo-grid type="flex" offset="x0" gap="x0" valign="center" fluid>
-                    <robo-grid v-if="enIcon || entity" type="flex" offset="x0" gap="x05" galign="start" valign="center">
+                <robo-grid type="flex" valign="center" fluid>
+                    <robo-grid v-if="enIcon || entity" type="flex" gap="x05" galign="start" valign="center">
                         <robo-icon v-if="enIcon" :icon="enIcon" :key="iconChange" :color="enIconColor" />
                         <robo-text v-if="entity" size="tiny">{{enData?.attributes?.friendly_name || entity}}</robo-text>
                     </robo-grid>
@@ -34,7 +34,7 @@
             <div style="font-size:9px;display:none">TemplateEntity, enData<br/> {{enData}}</div>
         </template>
         <template v-if="card?.type === 'picture-elements'">
-            <robo-image v-if="card?.image" :src="`https://ipfs.io/ipfs/${card.image}`" />
+            <img v-if="card?.image" :src="`https://ipfs.io/ipfs/${card.image}`" />
         </template>
 
     </robo-section>
@@ -47,7 +47,7 @@
 </script>
 
 <script setup>
-import { defineProps, computed, ref } from 'vue'
+import { computed, ref } from 'vue'
 import entityStatuses from '../entities/statuses'
 import entityTypes from '../entities/types'
 import {getEntityFullType, getEntityType} from '../entities/utils'

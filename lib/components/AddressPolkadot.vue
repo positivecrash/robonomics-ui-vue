@@ -1,6 +1,6 @@
 <template>
 
-    <robo-section offset="x0">
+    <robo-section>
         <robo-input
             type="text"
             v-bind="$attrs"
@@ -16,7 +16,7 @@
 </script>
 
 <script setup>
-    import { defineProps, defineEmits, computed, ref, onMounted, watch } from 'vue'
+    import { computed } from 'vue'
     import { isValidAddress } from '../polkadot/tools'
 
     import { useStore } from 'vuex'

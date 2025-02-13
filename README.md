@@ -1,4 +1,5 @@
-# Robonomics ui vue components library
-**This is beta version**
-examples - http://test.robonomics.network
-Vue 3 required
+# Robonomics App Components
+
+## Tech Stack:
+- Vue 3
+- Vuex

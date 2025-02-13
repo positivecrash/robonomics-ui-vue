@@ -37,13 +37,8 @@
     
 </template>
 
-<script>
-  export default {
-  components: { Details }, name: 'RoboTemplateEntityControls' }
-</script>
-
 <script setup>
-import { defineProps, computed, ref, onMounted, watch } from 'vue'
+import { computed, ref, onMounted, watch } from 'vue'
 import entityTypes from '../entities/types'
 import {getEntityType} from '../entities/utils'
 
@@ -66,7 +61,6 @@ const props = defineProps({
 })
 
 import { useStore } from 'vuex'
-import Details from './Details.vue'
 const store = useStore()
 const telemetry = computed( () => {
   return store.state.robonomicsUIvue.rws.telemetry

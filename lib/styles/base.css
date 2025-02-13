@@ -1,121 +1,29 @@
-/* @font-face {
-	font-family: 'Roboto Flex';
-	src: url('RobotoFlex-VariableFont.woff2') format("woff2-variations");
-} */
-
 :root {
-	--font-size: 1.2rem;
-	
-	--space: 1rem;
-
-	--color-dark: hsl(0, 0%, 10%); /* deprecated, use --robo-color-dark */
-	--color-light: #ffffff; /* deprecated, use --robo-color-light */
-	--color-blue: #368EFF;
-	--color-blue-light: #9898fa;
-	/* --color-bluegreen-light: #8fe9ee; */
-	--color-bluegreen-light: #dcfffc;
-	--color-green: #8CD517;
-	--color-orange: #ffa600;
-	--color-red: #CE3333;
-	--color-gray: #AEADB4;
-	--color-gray-light: #EBEAF0;
-
-	--color-card-background-light: #ffffff;
-	--color-card-background-light-70: hsla(0, 0%, 100%, 70%);
-	--color-card-background-dark: #242424;
-	--color-card-background-dark-70: hsla(0, 0%, 14%, 70%);
-	--color-card-background-lightblue: var(--color-bluegreen-light);
-
-	--color-text: var(--color-dark);
-	--color-link: var(--color-blue);
-	--color-link-hover: var(--color-green);
-	--color-body: var(--color-gray-light);
-
-	--input-bg: var(--color-card-background);
-	--input-text-color: inherit;
-	/* --input-text-color: var(--color-text); */
-	--input-border-color: var(--color-text);
-	--input-border-width: 1px;
-	--input-padding-g: var(--space);
-	--input-padding-v: var(--space);
-
-	--card-padding: var(--space);
-
-	--animation-bump: cubic-bezier(0.6, 0.04, 0.98, 0.335);
-
-	--size-logo-title-gorizontal: 4rem;
-
-	--card-label-height: calc( var(--space) * 1.5);
-	--card-border-color: var(--color-card-background);
-
-	--aside-size-left: 14rem;
-	--aside-size-right: 16rem;
+	--input-padding-g: var(--robo-space);
+	--input-padding-v: var(--robo-space);
 	--layout-maxwidth: 1920px;
-
-	--gap: var(--space);
-	--gap-layout: calc( var(--space) * 2);
-	--gap-text: calc( var(--space) * 2);
-	
-	--border-radius: 0px;
-
-	color-scheme: light dark;
+	--gap: var(--robo-space);
+	--gap-layout: calc( var(--robo-space) * 2);
+	--gap-text: calc( var(--robo-space) * 2);
+	--border-radius: 4px;
 }
-
-html, body, #app {
-	height: 100%;
-    position: relative;
-}
-
-body {
-	background-color: var(--color-body);
-}
-
-@media (prefers-color-scheme: dark){
-	:root {
-		--color-dark: #ffffff;
-		--color-light: #000000;
-		--color-blue: #368EFF;
-		--color-gray-light: #131313;
-
-		--color-card-background-light: #242424;
-		--color-card-background-dark: #ffffff;
-	}
-}
-
-
-
-.robo-overlay {
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	z-index: 1000;
-	background: rgba(0, 0, 0, 0.4);
-	backdrop-filter: blur(2px);
-}
-
-label {
-	font-weight: bold;
-	text-align: left;
-}
-
 
 /* for outside rewriting */
 :root {
-	/* --robo-font-family-sansserif: 'Roboto Flex', 'Roboto',-apple-system, BlinkMacSystemFont,avenir next,avenir,segoe ui,helvetica neue,helvetica,Ubuntu,roboto,noto,arial,sans-serif; */
-	--robo-font-family-sansserif: 'Roboto Mono', Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
-    --robo-font-family-mono: 'Roboto Mono', Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
+	color-scheme: light;
+	--robo-font-family: 'Roboto Mono', monospace, system-ui;
 
 	--robo-space: 1rem;
-	--robo-fontsize: var(--robo-space);
-	--robo-lineheight: 1.2;
+	--robo-font-size: 1.2rem;
+	--robo-line-height: 1.2;
 	--robo-layout-padding: calc(var(--robo-space) * 2);
+	--robo-dotlabel-size: 15px;
 
 	--robo-color-dark: hsl(0, 0%, 10%);
 	--robo-color-dark-90: hsl(0, 0%, 10%);
 	--robo-color-dark-85: hsl(0, 0%, 15%);
 	--robo-color-dark-80: hsl(0, 0%, 20%);
+	--robo-color-dark-70: hsl(0, 0%, 30%);
 	--robo-color-dark-30: hsl(0, 0%, 70%);
 
 	--robo-color-light: hsl(100, 100%, 100%);
@@ -128,18 +36,13 @@ label {
 	--robo-color-blue: hsl(214, 98%, 50%);
 	--robo-color-blue-120: hsl(214, 98%, 30%);
 	--robo-color-blue-110: hsl(214, 98%, 40%);
-	--robo-color-blue-105: hsl(214, 98%, 45%);
-	--robo-color-blue-90: hsl(214, 98%, 60%);
 	--robo-color-blue-80: hsl(214, 98%, 70%);
-	--robo-color-blue-80-5: hsla(214, 98%, 70%, 0.5);
 
 	--robo-color-green: hsl(83, 100%, 38%);
-	--robo-color-green-120: hsl(83, 100%, 18%);
 	--robo-color-green-110: hsl(83, 100%, 28%);
-	--robo-color-green-105: hsl(83, 100%, 33%);
 
 	--robo-color-orange: hsl(39, 100%, 50%);
-
+	
 	--robo-color-red: hsl(0, 61%, 50%);
 
 	--robo-color-text: var(--robo-color-dark-90);
@@ -147,7 +50,7 @@ label {
 	--robo-color-link-hover: var(--robo-color-blue-120);
 
 	--robo-input-padding: var(--robo-space);
-	--robo-input-fontsize: var(--robo-fontsize);
+	--robo-input-fontsize: var(--robo-font-size);
 
 	--robo-color-input: var(--robo-color-light);
 	--robo-color-inputcolor: var(--robo-color-dark-80);
@@ -155,16 +58,47 @@ label {
 	--robo-color-inputborderdisabled: var(--robo-color-dark-30);
 	--robo-color-inputcoloractive: var(--robo-color-blue);
 	--robo-opacity-inputdisabled: 0.6;
+
+	--robo-body-background-color: var(--robo-color-light-95);
+
+	--robo-card-padding: var(--robo-space);
+	--robo-card-background-color: var(--robo-color-light);
 }
 
-@media (prefers-color-scheme: dark){
+/* @media (prefers-color-scheme: dark){
 	:root {
-		--robo-color-blue: var(--robo-color-blue-90);
-
+		--robo-color-blue: var(--robo-color-blue-80);
 		--robo-color-input: var(--robo-color-dark-80);
 		--robo-color-inputcolor: var(--robo-color-light);
 		--robo-color-inputborder: var(--robo-color-light);
 
 		--robo-color-text: var(--robo-color-light);
+		--robo-body-background-color: var(--robo-color-dark-85);
+		--robo-card-background-color: var(--robo-color-dark-70);
 	}
+} */
+
+html, body, #app {
+	height: 100%;
+    position: relative;
+}
+
+body {
+	background-color: var(--robo-body-background-color);
+	color: var(--robo-color-text);
+}
+
+.robo-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 1000;
+	background: rgba(0, 0, 0, 0.4);
+	backdrop-filter: blur(2px);
+}
+
+.networkname {
+	text-transform: capitalize;
 }
