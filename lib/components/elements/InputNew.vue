@@ -29,27 +29,43 @@
           :aria-pressed="showPasswordPressed"
           :aria-label="showPasswordPressed ? 'Hide' : 'Show'"
         >
-          <robo-icon v-if="showPasswordPressed" icon="eye-slash" />
-          <robo-icon v-else icon="eye" />
+          <robo-icon :icon="showPasswordPressed ? 'eye-slash' : 'eye'" />
       </robo-button>
 
       <robo-button 
         v-if="props.edit" 
-        @click.prevent="!isChanged ? startedit() : edit()"  
+        @click="edit"  
         :loading="editStatus === 'loading'"
         :disabled="attrs.disabled"
         clean>
-        <template v-if="editStatus === 'init'">
-          <robo-icon v-if="!isChanged && !isFocused" icon="pencil" />
-          <robo-icon v-if="isChanged || isFocused" icon="save" />
+          <robo-icon v-if="editStatus !== 'loading'" :icon="(!isChanged && !isFocused) ? 'pencil' : 'save'" />
+        <!-- <template v-if="editStatus === 'init'">
+          <robo-icon :icon="(!isChanged && !isFocused) ? 'pencil' : 'save'" />
         </template>
         
         <robo-icon v-if="editStatus === 'error'" icon="ban" color="var(--robo-color-red)" />
-        <robo-icon v-if="editStatus === 'ok'" icon="check" color="var(--robo-color-green)" />
+        <robo-icon v-if="editStatus === 'ok'" icon="check" color="var(--robo-color-green)" /> -->
       </robo-button>
+      
+      <template v-if="editStatus === 'ok' || editStatus === 'error'">
+        <robo-details v-if="message">
+          <template #summary>
+            <robo-icon 
+              :icon="(editStatus === 'ok') ? 'circle-check' : 'circle-exclamation'" 
+              :color="(editStatus === 'ok') ? 'var(--robo-color-green)' : 'var(--robo-color-orange)'" 
+            />
+          </template>
+          {{message}}
+        </robo-details>
+        <robo-icon 
+          v-else
+          :icon="(editStatus === 'ok') ? 'circle-check' : 'circle-exclamation'" 
+          :color="(editStatus === 'ok') ? 'var(--robo-color-green)' : 'var(--robo-color-orange)'" 
+        />
+      </template>
+
     </robo-grid>
 
-    <robo-status v-if="message" :type="editStatus === 'ok' ? 'ok' : 'warning'" solid>{{message}}</robo-status>
   </div>
 </template>
 
@@ -168,37 +184,47 @@
   const firstchange = ref(false);
 
   const changing = () => {
+
     editStatus.value = 'init';
     message.value = null;
 
-    if(firstchange.value) {
+    // Сначала сравниваем, а потом, если это первый вызов, сохраняем значение
+    if (firstchange.value) {
+      // Если savedValue не совпадает, то отобразим изменение
+      if (savedValue.value !== input.value?.value) {
+        isChanged.value = true;
+      }
       savedValue.value = input.value?.value;
       firstchange.value = false;
-    }
-
-    if(savedValue.value !== input.value?.value) {
-      isChanged.value = true;
     } else {
-      isChanged.value = false;
+      if (savedValue.value !== input.value?.value) {
+        isChanged.value = true;
+      } else {
+        isChanged.value = false;
+      }
     }
-  }
-
-  const startedit = () => {
-    // inputRef.value.focus();
-    isFocused.value = true;
-    setTimeout(() => {
-      input.value.focus();
-    }, 10);
   };
 
   const edit = () => {
-    editStatus.value = 'loading';
-    emit('onEdit', (status, msg) => save(status, msg));
+    
+    if (!isChanged.value && !isFocused.value) {
+      // console.log('edit 1 cond – переводим в режим редактирования');
+      isFocused.value = true;
+      setTimeout(() => {
+        input.value.focus();
+      }, 10);
+    } else {
+      // console.log('edit 2 cond – пытаемся сохранить');
+      editStatus.value = 'loading';
+      emit('onEdit', (status, msg) => save(status, msg));
+    }
+
   }
 
   const save = (status, msg) => {
-    editStatus.value = props.statuscode || status;
-    message.value = props.statusmsg || msg || null;
+
+    editStatus.value = status;
+    message.value = msg || null;
 
     if(status === 'ok') {
       isChanged.value = false;
@@ -237,25 +263,26 @@
         savedValue.value = input.value.value;
       }
 
-      if(v === 'error') {
-        // isChanged.value = true;
-        isFocused.value = true;
-        input.value.focus();
-      }
-    });
+      // if(v === 'error') {
+      //   // isChanged.value = true;
+      //   isFocused.value = true;
+      //   input.value.focus();
+      // }
+    }, {immediate: true});
 
     watch(()=> props.statusmsg, v => {
       message.value = v;
-    });
+    }, {immediate: true});
 
-    watch(()=> editStatus.value, v => {
-      if(v === 'ok' || v === 'error') {
-        setTimeout(() => {
-          editStatus.value = 'init';
-          message.value = null;
-        }, 3000);
-      }
-    });
+    // watch(()=> editStatus.value, v => {
+    //   // if(v === 'ok' || v === 'error') {
+    //   if(v === 'ok') {
+    //     setTimeout(() => {
+    //       editStatus.value = 'init';
+    //       message.value = null;
+    //     }, 10000);
+    //   }
+    // }, {immediate: true});
 
     /* - EDIT */
   })

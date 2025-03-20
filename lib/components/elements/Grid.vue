@@ -345,8 +345,14 @@ const classes = computed( () => {
         column-count: var(--grid-columns);
         column-gap: var(--gap);
     }
+    
+    .robo-grid-type--masonry > * {
+      max-width: 100%;
+      word-break: break-word;
+      overflow-wrap: break-word;
+    }
 
-    .robo-grid:last-child { padding-bottom: 0; }
+    /* .robo-grid:last-child { padding-bottom: 0; } */
 
     .robo-grid-flexfluid {
       flex-wrap: wrap;
@@ -377,7 +383,7 @@ const classes = computed( () => {
        }
     }
 
-    @media screen and (max-width: 700px) {
+    @media screen and (max-width: 850px) {
        .robo-grid-type--masonry {
         --grid-columns: v-bind(masonryCalc(1))
        }

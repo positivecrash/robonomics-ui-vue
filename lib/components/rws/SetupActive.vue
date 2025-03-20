@@ -9,7 +9,7 @@
             </template>
 
             <robo-section>
-                <robo-select
+                <!-- <robo-select
                     v-if="rwslist.length > 1 && selectable"
                     block
                     size="small"
@@ -19,15 +19,15 @@
                     @change="setActive()"
                     class="selectrws"
                     offset="x05"
-                />
+                /> -->
 
+                <robo-rws-setup-active-select v-if="selectable" class="selectrws" offset="x05"/>
                 <robo-text v-else title="5" offset="x025" nowrap>{{activerws.name}}</robo-text>
 
                 <robo-text size="small">
                     <robo-rws-setup-active-info 
                         :show="show"
                         @on-controller-edit="onControllerEdit"
-                        @on-controller-request="onControllerRequest"
                         :onUserDelete="onUserDelete" 
                         :onUserAdd="onUserAdd"
                 />
@@ -39,8 +39,9 @@
     </template>
 
     <template v-if="type === 'full'">
-        <robo-status v-if="!activerws" type="error">The Setup was not found</robo-status>
+        
         <robo-status v-if="rwslist.length < 1" type="error">No setups were found</robo-status>
+        <robo-status v-else-if="!activerws" type="error">No Active Setup found</robo-status>
 
         <template v-if="rwslist.length > 0">
             <robo-select
@@ -60,7 +61,6 @@
                     :show="show" 
                     @test="testEmit"
                     @on-controller-edit="onControllerEdit"
-                    @on-controller-request="onControllerRequest"
                     :onUserDelete="onUserDelete" 
                     :onUserAdd="onUserAdd"
                 />
@@ -101,9 +101,6 @@
         onControllerEdit: {
             type: Function
         },
-        onControllerRequest: {
-            type: Function
-        },
         onUserAdd: {
             type: Function
         },
@@ -115,7 +112,8 @@
     const rwsactiveModel = ref(null);
 
     const rwslist = computed( () => {
-        return store.state.robonomicsUIvue.rws.list;
+        const currentNetwork = store.state.robonomicsUIvue.polkadot.connection.network;
+        return store.state.robonomicsUIvue.rws.list.filter(item => item.network === currentNetwork);
     });
 
     const activerws = computed( () => {
@@ -147,7 +145,7 @@
     });
 
     const setActive = () => {
-        store.commit('rws/setActive', rwsactiveModel.value);
+        store.commit('rws/changeActiveSetup', rwsactiveModel.value);
 
         /* force reload for all pages, in case of something sensible need to be updated only on reload */
         router.go();
@@ -158,7 +156,7 @@
     };
 
     onMounted( () => {
-        store.dispatch('rws/getActive');
+        // store.dispatch('rws/getActive');
         rwsactiveModel.value = store.state.robonomicsUIvue.rws.active;
     });
 

@@ -36,6 +36,11 @@ const props = defineProps({
       }
   },
 
+  shadow: {
+    type: Boolean,
+    default: false
+  },
+
   width: {
     type: String,
     default: 'wide',
@@ -51,6 +56,7 @@ const classes = computed(() => {
     [`robo-section-card`]: props.card,
     [`robo-section-disabled`]: props.disabled,
     [`robo-section-gcenter`]: props.gcenter,
+    [`robo-section-shadow`]: props.shadow,
   }
 });
 
@@ -109,5 +115,9 @@ const widthFromData = computed( () => {
 
     .robo-section-gcenter {
       text-align: center;
+    }
+
+    .robo-section-shadow {
+      box-shadow: 0 5px 10px rgba(0,0,0,.2);
     }
 </style>

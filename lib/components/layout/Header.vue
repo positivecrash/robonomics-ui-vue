@@ -6,7 +6,7 @@
       <robo-grid type="flex" gap="x05" valign="center">
         <a v-if="logoIcon" :href="mainhost" class="robo-layout-header-logo"><img :src="logoIcon" /></a>
         
-        <div class="connection" :class="(libp2p === null && parachain === null) ? 'waiting' : 'connected' ">
+        <!-- <div class="connection" :class="(libp2p === null && parachain === null) ? 'waiting' : 'connected' ">
           <robo-text size="small" weight="bold">
             <template v-if="libp2p === null && parachain === null">
               connecting
@@ -28,7 +28,7 @@
               via relay
             </template>
           </robo-text>
-        </div>
+        </div> -->
 
       </robo-grid>
   
@@ -102,12 +102,12 @@
 
 </template>
 
-<script>
-  export default { name: 'RoboLayoutHeader' }
-</script>
-
 <script setup>
-  import { computed, onMounted } from 'vue';
+  defineOptions({
+    name: 'RoboLayoutHeader'
+  });
+
+  import { computed, onMounted, watch } from 'vue';
   import { useStore } from 'vuex';
   const store = useStore();
 
@@ -137,25 +137,30 @@
     return window.location.origin || '/';
   });
 
-  const libp2p = computed( () => {
-    return store.state.robonomicsUIvue.app.libp2p.connected;
-  });
+  // const libp2p = computed( () => {
+  //   return store.state.robonomicsUIvue.app.libp2p.connected;
+  // });
 
-  const parachain = computed( () => {
-    return store.state.robonomicsUIvue.app.parachain.connected;
-  });
+  // const parachain = computed( () => {
+  //   return store.state.robonomicsUIvue.app.parachain.connected;
+  // });
 
-  const relay = computed( () => {
-    return store.state.robonomicsUIvue.app.relay.connected;
-  });
+  // const relay = computed( () => {
+  //   return store.state.robonomicsUIvue.app.relay.connected;
+  // });
 
-  const network = computed( () => {
-    return store.state.robonomicsUIvue.polkadot.network;
-  });
+  // const network = computed( () => {
+  //   return store.state.robonomicsUIvue.polkadot.connection.network;
+  // });
 
-  onMounted(() => {
+  watch(()=> store.state.robonomicsUIvue.rws.list, v => {
     store.dispatch('polkadot/detectNetwork');
-  })
+
+    if(v?.length > 0) {
+      store.dispatch('rws/checkNetworkRws');
+      store.dispatch('rws/getActiveSetup');
+    }
+  }, {immediate: true});
 
 </script>
 
@@ -226,7 +231,7 @@
   }
 
   .connection.waiting:before {
-    animation: Blink 2s linear infinite;
+    animation: Blink 0.8s linear infinite;
   }
 
   /* .robo-layout-header-title {

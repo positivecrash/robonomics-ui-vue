@@ -4,7 +4,7 @@
       <select 
         :name="name" 
         v-bind="$attrs"
-        v-model="selected" 
+        v-model="model" 
         @change="setWidth"
         :disabled="disabled ? true : null"
       >
@@ -23,12 +23,16 @@
     </div>
 </template>
 
-<script>
-  export default { name: 'RoboSelect' }
-</script>
-
 <script setup>
-import { computed } from 'vue'
+
+defineOptions({
+  name: 'RoboSelect',
+  inheritAttrs: false
+});
+
+import { computed } from 'vue';
+
+const model = defineModel();
 
 const props = defineProps({
   block: {
@@ -42,10 +46,6 @@ const props = defineProps({
   disabled: {
     type: Boolean,
     default: false
-  },
-  modelValue: {
-      type: String,
-      required: true
   },
   label: {
     type: String
@@ -107,19 +107,6 @@ const offsetFromData = computed( () => {
 
 const emit = defineEmits(['update:modelValue'])
 
-const selected = computed({
-    get: () => {
-      if(!props.modelValue) {
-        console.warn('[robonomics-ui-vue3]: `robo-select` component is missing required v-model directive')
-      } else {
-        return props.modelValue
-      }
-    },
-    set: value => {
-      emit('update:modelValue', value)
-    }
-})
-
 </script>
 
 <style scoped>
@@ -138,11 +125,12 @@ const selected = computed({
     --border-active: var(--robo-color-inputcoloractive);
     --label-active: var(--robo-color-inputcoloractive);
     --offset: v-bind(offsetFromData);
+    --padding: var(--robo-input-padding);
 
     --select-tog-size: 0.65rem;
     position: relative;
     line-height: 1;
-    width: 100%;
+    max-width: 100%;
   }
 
   .robo-select:not(:last-child) {
@@ -163,14 +151,15 @@ const selected = computed({
     font-family: inherit;
     font-size: inherit;
     font-weight: bold;
-    line-height: 2;
-    padding-right: calc(var(--input-padding-g) * 1.5 + var(--select-tog-size));
-    /* min-width: 100%; */
+    line-height: 1.5;
+    padding-right: calc(var(--padding) * 3 + var(--select-tog-size));
+    min-width: fit-content;
     width: 100%;
   }
 
   .robo-select--block {
     display: block;
+    width: 100%;
   }
 
   .robo-select:not(.robo-select--clean) {
@@ -180,16 +169,20 @@ const selected = computed({
   }
 
   .robo-select:not(.robo-select--clean) select {
-    padding-bottom: var(--input-padding-v);
-    padding-left: var(--input-padding-g);
-    padding-top: var(--input-padding-v);
+    padding-top: var(--padding);
+    padding-bottom: var(--padding);
+    padding-left: var(--padding);
   }
 
+  .robo-select.robo-select--clean select {
+    padding: 0 calc(var(--padding) + var(--select-tog-size) + var(--robo-space)/2) 0 0;
+  }
+  
   .robo-icon {
     pointer-events: none;
     position: absolute;
-    right: calc(var(--input-padding-g) * 0.45);
-    top: calc(50% - var(--select-tog-size) * 0.5);
+    right: calc(var(--padding) * 0.45);
+    top: calc(50% - var(--select-tog-size)/1.5);
   }
 
   .robo-select--disabled, .robo-select--disabled select {
@@ -202,8 +195,11 @@ const selected = computed({
   } */
 
   .robo-select--size-small {
-    --input-padding-v: calc(var(--input-padding-g) * 0.5);
-    /* --input-padding-g: 0.5rem; */
+    --padding: calc(var(--robo-input-padding) * 0.3);
+  }
+
+  .robo-select--size-small select {
+    font-size: 80%;
   }
 
   .robo-select--size-small .robo-icon {
@@ -212,19 +208,15 @@ const selected = computed({
   }
 
   .robo-select-label {
-      left: var(--input-padding-g);
+      left: var(--padding);
       position: absolute;
-      top: calc(var(--robo-space) * 0.5);
+      top: calc(var(--padding) * 0.2);
       transition: 0.2s all ease;
-  }
-
-  .robo-select--labeled {
-    padding-top: var(--robo-space);
+      opacity: 0.6;
   }
 
   .robo-select--labeled select {
-    --input-padding-g: var(--robo-space);
-    padding-top: calc(var(--input-padding-v) - var(--robo-space)/2) !important;
+    padding-top: calc(var(--padding) * 2) !important;
   }
 
   .robo-select--clean .robo-select-label {

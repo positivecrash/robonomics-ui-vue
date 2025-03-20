@@ -25,8 +25,11 @@
 
         </robo-grid>
 
-        <robo-status v-if="status === 'cancel'" type="warning" solid>The removal of the user has been canceled</robo-status>
-        <robo-status v-if="status === 'error'" type="error" solid>{{msg ?? 'Something went wrong during user removing'}}</robo-status>
+        <robo-status v-if="status === 'cancel' || status === 'error'" type="warning" solid>
+            <template v-if="status === 'cancel'">The removal of the user has been canceled</template>
+            <template v-else>{{statusmsg ?? 'Something went wrong during user removing'}}</template>
+        </robo-status>
+
     </robo-section>
 </template>
 
@@ -39,6 +42,7 @@ import { shortenAddress } from '../../tools'
 import { ref, computed, watch } from 'vue'
 import { useStore } from 'vuex'
 const store = useStore()
+import { dateGetRange } from '../../tools'
 
 const props = defineProps({
     useraddress: {
@@ -55,6 +59,14 @@ const status = ref('init')
 const statusmsg = ref(null)
 const emit = defineEmits(['onUserDelete'])
 
+const expiration = computed( () => {
+    return store.state.robonomicsUIvue.rws.expiredate;
+});
+
+const expiresin = computed( () => {
+    return dateGetRange(expiration.value);
+});
+
 const remove = (st, msg) => {
 
     if(st ==='ok') {
@@ -68,7 +80,14 @@ const remove = (st, msg) => {
 }
 
 const removeuser = () => {
-    status.value = 'loading'
+
+    if(expiresin.value > 0) {
+        status.value = 'error';
+        statusmsg.value = 'Please, renew your subscription first';
+        return;
+    }
+
+    status.value = 'loading';
     emit('onUserDelete', props.useraddress, (status, message) => remove(status, message))
 }
 
@@ -86,8 +105,6 @@ const active = computed( () => {
 
 const labeledit = (save) => {
 
-    console.log('labeledit pressed')
-
     store.dispatch('rws/editUserListLabel', {address: props.useraddress, label: userlabel.value}).then(result => {
         if(result) {
             save('ok');
@@ -97,18 +114,23 @@ const labeledit = (save) => {
     });
 }
 
-const initlabel = () => {
-    store.dispatch('rws/findrws', active.value).then(index => {
-        if(index > -1) {
-            if(rws.value[index]?.users) {
-                const finduser = rws.value[index].users.map(item => item.address).indexOf(props.useraddress);
-                if(finduser > -1) {
-                    userlabel.value = rws.value[index].users[finduser].label
-                }
+const initlabel = async () => {
+    // Ищем индекс текущего сетапа
+    const index = await store.dispatch('rws/findSetupIndex', active.value);
+
+    if (index > -1) {
+        const setup = rws.value[index];
+        
+        if (setup?.users) {
+            // Ищем пользователя в списке users по адресу
+            const finduser = setup.users.findIndex(user => user.address === props.useraddress);
+
+            if (finduser > -1) {
+                userlabel.value = setup.users[finduser].label;
             }
         }
-    })
-}
+    }
+};
 
 watch(() => active.value, () => {
     initlabel();

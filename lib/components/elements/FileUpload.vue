@@ -9,7 +9,7 @@
 
             <robo-button size="small" :outline="!drop" :disabled="disabled">  
                 <robo-loader v-if="load" />
-                <robo-icon v-else icon="floppy" />
+                <robo-icon v-else icon="save" />
                 <robo-text v-if="slots.label && !drop"><slot name="label" /></robo-text>
                 <robo-text v-if="drop">Select a file</robo-text>
                 <input @change="upload($event)" type="file" v-bind="$attrs" :accept="accept" />

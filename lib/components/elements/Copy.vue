@@ -1,8 +1,14 @@
 <template>
-    <robo-button v-if="props.text" @click.prevent="copy" :size="props.size" clean :disabled="copied ? 'ok' : null">
+    <robo-button 
+        v-if="props.text" 
+        @click.prevent="copy" 
+        class="robo-copy"
+        :size="props.size" 
+        clean 
+        :disabled="copied ? 'ok' : null"
+    >
         <robo-grid type="flex" gap="x025">
-            <robo-icon icon="copy" />
-            <robo-icon icon="check" v-if="copied" />
+            <robo-icon :icon="copied ? 'check' : 'copy'" />
         </robo-grid>
     </robo-button>
 </template>

@@ -3,13 +3,19 @@
         <robo-status type="error" solid>No subscription found in <i class="networkname">{{network}}</i></robo-status>
     </robo-grid>
 
-    <robo-text lines="dotted" size="small" class="setupinfo">
+    <robo-text lines="dotted" size="small" class="setupinfo" :class="blinkContent && 'setupinfonew'">
 
+        <robo-grid type="flex" offset="x025" gap="x025" valign="center">
+            <robo-icon :icon="store.state.robonomicsUIvue.polkadot.connection.network" />
+            <span class="robo-longline">Setup's network:</span>
+            <robo-text weight="bold" class="networkname">{{store.state.robonomicsUIvue.polkadot.connection.network}}</robo-text>
+        </robo-grid>
+        
         <robo-grid v-if="show.includes('name') && expiration" type="flex" offset="x025" gap="x025" valign="center">
             <robo-icon icon="quote" />
             <span class="robo-longline">Name in dapp:</span>
             <b v-if="!ispagesetup">{{localname}}</b>
-            <robo-input-new v-if="ispagesetup" v-model="localname" type="text" width="fit" view="line" edit @on-edit="editRwsName" placeholder="Type here a name" />
+            <robo-input-new v-if="ispagesetup" v-model="localname" type="text" width="fit" view="line" edit @on-edit="savename" placeholder="Type here a name" />
         </robo-grid>
 
         <robo-grid v-if="show.includes('date') && expiration" type="flex" offset="x025" gap="x025" valign="center">
@@ -30,8 +36,7 @@
             <robo-icon icon="settings" />
             <span class="robo-longline">Controller:</span>
 
-            <robo-input-new 
-                v-if="isAdmin"
+            <robo-input-new
                 v-model="controller" 
                 :statuscode="gencontrollerstatus"
                 :statusmsg="gencontrollermsg"
@@ -42,21 +47,14 @@
                 view="line" 
                 edit 
                 style="max-width: 42ch;"
-                @on-edit="editcontroller"  
+                @on-edit="handleControllerEdit"  
             />
 
-            <template v-if="!isAdmin">
-                <b>{{controller ? shortenAddress(controller) : '-'}}</b>
-                <robo-copy v-if="controller" :text="controller" />
-            </template>
-
-            <!-- <b>{{shortenAddress(rwslist[active].controller)}}</b>
-            <robo-copy :text="rwslist[active].controller" /> -->
         </robo-grid>
 
         <robo-grid v-if="show.includes('controller') && ispagesetup && isAdmin" offset="x025">
             <robo-account-polkadot-generate
-                @on-generate="setcontroller"
+                @on-generate="handleControllerGenerate"
                 beforename="Controller" 
                 detailstype="initial"
                 labelpassword="A password for new Controller account *">
@@ -127,7 +125,7 @@
                             <label for="backup-controller">Controller address</label>
                         </robo-grid>
 
-                        <robo-grid v-if="activeusers?.length > 0" type="flex" gap="x05" offset="x05" galign="start" valign="center">
+                        <robo-grid v-if="activeuserslabeled?.length > 0" type="flex" gap="x05" offset="x05" galign="start" valign="center">
                             <robo-input v-model="bcusers" type="checkbox" id="backup-users" name="backupusers" /> 
                             <label for="backup-users">Users' names</label>
                         </robo-grid>
@@ -211,8 +209,8 @@
     import { ref, computed, watch, toRaw, onMounted } from 'vue';
     import { useStore } from 'vuex';
     const store = useStore();
-    import { shortenAddress, dateGetString, dateGetRange, getConfigFileName, downloadJson, setStatusView } from '../../tools';
-    import { isAccountsIdentical } from '../../polkadot/tools';
+    import { shortenAddress, dateGetString, dateGetRange, formatFileName, downloadJson, setStatusView } from '../../tools';
+    import { isAccountsIdentical, isValidAddress } from '../polkadot/tools';
 
     const props = defineProps({
         onUserDelete: {
@@ -227,15 +225,12 @@
         }
     });
 
-    const emit = defineEmits(['onControllerEdit', 'onControllerRequest']);
+    const emit = defineEmits(['onControllerEdit']);
 
     const rwslist = computed( () => {
-        return store.state.robonomicsUIvue.rws.list;
+        const currentNetwork = store.state.robonomicsUIvue.polkadot.connection.network;
+        return store.state.robonomicsUIvue.rws.list.filter(item => item.network === currentNetwork);
     });
-
-    // const activerws = computed( () => {
-    //     return rwslist.value.find(item => item.owner === store.state.robonomicsUIvue.rws.active);
-    // });
 
     const activerwsowner = computed( ()=> {
         return store.state.robonomicsUIvue.rws.active;
@@ -250,7 +245,7 @@
     });
 
     const network = computed( () => {
-        return store.state.robonomicsUIvue.polkadot.network;
+        return store.state.robonomicsUIvue.polkadot.connection.network;
     });
 
     /* if !expiration -> no subscription */
@@ -265,10 +260,6 @@
     const isAdmin = computed ( () => {
         return isAccountsIdentical(connectedacc.value, activerwsowner.value);
     });
-
-    // const isUser = computed ( () => {
-    //     return users.value?.find(user => isAccountsIdentical(user, connectedacc.value));
-    // });
 
     const ispagesetup = computed ( () => {
         return window.location.hash === '#' + store.state.robonomicsUIvue.rws.links.setup;
@@ -291,96 +282,183 @@
         return rwslist.value[active.value].controller;
     });
 
+    /* юзеры подписки с локальными лейблами */
     const activeusers = computed( () => {
+        return rwslist.value[active.value]?.users;
+    });
+
+    const activeuserslabeled = computed( () => {
         // return rwslist.value[active.value].users;
         /* Only for backup, filter not empty labels only */
-        return rwslist.value[active.value]?.users?.filter(i => i?.label && i?.label !== '');
+        if(activeusers.value) {
+            return activeusers.value.filter(i => i?.label && i?.label !== '');
+        } else {
+            return null;
+        }
+        
     });
     /* - CURRENT SUBSCRIPTION INFO */
 
     /* + NAME */
     const localname = ref(null); /* set up onMount */
 
-    const editRwsName = (save) => {
+    const savename = async (save) => {
         try {
-            if(localname.value === '' || !localname.value) {
-                save('error', 'please, enter some name');
+            if (!localname.value || localname.value.trim() === '') {
+                save('error', 'Please, enter some name');
                 return;
             }
 
-            rwslist.value[active.value].name = localname.value;
-            store.dispatch('rws/rewrite', rwslist.value);
-            save('ok');
-        } catch(e) {
-            save('error');
+            const trimmedName = localname.value.trim();
+
+            const result = await store.dispatch('rws/updateSetupField', {
+                owner: activeowner.value,
+                updates: {
+                    name: trimmedName
+                }
+            });
+
+            if (result.success) {
+                save('ok');
+            } else {
+                save('error', result.error || 'Failed to save name');
+            }
+        } catch (e) {
+            console.error('Error saving name:', e);
+            save('error', e.message || 'An unknown error occurred');
         }
-    }
+    };
     /* - NAME */
+
+    const isInUserList = (user) => {
+        return users?.value && users?.value?.length > 1 && users?.value.find(u => u === user);
+    }
 
     /* + CONTROLLER */
     const controller = ref(rwslist.value[active.value].controller);
     const gencontrollerstatus = ref(null);
     const gencontrollermsg = ref(null);
 
-    const savecontroller = (newcontroller, newcontrollerkey, status, message, save) => {
-
-        /* тут при загрузке получается контроллер из подписки,
-        и если такой контроллер уже есть в dapp, то ничего делать не надо больше */
-        if(!newcontroller) {
-            gencontrollerstatus.value = 'init';
-            return;
+    const savecontroller = async (newcontroller, newcontrollerkey, status, message, save) => {
+        if (status === 'error') {
+            gencontrollerstatus.value = 'error';
+            gencontrollermsg.value = message;
         }
 
-        if(newcontroller === controller.value) {
-            gencontrollerstatus.value = 'ok';
-            return;
+        else if (status === 'cancel') {
+            gencontrollerstatus.value = 'error';
+            gencontrollermsg.value = 'Saving controller account to User list was cancelled';
         }
 
-        if(status === 'ok') {
+        else if (status === 'ok') {
+            gencontrollerstatus.value = status;
+            gencontrollermsg.value = 'Controller setup locally in dapp and saved in chain. Make sure this account is used as a controller in Home Assistant integration.';
             controller.value = newcontroller;
-            rwslist.value[active.value].controller = controller.value;
+
+            const result = await store.dispatch('rws/updateSetupField', {
+                owner: activeowner.value,
+                updates: {
+                    controller: newcontroller,
+                    controllerkey: newcontrollerkey || undefined,
+                }
+            });
+
+            if (!result.success) {
+                gencontrollerstatus.value = 'error';
+                gencontrollermsg.value = result.error || 'Failed to save controller';
+            }
         }
 
-        if(newcontrollerkey) {
-            rwslist.value[active.value].controllerkey = newcontrollerkey;
-        } else {
-            delete rwslist.value[active.value].controllerkey;
+        else {
+            gencontrollerstatus.value = status;
+            gencontrollermsg.value = message;
         }
 
-        store.dispatch('rws/rewrite', rwslist.value);
+        if (save) {
+            save(status, message);
+        }
+    };
 
-        gencontrollerstatus.value = status;
-        gencontrollermsg.value = message;
+    const handleController = (newcontroller, newcontrollerkey, saveCallback) => {
+        // общий метод для сохранения через инпут и генерации нового контроллера
 
-        if(!save) {
-            // надо подумать все ли ок с переносом из этого условия
-            // gencontrollerstatus.value = status;
-            // gencontrollermsg.value = message;
+        if(expiresin.value > 0) {
+            gencontrollerstatus.value = 'error';
+            gencontrollermsg.value = 'Please, renew subscription first';
             return;
         }
 
-        save(status, message);
-    
+        if(isValidAddress(newcontroller)) {
+            // проверяем валидность самого адреса (к сожалению тип шифрования без подписи проверить не можем, только формат)
+
+            if(isInUserList(newcontroller)) {
+                // если контроллер уже в списке юзеров, то сохраняем локально в сетапе дапп
+                savecontroller(
+                    newcontroller, 
+                    newcontrollerkey, 
+                    'ok', 
+                    'Controller setup locally in dapp. Make sure this account used as a controller in Home Assistant integration.', 
+                    saveCallback
+                );
+            } else {
+                // если контроллера нет в списке юзеров, то проверяем есть ли права на запись в чейн (подключен ли админский аккаунт)
+                if(isAdmin.value) {
+                    emit('onControllerEdit', 
+                        newcontroller, 
+                        (status, message) => savecontroller(newcontroller, newcontrollerkey, status, message, saveCallback)
+                    );
+                } else {
+                    // если не админ, то выдаем ошибку
+                    gencontrollerstatus.value = 'error';
+                    gencontrollermsg.value = 'Controller should be in the User list of subscription (request from Admin)';
+                    if(saveCallback) {
+                        saveCallback(gencontrollerstatus.value, gencontrollermsg.value);
+                    }
+                }
+            }
+        } else {
+            gencontrollerstatus.value = 'error';
+            gencontrollermsg.value = 'Invalid account address';
+            if(saveCallback) {
+                saveCallback(gencontrollerstatus.value, gencontrollermsg.value);
+            }
+        }
     }
 
-    /* Clicking on input's button edit */
-    const editcontroller = (save) => {
-        emit('onControllerEdit', controller.value, (status, message) => savecontroller(controller.value, null, status, message, save));
-    }
+    const handleControllerEdit = (saveCallback) => {
 
-    /* Generated account */
-    const setcontroller = (newcontroller, newcontrollerkey) => {
-        emit('onControllerEdit', newcontroller, (status, message) => savecontroller(newcontroller, newcontrollerkey, status, message, null));
-    }
-
-    /* Requesting controller */
-    const requestcontroller = () => {
         gencontrollerstatus.value = 'loading';
-        emit('onControllerRequest', activerwsowner.value, (controller, status, message) => savecontroller(controller, null, status, message, null));
+        gencontrollermsg.value = '';
+
+        handleController(controller.value, activecontrollerkey.value || null, saveCallback);
+    };
+
+    const handleControllerGenerate = (newcontroller, newcontrollerkey) => {
+
+        // controller.value = newcontroller;
+        gencontrollerstatus.value = 'loading';
+        gencontrollermsg.value = '';
+
+        handleController(newcontroller, newcontrollerkey);
+    };
+
+    const checkcontroller = () => {
+        if(isValidAddress(controller.value) && isInUserList(controller.value)) {
+            gencontrollerstatus.value = 'ok';
+            gencontrollermsg.value = '';
+        } else if (!isValidAddress(controller.value)) {
+            gencontrollerstatus.value = 'error';
+            gencontrollermsg.value = 'Account is not valid';
+        } else if (!isInUserList(controller.value)) {
+            gencontrollerstatus.value = 'error';
+            gencontrollermsg.value = 'Account should be added in User list';
+        }
     }
+
     /* - CONTROLLER */
 
     /* + USERS */
+    // юзеры, полученный из чейна
     const users = computed( () => {
         return store.state.robonomicsUIvue?.rws?.users;
     });
@@ -390,11 +468,12 @@
     var userschangedcount = 0;
 
     watch(() => users.value, (newValue, oldValue) => {
-
+        
         store.dispatch('rws/updateUserList', newValue);
 
         if(userschangedcount > 1 && JSON.stringify(toRaw(newValue)) !== JSON.stringify(toRaw(oldValue))) {
 
+            checkcontroller();
             userschanged.value = true;
 
             setTimeout(() => {
@@ -425,22 +504,26 @@
 
     const downloadbackup = () => {
         let bccontent = {};
-        let filename = getConfigFileName(activename.value || 'subscription');
+        let filename = formatFileName(activename.value || 'subscription');
+
+        if(store.state.robonomicsUIvue.polkadot.connection.network) {
+            bccontent.network = store.state.robonomicsUIvue.polkadot.connection.network;
+        }
 
         if(bcname.value && activename.value) {
-            bccontent.name = activename.value;
+            bccontent.name = activename.value.trim();
         }
 
         if(bcowner.value && activeowner.value) {
-            bccontent.owner = activeowner.value;
+            bccontent.owner = activeowner.value.trim();
         }
 
         if(bccontroller.value && activecontroller.value) {
-            bccontent.controller = activecontroller.value;
+            bccontent.controller = activecontroller.value.trim();
         }
 
-        if(bcusers.value && activeusers.value) {
-            bccontent.users = activeusers.value;
+        if(bcusers.value && activeuserslabeled.value.length > 0) {
+            bccontent.users = activeuserslabeled.value;
         }
 
         if(bccontrollerkey.value && activecontrollerkey.value) {
@@ -448,38 +531,67 @@
         }
 
         if(bcmessaging.value && messaging.value) {
-            bccontent.messaging = messaging.value;
+            bccontent.messaging = messaging.value.trim();
         }
 
         if(bcipfs.value && ipfsgate.value) {
-            bccontent.ipfsgate = ipfsgate.value;
+            bccontent.ipfsgate = ipfsgate.value.trim();
         }
         
-        if(bcpinata.value && pinatapublic.value) {
-            bccontent.pinatapublic = pinatapublic.value;
+        if (bcpinata.value) {
+            const pinataKeys = {};
+            if (pinatapublic.value) pinataKeys.public = pinatapublic.value.trim();
+            if (pinataprivate.value) pinataKeys.private = pinataprivate.value.trim();
+            if (Object.keys(pinataKeys).length > 0) {
+                bccontent.pinata = pinataKeys;
+            }
         }
 
-        if(bcpinata.value && pinataprivate.value) {
-            bccontent.pinataprivate = pinataprivate.value;
+        if (Object.keys(bccontent).length === 0) {
+            console.warn('Backup content is empty. No data to save.');
+            return;
         }
 
-        downloadJson(bccontent, filename);
+        // Сортируем bccontent по алфавиту
+        const sortedBcContent = Object.keys(bccontent)
+            .sort()
+            .reduce((acc, key) => {
+                acc[key] = bccontent[key];
+                return acc;
+            }, {});
+
+        downloadJson(sortedBcContent, filename);
     }
     /* - BACKUP */
 
     const removesetup = () => {
-        store.dispatch('rws/clear', activerwsowner.value);
+        store.dispatch('rws/deleteSetup', activerwsowner.value);
     }
 
+    const blinkContent = ref(true);
+
     onMounted( () => {
-        /* !attention: we don't need this here only because I assume this component is always fired inside of RoboRwsSetupActive */
-        // store.dispatch('rws/getActive');
+        watch(() => blinkContent.value, v => {
+            if(v) {
+                setTimeout(() => {
+                    blinkContent.value = false;
+                }, 6000);
+            }
+        }, {immediate: true});
 
         watch(() => active.value, () => {
-            requestcontroller();
             localname.value = activename.value;
+            blinkContent.value = true;
+            checkcontroller();
         }, { immediate: true });
+
     });
+    
+
+    // onMounted( () => {
+        /* !attention: we don't need this here only because I assume this component is always fired inside of RoboRwsSetupActive */
+        // store.dispatch('rws/getActive');
+    // });
 </script>
 
 <style>
@@ -491,5 +603,9 @@
 <style scoped>
     .setupinfo.robo-text[class*="robo-text--lines-"] > :not(:last-child) {
         --robo-text-lines-padding: 10px;
+    }
+
+    .setupinfonew {
+        animation: Blink 0.8s linear 2 forwards;
     }
 </style>

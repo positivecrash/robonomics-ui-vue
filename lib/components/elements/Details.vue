@@ -3,11 +3,8 @@
     <summary class="robo-details-summary" :aria-expanded="isOpened ? true : false" tabindex="0" role="button" @click="doFixRatio">
       <robo-grid type="flex" gap="x025" valign="center" galign="stretch">
         <slot name="summary" />
-        <robo-icon v-if="togglerShow" :icon="(summarystyle === 'info') ? 'circle-info' : 'select-arrow'" class="robo-details-summary-toggler" />
-        <robo-icon v-if="type === 'initial' && !isOpened" icon="arrowhead-bottom" />
-        <robo-icon v-if="type === 'initial' && isOpened" icon="arrowhead-top" />
+        <robo-icon :icon="toggleIcon" :class="togglerShow ? 'robo-details-summary-toggler' : null" />
       </robo-grid>
-      <!-- <slot v-else name="summary" /> -->
     </summary>
     
     <div class="robo-details-content" ref="content">
@@ -188,6 +185,16 @@ const classes = computed( () => {
     }
 
     return list
+});
+
+const toggleIcon = computed( () => {
+  if(togglerShow.value) {
+    return (props.summarystyle === 'info') ? 'circle-info' : 'select-arrow';
+  }
+
+  if(props.type === 'initial') {
+    return isOpened.value ? 'arrowhead-top' : 'arrowhead-bottom';
+  }
 });
 
 /* + methods */

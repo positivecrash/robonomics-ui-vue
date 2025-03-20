@@ -12,22 +12,28 @@
 
         <form @submit.prevent="savepass" v-if="useraccount && userkey">
             <robo-grid gap="x05" columns="1">
-                <robo-select 
-                    v-model="useraccount" 
-                    @change="reset" 
-                    :options="shortennedusers" 
-                    :values="users" 
-                    label="Selected user" 
-                    block 
-                />
+                <div class="robo-hapass-line">
+                    <robo-select 
+                        v-model="useraccount" 
+                        @change="reset" 
+                        :options="shortennedusers" 
+                        :values="users" 
+                        label="Selected user" 
+                        block 
+                    />
+                    <robo-copy v-if="status === 'ok'" :text="useraccount" />
+                </div>
 
-                <robo-input-new 
-                    v-model="userpass"
-                    @input="changed = true"
-                    label="New password" 
-                    type="password" 
-                    width="wide" 
-                />
+                <div class="robo-hapass-line">
+                    <robo-input-new 
+                        v-model="userpass"
+                        @input="changed = true"
+                        label="New password" 
+                        type="password" 
+                        width="wide" 
+                    />
+                    <robo-copy v-if="status === 'ok'" :text="userpass" />
+                </div>
 
                 <robo-button 
                     block
@@ -57,7 +63,7 @@
 
 <script setup>
 import { computed, ref, onMounted, watch } from 'vue';
-import { shortenAddress } from '../../tools';
+import { shortenAddress, dateGetRange } from '../../tools';
 import { useStore } from 'vuex';
 const store = useStore();
 
@@ -77,6 +83,14 @@ const userkey = computed( () => {
   return store.state.robonomicsUIvue.rws.user.key;
 });
 
+const expiration = computed( () => {
+    return store.state.robonomicsUIvue.rws.expiredate;
+});
+
+const expiresin = computed( () => {
+    return dateGetRange(expiration.value);
+});
+
 const shortennedusers = computed( () => {
     if(users.value) {
         return users.value.map(i => {
@@ -93,6 +107,13 @@ const reset = () => {
 }
 
 const savepass = () => {
+
+    if(expiresin.value > 0) {
+        status.value = 'error';
+        msg.value = 'Please, renew your subscription first';
+        return;
+    }
+
     if(!userpass.value || userpass.value === '') {
         msg.value = 'Password can not be empty';
         status.value = 'error';
@@ -147,3 +168,16 @@ onMounted( () => {
     });
 })
 </script>
+
+<style scoped>
+    .robo-hapass-line {
+        position: relative;
+        width: 100%;
+    }
+
+    .robo-hapass-line .robo-copy {
+        position: absolute;
+        right: calc(-1 * (var(--robo-font-size) + var(--robo-space) ));
+        top: calc(50% - var(--robo-font-size)/2);
+    }
+</style>

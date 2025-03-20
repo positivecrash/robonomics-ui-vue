@@ -2,10 +2,12 @@
     <div :class="classList" v-if="!timeouttrigger && !closethis">
         <span v-if="slots.left" class="robo-status-text"><slot name="left" /></span>
 
-        <robo-icon v-if="type === 'ok'" icon="circle-check" color="var(--color-accent)" />
+        <robo-icon :icon="statusIcon" color="var(--color-accent)" />
+
+        <!-- <robo-icon v-if="type === 'ok'" icon="circle-check" color="var(--color-accent)" />
         <robo-icon v-if="type === 'info'" icon="circle-info" color="var(--color-accent)" />
         <robo-icon v-if="type === 'warning'" icon="circle-exclamation" color="var(--color-accent)" />
-        <robo-icon v-if="type === 'error'" icon="circle-xmark" color="var(--color-accent)" />
+        <robo-icon v-if="type === 'error'" icon="circle-xmark" color="var(--color-accent)" /> -->
 
         <span v-if="slots.default" class="robo-status-text"><slot /></span>
 
@@ -65,6 +67,14 @@ const classList = computed (() => {
     [`robo-status--${props.type}`]: props.type,
   }
 })
+
+const statusIcon = computed( () => ({
+      'ok': 'circle-check',
+      'info': 'circle-info',
+      'warning': 'circle-exclamation',
+      'error': 'circle-xmark',
+  }[props.type] ??  null)
+);
 
 let calcGap = gap => 
   ({

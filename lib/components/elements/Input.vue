@@ -48,8 +48,7 @@
           :aria-pressed="showPasswordPressed"
           :aria-label="showPasswordPressed ? 'Hide' : 'Show'"
         >
-          <robo-icon v-if="showPasswordPressed" icon="eye-slash" />
-          <robo-icon v-else icon="eye" />
+          <robo-icon :icon="showPasswordPressed ? 'eye-slash' : 'eye'" />
         </robo-button>
 
         <robo-details v-if="tip" type="tooltip" tooltip-placement="bottom-end">
@@ -239,6 +238,7 @@ export default defineComponent({
       font-family: inherit;
       font-size: inherit;
       font-weight: bold;
+      line-height: 1.5;
       padding: var(--robo-input-padding);
       transition: 0.2s all ease;
       width: 100%;

@@ -1,66 +1,62 @@
 <template>
-    <template v-if="!users || users?.length < 1">
-        <robo-status type="warning" solid>You need to add users in the subscription first</robo-status>
-        <robo-button :router="store.state.robonomicsUIvue.rws.links.setup" size="small" block>
-            <robo-icon icon="pencil" />
-            <span>Got to setup</span>
-        </robo-button>
-    </template>
-    <form v-if="!useraccount || !userkey" @submit.prevent="signin" class="signin">
+    <robo-text v-if="checking" align="center"><robo-loader size="3" /></robo-text>
+    <template v-else>
+        <template v-if="!users || users?.length < 1">
+            <robo-status type="warning" offset="x05">No accounts found in the subscription</robo-status>
+            <robo-button :router="store.state.robonomicsUIvue.rws.links.setup" size="small" block>
+                <robo-icon icon="pencil" />
+                <span>Got to setup</span>
+            </robo-button>
+        </template>
 
-        <robo-grid gap="x025" columns="1">
-            <!-- <robo-status type="warning" solid>Please sign in with a user account first</robo-status> -->
+        <form v-if="users?.length > 0 && !userkey" @submit.prevent="signin" class="signin">
+        <!-- <form v-if="users?.length > 0 && (!useraccount || !userkey)" @submit.prevent="signin" class="signin"> -->
 
-            <robo-select 
-                v-model="useraccount"
-                @change="errormsg = null" 
-                :options="shortennedusers" 
-                :values="users" 
-                label="Select a user" 
-                block 
-            />
+            <robo-grid gap="x025" columns="1">
+                <!-- <robo-status type="warning" solid>Please sign in with a user account first</robo-status> -->
 
-            <robo-select 
-                v-model="acctype" 
-                @change="errormsg = null"
-                :options="['ed25519', 'sr25519']" 
-                :values="['ed25519', 'sr25519']" 
-                label="Type of account" 
-                block 
-            />
+                <robo-select 
+                    v-model="useraccount"
+                    @change="errormsg = null" 
+                    :options="shortennedusers" 
+                    :values="users" 
+                    label="Select a user" 
+                    block 
+                />
 
-            <robo-input-new 
-                v-model="userseed"
-                :disabled="useraccount && userkey" 
-                @input="errormsg = null"
-                type="password" 
-                placeholder="Seed phrase for encryption" 
-                label="Pass phrase" 
-                width="wide" 
-            />
-            
-            <robo-text v-if="useraccount && userkey" weight="bold" size="small">Your key has been already saved locally, you may sign in</robo-text>
-            
-            <robo-grid v-if="webcrypto" type="flex" galign="start" gap="x05" offset="x1">
-                <robo-input type="checkbox" id="keepsigned" v-model="keepsigned" /> 
-                <label for="keepsigned">Keep me signed in (only for trusted devices)</label>
+                <robo-input-new 
+                    v-model="userseed"
+                    :disabled="useraccount && userkey" 
+                    @input="errormsg = null"
+                    type="password" 
+                    placeholder="Seed phrase for encryption" 
+                    label="Pass phrase" 
+                    width="wide" 
+                />
+                
+                <robo-text v-if="useraccount && userkey" weight="bold" size="small">Your key has been already saved locally, you may sign in</robo-text>
+                
+                <robo-grid v-if="webcrypto" type="flex" galign="start" gap="x05" offset="x1">
+                    <robo-input type="checkbox" id="keepsigned" v-model="keepsigned" /> 
+                    <label for="keepsigned">Keep me signed in (only for trusted devices)</label>
+                </robo-grid>
+
+                <robo-button block>Sign in</robo-button>
+
+                <robo-status v-if="errormsg" type="error" solid>{{errormsg}}</robo-status>
             </robo-grid>
 
-            <robo-button block>Sign in</robo-button>
-
-            <robo-status v-if="errormsg" type="error" solid>{{errormsg}}</robo-status>
-        </robo-grid>
-
-    </form>
+        </form>
+    </template>
 </template>
 
 <script>
   export default { name: 'RoboRwsUserSignin' }
 </script>
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import {encodeAddress, mnemonicValidate} from "@polkadot/util-crypto"
-import { getpair } from '../../polkadot/tools'
+import { getpair } from '../polkadot/tools'
 import { shortenAddress } from '../../tools'
 import { IDBworkflow, IDBgettable, decrypt } from '../../idb'
 
@@ -83,12 +79,13 @@ const userkey = computed( () => {
   return store.state.robonomicsUIvue.rws.user.key;
 });
 
-const useraccount = ref(store.state.robonomicsUIvue.rws.user.account ?? users?.value[0]);
-const userseed = ref(null);
+const acctype = 'ed25519';
+const useraccount = ref(null); // v-model for select
+const userseed = ref(null); // v-model for input to put seed in
 const errormsg = ref(null);
 const keepsigned = ref(false);
-const acctype = ref(store.state.robonomicsUIvue.rws.user.acctype ?? 'ed25519');
 const webcrypto = ref(window.crypto.subtle || window.crypto.webkitSubtle);
+const checking = ref(false);
 
 const getinfo = async (user) => {
     let savedusers = [];
@@ -98,36 +95,36 @@ const getinfo = async (user) => {
     if(index !== -1) {
         const pair = await decrypt(savedusers[index].iv, savedusers[index].key, savedusers[index].pair);
         store.commit('rws/setUserKey', pair);
-        store.commit('rws/setUserAcctype', savedusers[index]?.type ?? null);
+    } else {
+        resetuserkey();
     }
 }
 
 const resetuser = () => {
-    store.commit('rws/setUser', null);
-    store.commit('rws/setUserKey', null);
-    store.commit('rws/setUserAcctype', null);
-
-    if(users.value.length > 0) {
-        useraccount.value = users.value[0];
-    } else {
-        useraccount.value = null;
-    }
+    store.commit('rws/removeUser');
+    checking.value = false;
+    // if(users.value.length > 0) {
+    //     useraccount.value = users.value[0];
+    // } else {
+    //     useraccount.value = null;
+    // }
 }
 
 const resetuserkey = () => {
     store.commit('rws/setUserKey', null);
-    store.commit('rws/setUserAcctype', null);
 }
 
 const checkkeys = async () => {
 
     if(users.value?.length < 1) {
         resetuser();
+        checking.value = false;
         return;
     }
 
     if(!webcrypto.value || !useraccount.value){
         resetuserkey();
+        checking.value = false;
         return;
     }
 
@@ -138,14 +135,13 @@ const checkkeys = async () => {
         /* проверка есть ли такой аккаунт в подписке */
         if(!users.value.find(i => i === useraccount.value)) {
             resetuser();
+            checking.value = false;
             return;
         }
 
-        if(!userkey.value || !acctype.value) {
-            await getinfo(useraccount.value);
-            return;
-        }
-
+        await getinfo(useraccount.value);
+        checking.value = false;
+        return;
     }
 }
 
@@ -192,7 +188,7 @@ const signin = async () => {
     }
 
     try {
-        const pair = await getpair(userseed.value, acctype.value);
+        const pair = await getpair(userseed.value, acctype);
         const addedaccount = encodeAddress(pair.publicKey);
 
         if(addedaccount !== encodeAddress(useraccount.value)) {
@@ -202,7 +198,6 @@ const signin = async () => {
 
         store.commit('rws/setUser', useraccount.value);
         store.commit('rws/setUserKey', pair);
-        store.commit('rws/setUserAcctype', acctype.value);
 
         if(webcrypto.value) {
             if(!keepsigned.value) {
@@ -224,7 +219,6 @@ const signin = async () => {
                 objtosave.iv = iv;
                 objtosave.key = key;
                 objtosave.pair = encryptedPair;
-                objtosave.type = acctype.value;
 
                 try {
                     IDBworkflow('dbrws', 1, 'dbrwsuser', 'readwrite', store => {
@@ -255,37 +249,47 @@ const signin = async () => {
 
 }
 
-onMounted( () => {
+watch(() => store.state.robonomicsUIvue.rws.user.account, v => {
+    useraccount.value = v;
+}, {immediate: true});
 
-    watch(() => store.state.robonomicsUIvue.rws.user.account, v => {
-        useraccount.value = v;
-    });
 
-    watch(() => useraccount.value, async (v) => {
+watch(() => useraccount.value, async (v) => {
 
-        if(!v) {
-            resetuser();
-            return;
+    checking.value = true;
+
+    if(!v) {
+        resetuser();
+        return;
+    }
+
+    resetuserkey();
+    await checkkeys();
+
+}, {immediate: true});
+
+
+watch(() => users.value, () =>{
+    if(!users.value.find(i => i === useraccount.value)) {
+        resetuser();
+    }
+}, {immediate: true});
+
+watch( () => userkey.value, (v) => {
+    if(v) {
+        userseed.value = null;
+    }
+}, {immediate: true});
+
+onMounted(async () => {
+    const bc = new BroadcastChannel('IDBUser');
+    bc.onmessage = async(e) => {
+        if(e.data === 'changed') {
+            await checkkeys();
         }
-
-        resetuserkey();
-        await checkkeys();
-    }, {immediate: true});
-
-
-    watch(() => users.value, () =>{
-        if(!users.value.find(i => i === useraccount.value)) {
-            resetuser();
-        }
-    });
-
-    watch( () => userkey.value, (v) => {
-        if(v) {
-            userseed.value = null;
-        }
-    });
-
+    };
 });
+
 </script>
 
 <style scoped>

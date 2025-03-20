@@ -1,19 +1,20 @@
 <template>
-    <span
-      v-if="props.icon"
-      v-bind="$attrs"
-      :class="classes"
-    >
-      <component :is="svg" />
-    </span>
+  <span
+    v-if="props.icon"
+    v-bind="$attrs"
+    :class="classes"
+    :style="styles"
+  ></span>
 </template>
 
-<script>
-  export default { name: 'RoboIcon' }
-</script>
 
 <script setup>
-import { computed, defineAsyncComponent } from 'vue'
+
+defineOptions({
+  name: 'RoboIcon'
+});
+
+import { computed } from 'vue'
 
 const props = defineProps({
   color: {
@@ -21,75 +22,65 @@ const props = defineProps({
     default: 'inherit'
   },
   icon: {
-      type: String,
-      default: null
+    type: String,
+    required: true
   },
   size: {
     type: String,
     default: 'normal',
-    validator: function (value) {
-      return ['supertiny', 'tiny', 'small', 'normal', 'medium', 'big', 'huge'].indexOf(value) !== -1;
-    }
+    validator: value => ['supertiny', 'tiny', 'small', 'normal', 'medium', 'big', 'huge'].includes(value)
   }
 })
 
-const classes = computed ( () => {
-  return {
-    [`robo-icon`]: true,
-    [`robo-icon--size-${props.size}`]: props.size,
-  }
-})
+const classes = computed(() => ({
+  'robo-icon': true,
+  [`robo-icon--size-${props.size}`]: props.size,
+  [`robo-icon--${props.icon}`]: props.icon, // Позволяет кастомные стили для каждой иконки
+}))
 
-const iconColor = computed( () => {
-  return props.color
-})
+const styles = computed(() => ({
+  '--icon-color': props.color,
+  '--icon-size': calcIconSize(props.size),
+  '--icon-content': `var(--icon-${props.icon})`
+}))
 
 const calcIconSize = icon => ({
-    'supertiny': 'calc(var(--robo-font-size) * 0.4)',
-    'tiny': 'calc(var(--robo-font-size) * 0.6)',
-    'small': 'calc(var(--robo-font-size) * 0.8)',
-    'normal': 'inherit',
-    'medium': 'calc(var(--robo-font-size) * 1.5)',
-    'big': 'calc(var(--robo-font-size) * 3)',
-    'huge': 'calc(var(--robo-font-size) * 6)'
+  'supertiny': 'calc(var(--robo-font-size) * 0.4)',
+  'tiny': 'calc(var(--robo-font-size) * 0.6)',
+  'small': 'calc(var(--robo-font-size) * 0.8)',
+  'normal': 'inherit',
+  'medium': 'calc(var(--robo-font-size) * 1.5)',
+  'big': 'calc(var(--robo-font-size) * 3)',
+  'huge': 'calc(var(--robo-font-size) * 6)'
 }[icon] ?? 'inherit')
-
-const iconSize = computed( () => {
-  return calcIconSize(props.size)
-})
-
-let svg = defineAsyncComponent(() =>
-  import(`../../icons/${props.icon}.vue`)
-)
-/* - Get svg of icon */
-
 </script>
 
 <style>
-  .robo-icon svg {
-    box-sizing: content-box;
-    height: 1em;
-    overflow: visible;
-    vertical-align: middle;
-  }
 
-  .robo-icon svg path {
-    fill: currentColor
-  }
-</style>
+@import '/lib/styles/icons.css';
 
-<style scoped>
-  .robo-icon {
-    --icon-color: v-bind(iconColor);
-    --icon-size: v-bind(iconSize);
+@font-face {
+  font-family: 'custom-icons';
+  src: url('/lib/iconfonts/icons.woff2') format('woff2'),
+       url('/lib/iconfonts/icons.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
 
-    color: var(--icon-color);
-    font-size: var(--icon-size);
-  }
+.robo-icon {
+  font-family: 'custom-icons';
+  font-style: normal;
+  font-size: var(--icon-size, inherit);
+  color: var(--icon-color, inherit);
+  display: inline-block;
+  line-height: 1;
+  vertical-align: middle;
+}
 
-  .robo-icon, .robo-icon svg {
-    display: inline-block;
-    line-height: 1;
-    vertical-align: middle;
-  }
+.robo-icon::before {
+  content: var(--icon-content, '');
+  display: block;
+  font-variant: normal;
+  text-transform: none;
+}
 </style>

@@ -97,7 +97,6 @@ export default defineComponent({
         }
       },
       set(value) {
-        console.log('value',value)
         this.$emit('update:modelValue', value)
       }
     },

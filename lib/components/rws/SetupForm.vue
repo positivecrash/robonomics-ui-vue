@@ -2,6 +2,8 @@
 
     <robo-grid gap="x05" columns="1">
 
+        <robo-polkadot-network-select clean size="large" icon />
+
         <div class="generativeline">
             <robo-input-new
                 v-model="name"
@@ -35,7 +37,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
-import { isValidAddress } from '../../polkadot/tools';
+import { isValidAddress } from '../polkadot/tools';
 import { generateName } from '../../tools';
 const store = useStore();
 const router = useRouter();
@@ -49,19 +51,31 @@ const createname = () => {
 };
 
 const addSubscription = () => {
+    msg.value = null;
 
-    if( !isValidAddress(owner.value) ) {
+    if (!isValidAddress(owner.value)) {
         msg.value = 'Owner address is not valid';
         return;
     }
 
-    if(name.value === '') {
-        msg.value = 'Name of setup is required';
-        return;
-    }
+    const generatedName = name.value && name.value.trim() !== '' ? name.value.trim() : generateName();
+    
+    const setupData = {
+        owner: owner.value,
+        name: generatedName,
+        network: store.state.robonomicsUIvue.polkadot.connection.network,
+    };
 
-    store.dispatch('rws/add', { name: name.value, owner: owner.value });
-    router.push({path: store.state.robonomicsUIvue.rws.links.setup });
+    store.dispatch('rws/addSetup', setupData).then((result) => {
+        if (result.success) {
+            router.push({ path: store.state.robonomicsUIvue.rws.links.setup });
+        } else {
+            msg.value = result.error || 'Something went wrong while adding the setup';
+        }
+    }).catch((error) => {
+        msg.value = 'Unexpected error: ' + error.message;
+        console.error(error);
+    });
 };
 
 </script>

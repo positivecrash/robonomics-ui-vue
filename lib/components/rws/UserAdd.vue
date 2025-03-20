@@ -30,8 +30,9 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { isValidAddress } from '../../polkadot/tools'
+import { isValidAddress } from '../polkadot/tools'
 import { encodeAddress } from '@polkadot/keyring'
+import { dateGetRange } from '../../tools'
 
 import { useStore } from 'vuex';
 const store = useStore();
@@ -46,6 +47,14 @@ const users = computed( () => {
     return store.state.robonomicsUIvue?.rws?.users;
 });
 
+const expiration = computed( () => {
+    return store.state.robonomicsUIvue.rws.expiredate;
+});
+
+const expiresin = computed( () => {
+    return dateGetRange(expiration.value);
+});
+
 const add = (st, msg) => {
     status.value = st ?? 'init';
     message.value = msg ?? null;
@@ -56,6 +65,12 @@ const adduser = () => {
     message.value = null;
 
     try{
+        if(expiresin.value > 0) {
+            status.value = 'error';
+            message.value = 'Please, renew your subscription first';
+            return;
+        }
+
         if( useraddress.value && useraddress.value != '' && isValidAddress(useraddress.value) ) {
             useraddress.value = encodeAddress(useraddress.value, 32);
 

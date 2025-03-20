@@ -2,7 +2,6 @@
     <robo-select
         v-if="rwslist.length > 1"
         block
-        size="small"
         :options="rwslistNames" 
         :values="rwslistOwners" 
         v-model="rwsactiveModel" 
@@ -10,6 +9,8 @@
         class="selectrws"
         offset="x05"
     />
+    <robo-text v-if="rwslist.length === 1" weight="bold" title="5" offset="x05">{{rwslist[0].name}}</robo-text>
+    <!-- <template v-if="rwslist.length < 1">No setups</template> -->
 </template>
 
 <script>
@@ -26,7 +27,9 @@
     const rwsactiveModel = ref(null);
 
     const rwslist = computed( () => {
-        return store.state.robonomicsUIvue.rws.list;
+        const currentNetwork = store.state.robonomicsUIvue.polkadot.connection.network;
+        return store.state.robonomicsUIvue.rws.list.filter(item => item.network === currentNetwork);
+        // return store.state.robonomicsUIvue.rws.list;
     });
 
     const activerwsowner = computed( ()=> {
@@ -54,7 +57,7 @@
     });
 
     const setActive = () => {
-        store.commit('rws/setActive', rwsactiveModel.value);
+        store.commit('rws/changeActiveSetup', rwsactiveModel.value);
 
         /* force reload for all pages, in case of something sensible need to be updated only on reload */
         router.go();
@@ -65,7 +68,7 @@
     };
 
     onMounted( () => {
-        store.dispatch('rws/getActive');
+        // store.dispatch('rws/getActive');
         rwsactiveModel.value = store.state.robonomicsUIvue.rws.active;
     });
 

@@ -21,6 +21,9 @@ export default defineComponent({
       type: String,
       default: ''
     },
+    labelnumber: {
+      type: Number,
+    }
   },
 
   computed: {
@@ -39,6 +42,7 @@ export default defineComponent({
     onBeforeMount(() => {
       addTab({
         label: props.label,
+        labelnumber: props.labelnumber,
       })
     })
 

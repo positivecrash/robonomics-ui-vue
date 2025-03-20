@@ -54,8 +54,8 @@ const userkey = computed( () => {
 
 const deleteuser = address => {
 
-    IDBworkflow('dbrws', 1, 'dbrwsuser', 'readwrite', store => {
-            const request = store.delete(address)
+    IDBworkflow('dbrws', 1, 'dbrwsuser', 'readwrite', dbstore => {
+            const request = dbstore.delete(address)
 
             request.onsuccess = () => {
                 const bc = new BroadcastChannel('IDBUser');

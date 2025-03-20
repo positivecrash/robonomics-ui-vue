@@ -21,19 +21,10 @@
 }
 
 @keyframes Blink {
-	0% {
-		opacity: 100%;
-	}
-	25% {
-		opacity: 30%;
+	0%, 100% {
+		opacity: 1;
 	}
 	50% {
-		opacity: 100%;
-	}
-	75% {
-		opacity: 30%;
-	}
-	100% {
-		opacity: 100%;
+		opacity: 0.3;
 	}
 }

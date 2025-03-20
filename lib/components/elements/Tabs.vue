@@ -2,6 +2,7 @@
     <div :class="classList">
 
       <div
+        class="tablist"
         role="tablist" 
         aria-labelledby="tablist"
         v-if="tabs"
@@ -13,12 +14,15 @@
 
           clean
           :type="tab.active ? 'ok' : 'dark'"
+          size="small"
+          class="tab"
 
           role="tab" 
           :aria-selected="tab.active" 
           :aria-controls="`tabpanel-${i}`"
         >
           {{tab.label}}
+          <span v-if="tab.labelnumber" class="tablabel">{{tab.labelnumber}}</span>
         </robo-button>
       </div>
 
@@ -89,6 +93,31 @@ div[role="tablist"] .robo-button {
 
 div[role="tablist"] .robo-button:last-child {
   margin-right: 0;
+}
+
+.tablist {
+  margin-bottom: var(--robo-space);
+  line-height: 1.8;
+}
+
+.tab {
+  position: relative;
+}
+
+.tablabel {
+  background-color: var(--robo-button-background);
+  color: var(--robo-color-light);
+  font-weight: bold;
+  font-size: 70%;
+  width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: -8px;
+  right: -17px;
 }
 
 </style>

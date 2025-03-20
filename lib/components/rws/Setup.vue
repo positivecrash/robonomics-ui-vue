@@ -4,13 +4,18 @@
         <robo-text title="3" offset="x1">Saved subscription setups</robo-text>
 
         <robo-section offset="x1">
-            <robo-text size="small" offset="x025" v-if="rws?.length > 1">Setup</robo-text>
+            <robo-text size="small" offset="x025" v-if="rws?.length > 1">Added setups</robo-text>
             <robo-rws-setup-active-select />
 
-            <robo-text size="small" offset="x025">Polkadot Ecosystem account
-              <span v-if="store.state.robonomicsUIvue.polkadot.address && rwsEndDate">(<template v-if="isAdmin">admin role</template>
-            <template v-if="!isAdmin && isUser">user role</template>
-            <template v-if="!isAdmin && !isUser">not added</template>)</span>
+            <robo-text size="small" offset="x025">
+              <template v-if="store.state.robonomicsUIvue.polkadot.connection.network"><span class="networkname">{{store.state.robonomicsUIvue.polkadot.connection.network}}</span> Network Connected</template>
+              <template v-if="store.state.robonomicsUIvue.polkadot.connection.network && store.state.robonomicsUIvue.polkadot.address && rwsEndDate">, </template>
+              <template v-if="store.state.robonomicsUIvue.polkadot.address && rwsEndDate">
+                Account connected 
+                (<b v-if="isAdmin">Admin</b>
+                <b v-if="!isAdmin && isUser">as User</b>
+                <template v-if="!isAdmin && !isUser">not added</template>)
+              </template>
             </robo-text> 
             <robo-account-polkadot
                 short 
@@ -19,6 +24,7 @@
                 selectable
                 selectstyle
                 selectblock
+                :selecttitle="store.state.robonomicsUIvue.polkadot.address ? 'Switch a network' : 'Connect an account / Switch a network'"
             />
         </robo-section>
     
@@ -29,7 +35,6 @@
                 :onUserDelete="onUserDelete" 
                 :onUserAdd="onUserAdd" 
                 :onControllerEdit="onControllerEdit"
-                :onControllerRequest="onControllerRequest"
               />
             </robo-section>
         </robo-section>
@@ -40,8 +45,16 @@
         </robo-section>
       </robo-section>
     </template>
+
     <template v-else>
-        <robo-status type="warning" solid>You haven't added any setups yet</robo-status>
+        <robo-section width="narrow" gcenter>
+          <robo-text size="small" weight="bold" offset="x05">You haven't added any setups yet</robo-text>
+          <robo-button 
+              v-if="store.state.robonomicsUIvue.rws.links.setupnew" 
+              :router="store.state.robonomicsUIvue.rws.links.setupnew" 
+              iconleft="rss">Add a setup
+          </robo-button>
+        </robo-section>
     </template>
 </template>
 
@@ -51,7 +64,7 @@
 
 <script setup>
 import { computed, ref, onMounted, watch } from 'vue';
-import { isAccountsIdentical } from '../../polkadot/tools';
+import { isAccountsIdentical } from '../polkadot/tools';
 import { useStore } from 'vuex';
 const store = useStore();
 
@@ -102,9 +115,10 @@ const isUser = computed ( () => {
 });
 
 const labeledusers = computed(() => {
-    store.dispatch('rws/findrws', active.value).then(index => {
-        return rws.value[index].users
-    })
+  const index = store.dispatch('rws/findSetupIndex', active.value);
+  if (index !== -1) {
+    return rws.value[index].users;
+  }
 })
 
 const rwsuser = computed( () => {
@@ -116,52 +130,16 @@ const rwsEndDate = computed( () => {
   return store.state.robonomicsUIvue.rws.expiredate;
 });
 
-let rwsnotempty = ref(false)
+const rwsnotempty = computed(() => {
+    const currentNetwork = store.state.robonomicsUIvue.polkadot.connection.network;
+    const activeSetup = store.state.robonomicsUIvue.rws.list.find(rws => 
+        rws.owner === store.state.robonomicsUIvue.rws.active && rws.network === currentNetwork
+    );
+    return activeSetup && activeSetup.owner && activeSetup.controller;
+});
 
-let isrwsempty = () => {
-    store.dispatch('rws/findrws', active.value).then(index => {
-        if(index > -1 && rws.value[index].owner!=="" && rws.value[index].controller!=="") {
-            rwsnotempty.value = true
-        } else {
-            rwsnotempty.value = false
-        }
-    })
-}
-
-const errormsg = ref(null)
-const upload = uploaded => {
-
-  errormsg.value = null
-
-  store.dispatch('rws/import', uploaded).then( e => {
-    if(e) {
-      router.push(store.state.robonomicsUIvue.rws.links.setup)
-    } else {
-      errormsg.value = 'Something went wrong while uploading'
-    }
-  })
-}
-
-const noSetupForActive = computed( () => {
-  if(rws.value.findIndex(item => item.owner === active.value) === -1) {
-    return true
-  } else {
-    return false
-  } 
-})
-
-onMounted( () => {
-  window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-    isrwsempty()
-
-    watch(rws.value, () => {
-        isrwsempty();
-    })
-
-    watch(() => active.value, () => {
-        isrwsempty();
-    })
-
-})
+onMounted(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+});
 
 </script>
