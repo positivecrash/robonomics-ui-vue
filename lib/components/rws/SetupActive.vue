@@ -144,8 +144,8 @@
         }
     });
 
-    const setActive = () => {
-        store.commit('rws/changeActiveSetup', rwsactiveModel.value);
+    const setActive = async () => {
+        await store.dispatch('rws/changeActiveSetup', rwsactiveModel.value);
 
         /* force reload for all pages, in case of something sensible need to be updated only on reload */
         router.go();

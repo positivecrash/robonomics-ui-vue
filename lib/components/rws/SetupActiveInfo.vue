@@ -382,46 +382,44 @@
     const handleController = (newcontroller, newcontrollerkey, saveCallback) => {
         // общий метод для сохранения через инпут и генерации нового контроллера
 
-        if(expiresin.value > 0) {
+        if(!isValidAddress(newcontroller)) {
             gencontrollerstatus.value = 'error';
-            gencontrollermsg.value = 'Please, renew subscription first';
-            return;
-        }
-
-        if(isValidAddress(newcontroller)) {
-            // проверяем валидность самого адреса (к сожалению тип шифрования без подписи проверить не можем, только формат)
-
-            if(isInUserList(newcontroller)) {
-                // если контроллер уже в списке юзеров, то сохраняем локально в сетапе дапп
-                savecontroller(
-                    newcontroller, 
-                    newcontrollerkey, 
-                    'ok', 
-                    'Controller setup locally in dapp. Make sure this account used as a controller in Home Assistant integration.', 
-                    saveCallback
-                );
-            } else {
-                // если контроллера нет в списке юзеров, то проверяем есть ли права на запись в чейн (подключен ли админский аккаунт)
-                if(isAdmin.value) {
+            gencontrollermsg.value = 'Please, enter valid address for an account in ' + network.value + ' network';
+        } else {
+            // если подключен владелец подписки, то нам нужно добавить контроллер не только в настройки даппа, но и в список юзеров
+            if(isAdmin.value) {
+                if(!expiresin.value) {
+                    gencontrollerstatus.value = 'error';
+                    gencontrollermsg.value = 'Please, activate a subscription first';
+                }
+                else if(expiresin.value > 0) {
+                    gencontrollerstatus.value = 'error';
+                    gencontrollermsg.value = 'Please, renew subscription first';
+                }
+                else {
+                    // если с подпиской все в порядке, пробуем сохранить адрес контроллера в список юзеров
                     emit('onControllerEdit', 
                         newcontroller, 
                         (status, message) => savecontroller(newcontroller, newcontrollerkey, status, message, saveCallback)
                     );
-                } else {
-                    // если не админ, то выдаем ошибку
-                    gencontrollerstatus.value = 'error';
-                    gencontrollermsg.value = 'Controller should be in the User list of subscription (request from Admin)';
-                    if(saveCallback) {
-                        saveCallback(gencontrollerstatus.value, gencontrollermsg.value);
-                    }
                 }
             }
-        } else {
-            gencontrollerstatus.value = 'error';
-            gencontrollermsg.value = 'Invalid account address';
-            if(saveCallback) {
-                saveCallback(gencontrollerstatus.value, gencontrollermsg.value);
+
+            // сохраняем контроллер локально в даппе
+            // если он уже в списке юзеров или подключен не админ (например юзер просто вручную меняет адрес)
+            if(isInUserList(newcontroller) || !isAdmin.value) {
+                savecontroller(
+                    newcontroller, 
+                    newcontrollerkey, 
+                    'ok', 
+                    'Controller setup saved locally in dapp. Make sure this account has been added as a user in the subscription and is used as a controller in Home Assistant integration.', 
+                    saveCallback
+                );
             }
+        }
+
+        if(saveCallback) {
+            saveCallback(gencontrollerstatus.value, gencontrollermsg.value);
         }
     }
 

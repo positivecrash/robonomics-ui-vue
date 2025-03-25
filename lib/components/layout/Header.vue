@@ -5,31 +5,6 @@
 
       <robo-grid type="flex" gap="x05" valign="center">
         <a v-if="logoIcon" :href="mainhost" class="robo-layout-header-logo"><img :src="logoIcon" /></a>
-        
-        <!-- <div class="connection" :class="(libp2p === null && parachain === null) ? 'waiting' : 'connected' ">
-          <robo-text size="small" weight="bold">
-            <template v-if="libp2p === null && parachain === null">
-              connecting
-            </template>
-             <template v-else>
-              connected
-            </template>
-          </robo-text>
-          <robo-text size="tiny">
-            <template v-if="libp2p && !parachain">
-              libp2p
-            </template>
-            <template v-if="!libp2p && parachain && network">
-              {{network}}
-            </template>
-          </robo-text>
-          <robo-text size="tiny">
-            <template v-if="relay">
-              via relay
-            </template>
-          </robo-text>
-        </div> -->
-
       </robo-grid>
   
       <robo-text size="small" class="robo-header-subselect">

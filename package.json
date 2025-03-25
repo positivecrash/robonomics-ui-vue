@@ -1,16 +1,14 @@
 {
   "name": "robonomics-ui-vue",
+  "type": "module",
+  "version": "0.6.2",
   "main": "index.js",
   "module": "index.es.js",
   "private": false,
-  "version": "0.5.2-beta.5",
   "scripts": {
-    "test-clear": "rimraf /Users/nicetea/Projects/Airalab/Frontend/robonomics-app/node_modules/robonomics-ui-vue/*.js && rimraf /Users/nicetea/Projects/Airalab/Frontend/robonomics-app/node_modules/robonomics-ui-vue/*.css && rimraf /Users/nicetea/Projects/Airalab/Frontend/robonomics-app/node_modules/robonomics-ui-vue/package.json",
-    "package-copy": "cp /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue/package.json /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue/dist",
-    "test-copy": "cp -R /Users/nicetea/Projects/Airalab/Frontend/robonomics-ui-vue/dist/ /Users/nicetea/Projects/Airalab/Frontend/robonomics-app/node_modules/robonomics-ui-vue/",
+    "build": "node ./build.prod.js",
+    "build-dev": "node ./build.dev.js",
     "dev": "vite",
-    "build": "vite build && yarn package-copy",
-    "build-test": "vite build && yarn package-copy && yarn test-clear && yarn test-copy",
     "preview": "vite preview"
   },
   "dependencies": {
