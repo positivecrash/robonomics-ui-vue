@@ -569,20 +569,16 @@
     const blinkContent = ref(true);
 
     onMounted( () => {
-        watch(() => blinkContent.value, v => {
-            if(v) {
-                setTimeout(() => {
-                    blinkContent.value = false;
-                }, 6000);
-            }
-        }, {immediate: true});
-
-        watch(() => active.value, () => {
-            localname.value = activename.value;
-            blinkContent.value = true;
-            checkcontroller();
-        }, { immediate: true });
-
+        watch(
+            [() => active.value, () => controller.value, () => users.value],
+            ([newActive, newController, newUsers], [oldActive, oldController, oldUsers]) => {
+                if (newActive !== oldActive) {
+                    localname.value = activename.value;
+                }
+                checkcontroller();
+            },
+            { immediate: true }
+        );
     });
     
 

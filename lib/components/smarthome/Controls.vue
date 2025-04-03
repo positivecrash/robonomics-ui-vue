@@ -92,6 +92,7 @@
                 </robo-button>
 
               </robo-grid>
+              <robo-text v-else size="small" highlight="error">Controller not found</robo-text>
 
               <robo-grid v-if="useraccount && userkey" type="flex" gap="x025" valign="center">
                 <robo-text size="small">User: {{shortenAddress(useraccount)}}</robo-text>
@@ -111,6 +112,10 @@
                   <robo-icon icon="arrow-up-right-from-square" />
                 </robo-button>
               </robo-grid>
+              <robo-text v-else size="small" highlight="error">
+                <template v-if="!useraccount">User not found</template>
+                <template v-if="!userkey">You need to login first</template>
+              </robo-text>
             </robo-grid>
           </robo-details>
 
