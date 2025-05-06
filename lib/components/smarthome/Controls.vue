@@ -219,7 +219,7 @@ const userkey = computed( () => {
 });
 
 const controller = computed( () => {
-  return rwslist.value[active.value].controller;
+  return rwslist.value[active.value].controller.address;
 });
 
 const expiration = computed( () => {
@@ -275,7 +275,10 @@ watch( () => store.state.robonomicsUIvue.polkadot.connection.network, v => {
 
 /* + Checks */
 const checkuser = user => {
-  return activeusers?.value.find(u => u.address === user);
+  if(activeusers.value) {
+    return activeusers.value.find(u => u.address === user);
+  }
+  return false;
 }
 
 const logout = () => {

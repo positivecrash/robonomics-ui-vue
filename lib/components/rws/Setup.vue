@@ -135,7 +135,7 @@ const rwsnotempty = computed(() => {
     const activeSetup = store.state.robonomicsUIvue.rws.list.find(rws => 
         rws.owner === store.state.robonomicsUIvue.rws.active && rws.network === currentNetwork
     );
-    return activeSetup && activeSetup.owner && activeSetup.controller;
+    return activeSetup && activeSetup.owner && activeSetup.controller.address;
 });
 
 onMounted(() => {

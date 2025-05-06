@@ -9,12 +9,10 @@
             </robo-button>
         </template>
 
-        <form v-if="users?.length > 0 && !userkey" @submit.prevent="signin" class="signin">
-        <!-- <form v-if="users?.length > 0 && (!useraccount || !userkey)" @submit.prevent="signin" class="signin"> -->
+        <!-- <form v-if="users?.length > 0 && !userkey" @submit.prevent="signin" class="signin"> -->
+        <form v-if="users?.length > 0 && (!useraccount || !userkey)" @submit.prevent="signin" class="signin">
 
             <robo-grid gap="x025" columns="1">
-                <!-- <robo-status type="warning" solid>Please sign in with a user account first</robo-status> -->
-
                 <robo-select 
                     v-model="useraccount"
                     @change="errormsg = null" 
@@ -64,7 +62,7 @@ import { useStore } from 'vuex';
 const store = useStore();
 
 const users = computed( () => {
-    return store.state.robonomicsUIvue.rws.users;
+    return store.state.robonomicsUIvue.rws?.users;
 });
 
 const shortennedusers = computed( () => {
@@ -88,6 +86,7 @@ const webcrypto = ref(window.crypto.subtle || window.crypto.webkitSubtle);
 const checking = ref(false);
 
 const getinfo = async (user) => {
+
     let savedusers = [];
     savedusers = await IDBgettable('dbrws', 1, 'dbrwsuser', {index: 'user', autoIncrement: false}, [{index: 'user', unique: true}]);
     const index = savedusers.findIndex(i => i.user === user);
@@ -253,7 +252,6 @@ watch(() => store.state.robonomicsUIvue.rws.user.account, v => {
     useraccount.value = v;
 }, {immediate: true});
 
-
 watch(() => useraccount.value, async (v) => {
 
     checking.value = true;
@@ -269,8 +267,8 @@ watch(() => useraccount.value, async (v) => {
 }, {immediate: true});
 
 
-watch(() => users.value, () =>{
-    if(!users.value.find(i => i === useraccount.value)) {
+watch(() => users.value, v => {
+    if(!v || !v.find(i => i === useraccount.value)) {
         resetuser();
     }
 }, {immediate: true});

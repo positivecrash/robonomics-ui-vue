@@ -97,11 +97,15 @@ const userlabel = ref('');
 
 const rws = computed( () => {
   return store.state.robonomicsUIvue.rws.list;
-})
+});
 
 const active = computed( () => {
   return store.state.robonomicsUIvue.rws.active;
-})
+});
+
+const users = computed( () => {
+    return store.state.robonomicsUIvue.rws.users
+});
 
 const labeledit = (save) => {
 
@@ -132,7 +136,7 @@ const initlabel = async () => {
     }
 };
 
-watch(() => active.value, () => {
+watch([() => active.value, () => users.value], () => {
     initlabel();
 }, { immediate: true });
 /* - LABEL */

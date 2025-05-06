@@ -211,6 +211,7 @@
     const store = useStore();
     import { shortenAddress, dateGetString, dateGetRange, formatFileName, downloadJson, setStatusView } from '../../tools';
     import { isAccountsIdentical, isValidAddress } from '../polkadot/tools';
+    import { backupTemplate } from '../../backupTemplate';
 
     const props = defineProps({
         onUserDelete: {
@@ -267,19 +268,19 @@
 
     /* + CURRENT SUBSCRIPTION INFO */
     const activecontrollerkey = computed( () => {
-        return rwslist.value[active.value].controllerkey;
+        return rwslist.value[active.value]?.controller?.private || null;
     });
 
     const activename = computed( () => {
-        return rwslist.value[active.value].name;
+        return rwslist.value[active.value]?.name || null;
     });
 
     const activeowner = computed( () => {
-        return rwslist.value[active.value].owner;
+        return rwslist.value[active.value]?.owner || null;
     });
 
     const activecontroller = computed( () => {
-        return rwslist.value[active.value].controller;
+        return rwslist.value[active.value]?.controller?.address || null;
     });
 
     /* юзеры подписки с локальными лейблами */
@@ -335,7 +336,7 @@
     }
 
     /* + CONTROLLER */
-    const controller = ref(rwslist.value[active.value].controller);
+    const controller = ref(rwslist.value[active.value].controller.address);
     const gencontrollerstatus = ref(null);
     const gencontrollermsg = ref(null);
 
@@ -466,7 +467,7 @@
     var userschangedcount = 0;
 
     watch(() => users.value, (newValue, oldValue) => {
-        
+
         store.dispatch('rws/updateUserList', newValue);
 
         if(userschangedcount > 1 && JSON.stringify(toRaw(newValue)) !== JSON.stringify(toRaw(oldValue))) {
@@ -501,65 +502,97 @@
     const pinataprivate = ref(null);
 
     const downloadbackup = () => {
-        let bccontent = {};
-        let filename = formatFileName(activename.value || 'subscription');
+        // Создаем копию шаблона
+        const backupData = { ...backupTemplate };
 
-        if(store.state.robonomicsUIvue.polkadot.connection.network) {
-            bccontent.network = store.state.robonomicsUIvue.polkadot.connection.network;
-        }
+        // Заполняем поля из наших значений. Если значение отсутствует, оставляем пустую строку.
+        backupData.owner = activeowner.value ? String(activeowner.value).trim() : "";
+        backupData.name = activename.value ? String(activename.value).trim() : "";
+        backupData.network = network.value ? String(network.value).trim() : "";
 
-        if(bcname.value && activename.value) {
-            bccontent.name = activename.value.trim();
-        }
+        backupData.controller.address = activecontroller.value
+            ? String(activecontroller.value).trim()
+            : "";
+        // Преобразуем объект ключа контроллера в строку JSON, если он задан
+        backupData.controller.private = activecontrollerkey.value
+            ? JSON.stringify(activecontrollerkey.value).trim()
+            : "";
 
-        if(bcowner.value && activeowner.value) {
-            bccontent.owner = activeowner.value.trim();
-        }
+        backupData.datalog.interval = messaging.value
+            ? String(messaging.value).trim()
+            : "";
 
-        if(bccontroller.value && activecontroller.value) {
-            bccontent.controller = activecontroller.value.trim();
-        }
+        // Обработка IPFS-шлюза: пробуем разобрать URL и порт, если задан
+        // if (ipfsgate.value) {
+        //     try {
+        //     const urlObj = new URL(String(ipfsgate.value).trim());
+        //     backupData.ipfs.url = urlObj.hostname || "";
+        //     backupData.ipfs.port = urlObj.port || "";
+        //     } catch (e) {
+        //     backupData.ipfs.url = String(ipfsgate.value).trim();
+        //     backupData.ipfs.port = "";
+        //     }
+        // }
+        // Обработка IPFS-шлюза: пробуем разобрать URL и порт, если задан
+        if (ipfsgate.value) {
 
-        if(bcusers.value && activeuserslabeled.value.length > 0) {
-            bccontent.users = activeuserslabeled.value;
-        }
+            // 1) приводим к строке, убираем пробелы и убираем слэш(и) на конце
+            const raw = String(ipfsgate.value).trim().replace(/\/+$/, '');
+            let hostname = '';
+            let port = '';
 
-        if(bccontrollerkey.value && activecontrollerkey.value) {
-            bccontent.controllerkey = activecontrollerkey.value;
-        }
+            try {
+                // 2) если протокол не указан, подставляем http:// чтобы URL-API его принял
+                const withProto = /^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//.test(raw)
+                ? raw
+                : `http://${raw}`;
 
-        if(bcmessaging.value && messaging.value) {
-            bccontent.messaging = messaging.value.trim();
-        }
+                // 3) парсим через URL
+                const urlObj = new URL(withProto);
+                hostname = urlObj.hostname; // без порта и путей
+                port = urlObj.port;         // если он есть, иначе пустая строка
 
-        if(bcipfs.value && ipfsgate.value) {
-            bccontent.ipfsgate = ipfsgate.value.trim();
-        }
-        
-        if (bcpinata.value) {
-            const pinataKeys = {};
-            if (pinatapublic.value) pinataKeys.public = pinatapublic.value.trim();
-            if (pinataprivate.value) pinataKeys.private = pinataprivate.value.trim();
-            if (Object.keys(pinataKeys).length > 0) {
-                bccontent.pinata = pinataKeys;
+            } catch (e) {
+                    // 4) в случае, если URL всё же не получилось распарсить (неверный формат),
+                    //    пробуем вручную: разбиваем по последнему двоеточию
+                    const idx = raw.lastIndexOf(':');
+                    if (idx > 0 && raw.indexOf(':') === idx) {
+                    hostname = raw.slice(0, idx);
+                    port = raw.slice(idx + 1);
+                } else {
+                    // просто домен/хост
+                    hostname = raw;
+                    port = '';
+                }
             }
+
+            backupData.ipfs.url = hostname;
+            backupData.ipfs.port = port;
         }
 
-        if (Object.keys(bccontent).length === 0) {
-            console.warn('Backup content is empty. No data to save.');
-            return;
+
+        backupData.pinata.public = pinatapublic.value
+            ? String(pinatapublic.value).trim()
+            : "";
+        backupData.pinata.private = pinataprivate.value
+            ? String(pinataprivate.value).trim()
+            : "";
+
+        // Формируем массив пользователей с полями address и label.
+        if (Array.isArray(activeuserslabeled.value)) {
+            backupData.users = activeuserslabeled.value.map(user => ({
+                address: user.address ? String(user.address).trim() : "",
+                label: user.label ? String(user.label).trim() : ""
+            }));
+        } else {
+            backupData.users = [];
         }
 
-        // Сортируем bccontent по алфавиту
-        const sortedBcContent = Object.keys(bccontent)
-            .sort()
-            .reduce((acc, key) => {
-                acc[key] = bccontent[key];
-                return acc;
-            }, {});
+        // Вызываем функцию для скачивания JSON-файла, используя форматированное имя файла.
+        downloadJson(backupData, formatFileName(activename.value || "subscription"));
+    };
 
-        downloadJson(sortedBcContent, filename);
-    }
+
     /* - BACKUP */
 
     const removesetup = () => {
