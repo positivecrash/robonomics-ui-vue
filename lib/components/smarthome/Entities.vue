@@ -19,6 +19,11 @@
                 :key="device.id"
                 class="masonry-item"
               >
+
+              <template v-if="device?.model === 'Altruist Sensor'">
+                <robo-smarthome-device-altruist :devicedata="device" :datalog="datalog" />
+              </template>
+              <template v-else>
                 <robo-section card shadow>
                   <robo-section>
                     <robo-text class="device-title" title="5">{{ device.name }}</robo-text>
@@ -47,6 +52,7 @@
                     </robo-grid>
                   </details>
                 </robo-section>
+              </template>
               </div>
             </div>
           </div>
@@ -88,21 +94,34 @@
               class="masonry-column"
             >
               <div v-for="device in column" :key="device.id" class="masonry-item">
-                <robo-section card shadow>
-                  <robo-section>
-                    <robo-text class="device-title" title="5">{{ device.name }}</robo-text>
-                    <robo-grid class="device-content" :columns="1" gap="x1" offset="x1">
-                      <!-- В режиме Area currentCategory отсутствует -->
-                      <robo-smarthome-entity
-                        v-for="(entData, entID) in sortedEntities(device.entities, null)"
-                        :key="entID"
-                        :entityID="entID"
-                        :entityData="entData"
-                        :services="services[entID.split('.')[0]]"
-                      />
-                    </robo-grid>
+                
+                <template v-if="device?.model === 'Altruist Sensor' || device?.model === 'Robonomics-1L-Switch'">
+                  <robo-smarthome-device-altruist 
+                    v-if="device?.model === 'Altruist Sensor'"
+                    :devicedata="device" :datalog="datalog" />
+
+                  <robo-smarthome-device-roboswitch1 
+                    v-if="device?.model === 'Robonomics-1L-Switch'"
+                    :devicedata="device" :datalog="datalog" />
+                </template>
+
+                <template v-else>
+                  <robo-section card shadow>
+                    <robo-section>
+                      <robo-text class="device-title" title="5">{{ device.name }}</robo-text>
+                      <robo-grid class="device-content" :columns="1" gap="x1" offset="x1">
+                        <!-- В режиме Area currentCategory отсутствует -->
+                        <robo-smarthome-entity
+                          v-for="(entData, entID) in sortedEntities(device.entities, null)"
+                          :key="entID"
+                          :entityID="entID"
+                          :entityData="entData"
+                          :services="services[entID.split('.')[0]]"
+                        />
+                      </robo-grid>
+                    </robo-section>
                   </robo-section>
-                </robo-section>
+                </template>
               </div>
             </div>
           </div>

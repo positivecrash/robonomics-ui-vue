@@ -1,7 +1,7 @@
 {
   "name": "robonomics-ui-vue",
   "type": "module",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "main": "index.js",
   "module": "index.es.js",
   "private": false,
@@ -16,7 +16,10 @@
     "@polkadot/ui-keyring": "^3.6.4",
     "@polkadot/util": "^12.6.2",
     "@polkadot/util-crypto": "^12.6.2",
+    "date-fns": "^4.1.0",
     "file-saver": "^2.0.5",
+    "highcharts": "^12.2.0",
+    "highcharts-vue": "^2.0.1",
     "mipd": "^0.0.7",
     "vue-router": "^4.2.5",
     "vuex": "^4.1.0"

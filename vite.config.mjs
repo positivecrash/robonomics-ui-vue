@@ -149,6 +149,8 @@ export default defineConfig({
         '@polkadot/util-crypto',
         '@polkadot/util',
         'mipd',
+        'highcharts',
+        'highcharts-vue'
       ],
       output: {
         globals: {

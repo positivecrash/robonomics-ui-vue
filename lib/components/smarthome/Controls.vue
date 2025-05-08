@@ -339,6 +339,7 @@ watch(() => props.datalog, v => {
 const sortVariant = ref(store.state.robonomicsUIvue.rws.devices.view);
 watch(() => sortVariant.value, newv => {
   store.state.robonomicsUIvue.rws.devices.view = newv;
+  localStorage.setItem('devicesView', newv);
 });
 /* - PICK OF TYPE SORTING DEVICES */
 
