@@ -5,28 +5,34 @@
         clean
         :class="buttonClass"
         @click.prevent="toggleSwitch"
-        :disabled="status === 'waiting'"
+        :disabled="status === 'waiting' || switchGangState === 'unavailable'"
       >
         <robo-icon icon="switch-1g" />
       </robo-button>
     </div>
 
     <div class="robo-switch-1g-content">
-      <h4>Energy consumption</h4>
-      <ul class="energy-list">
-        <li v-for="e in energyEntities" :key="e.id">
-          <span class="label">
-            {{ formatLabel(e.deviceEntity) }}:
-          </span>
-          <span class="value">
-            {{ datalog.entities[e.id].state }}
-          </span>
-          <span class="unit">
-            {{ unitMap[e.deviceEntity] }}
-          </span>
-        </li>
-      </ul>
+        <robo-text v-if="switchGangState === 'unavailable'" size="small">Unavailable, check device's internet connection.</robo-text>
+        <div v-else>
+        <h4>Energy consumption</h4>
+        <ul class="energy-list">
+            <template v-for="e in energyEntities" :key="e.id">
+                <li v-if="datalog.entities[e.id].state !== 'unavailable'">
+                <span class="label">
+                    {{ formatLabel(e.deviceEntity) }}:
+                </span>
+                <span class="value">
+                    {{ datalog.entities[e.id].state }}
+                </span>
+                <span class="unit">
+                    {{ unitMap[e.deviceEntity] }}
+                </span>
+                </li>
+            </template>
+        </ul>
+        </div>
     </div>
+
   </robo-section>
 </template>
 
@@ -78,6 +84,16 @@ const energyEntities = computed(() =>
     ['energy_power', 'energy_voltage', 'energy_current'].includes(e.deviceEntity)
   )
 )
+
+const switchGangEntityId = computed(() => 
+  Object
+    .keys(props.datalog.entities)
+    .find(id => id.endsWith('robonomics_1_gang_switch'))
+);
+
+const switchGangState = computed(() =>
+  props.datalog.entities[switchGangEntityId.value]?.state
+);
 
 // отображаемые единицы измерения
 const unitMap = {
