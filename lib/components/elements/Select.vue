@@ -208,7 +208,7 @@ const emit = defineEmits(['update:modelValue'])
   }
 
   .robo-select-label {
-      left: var(--padding);
+      left: calc(var(--padding) * 0.5);
       position: absolute;
       top: calc(var(--padding) * 0.2);
       transition: 0.2s all ease;

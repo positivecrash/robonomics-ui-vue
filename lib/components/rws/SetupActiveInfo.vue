@@ -53,7 +53,13 @@
         </robo-grid>
 
         <robo-grid v-if="show.includes('controller') && ispagesetup && isAdmin" offset="x025">
+
+            <robo-status v-if="expiresin > 0" type="warning">
+                To generate new controller you need active subscription. Renew <robo-link :router="store.state.robonomicsUIvue.rws.links.activate">here</robo-link>
+            </robo-status>
+
             <robo-account-polkadot-generate
+                v-else
                 @on-generate="handleControllerGenerate"
                 beforename="Controller" 
                 detailstype="initial"
@@ -211,7 +217,7 @@
     const store = useStore();
     import { shortenAddress, dateGetString, dateGetRange, formatFileName, downloadJson, setStatusView } from '../../tools';
     import { isAccountsIdentical, isValidAddress } from '../polkadot/tools';
-    import { backupTemplate } from '../../backupTemplate';
+    import { setupTemplate } from '../../backupTemplate';
 
     const props = defineProps({
         onUserDelete: {
@@ -359,8 +365,10 @@
             const result = await store.dispatch('rws/updateSetupField', {
                 owner: activeowner.value,
                 updates: {
-                    controller: newcontroller,
-                    controllerkey: newcontrollerkey || undefined,
+                    controller: {
+                        address: newcontroller,
+                        private: newcontrollerkey || ""
+                    }
                 }
             });
 
@@ -381,6 +389,7 @@
     };
 
     const handleController = (newcontroller, newcontrollerkey, saveCallback) => {
+
         // общий метод для сохранения через инпут и генерации нового контроллера
 
         if(!isValidAddress(newcontroller)) {
@@ -391,7 +400,7 @@
             if(isAdmin.value) {
                 if(!expiresin.value) {
                     gencontrollerstatus.value = 'error';
-                    gencontrollermsg.value = 'Please, activate a subscription first';
+                    gencontrollermsg.value = 'Please, buy a subscription first';
                 }
                 else if(expiresin.value > 0) {
                     gencontrollerstatus.value = 'error';
@@ -503,7 +512,7 @@
 
     const downloadbackup = () => {
         // Создаем копию шаблона
-        const backupData = { ...backupTemplate };
+        const backupData = { ...setupTemplate };
 
         // Заполняем поля из наших значений. Если значение отсутствует, оставляем пустую строку.
         backupData.owner = activeowner.value ? String(activeowner.value).trim() : "";

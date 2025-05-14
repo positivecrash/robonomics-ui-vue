@@ -1,6 +1,6 @@
 <template>
   <div :class="classes" :disabled="editStatus === 'loading'">
-    <robo-text v-if="label" :size="isFocused ? 'small' : 'tiny'" weight="bold" class="robo-input-label">{{label}}</robo-text>
+    <robo-text v-if="label" size="tiny" weight="bold" class="robo-input-label">{{label}}</robo-text>
 
     <robo-grid class="robo-input-inside" type="flex" gap="x05" valign="center">
       <span 
@@ -101,6 +101,14 @@
       type: String
     },
 
+    size: {
+      type: String,
+      default: 'medium',
+      validator: function (value) {
+        return ['small', 'medium'].indexOf(value) !== -1;
+      }
+    },
+
     statuscode: {
       type: String
     },
@@ -139,6 +147,7 @@
       [`robo-input-labeled`]: props.label,
       [`robo-input-focused`]: isFocused.value,
       [`robo-input-disabled`]: attrs?.disabled,
+      [`robo-input-size-${props.size}`]: props.size && props.size !== 'medium',
     }
   });
 
@@ -325,6 +334,10 @@
     --background-color: transparent;
   }
 
+  .robo-input.robo-input-size-small input {
+    --robo-input-padding: calc(var(--robo-space) * 0.5); 
+  }
+
   input {
     appearance: none;
     background-color: var(--background-color);
@@ -368,14 +381,15 @@
   /* + LABEL */
   .robo-input-label {
       color: var(--label-color);
-      left: var(--robo-input-padding);
+      left: calc(var(--robo-input-padding) * 0.5);
       position: absolute;
       top: calc(var(--robo-input-padding) * 0.5);
       transition: 0.2s all ease;
+      opacity: 0.6;
   }
 
   .robo-input-labeled input {
-      padding-top: calc(var(--robo-input-padding) * 2);
+      padding-top: calc(var(--robo-input-padding) * 2.2);
   }
   /* - LABEL */
 </style>

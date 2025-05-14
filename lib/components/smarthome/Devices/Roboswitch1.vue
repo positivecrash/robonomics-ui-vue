@@ -12,25 +12,37 @@
     </div>
 
     <div class="robo-switch-1g-content">
-        <robo-text v-if="switchGangState === 'unavailable'" size="small">Unavailable, check device's internet connection.</robo-text>
-        <div v-else>
-        <h4>Energy consumption</h4>
-        <ul class="energy-list">
-            <template v-for="e in energyEntities" :key="e.id">
-                <li v-if="datalog.entities[e.id].state !== 'unavailable'">
-                <span class="label">
-                    {{ formatLabel(e.deviceEntity) }}:
-                </span>
-                <span class="value">
-                    {{ datalog.entities[e.id].state }}
-                </span>
-                <span class="unit">
-                    {{ unitMap[e.deviceEntity] }}
-                </span>
-                </li>
-            </template>
-        </ul>
-        </div>
+      <robo-text weight="bold" galign="center" size="small">{{ devicedata.name }}</robo-text>
+      <robo-text v-if="switchGangState === 'unavailable'" size="small" galign="center">Unavailable, check device's internet connection.</robo-text>
+      
+      <robo-section offset="x05">
+          <robo-grid type="flex" gap="x05" galign="center">
+            <robo-details summarystyle="link">
+              <template #summary>
+                <robo-icon icon="bolt" />
+              </template>
+              
+              <robo-grid type="flex" gap="x05" v-for="e in energyEntities" :key="e.id">
+                <robo-text size="small" weight="bold">{{ formatLabel(e.deviceEntity) }}</robo-text>
+                <robo-text size="small">{{ datalog.entities[e.id].state }} <template v-if="datalog.entities[e.id].state !== 'unavailable'">{{ unitMap[e.deviceEntity] }}</template></robo-text>
+              </robo-grid>
+
+            </robo-details>
+
+
+            <robo-details summarystyle="link">
+              <template #summary>
+                <robo-icon icon="circle-info" />
+              </template>
+              
+              <robo-grid type="flex" gap="x05" v-for="e in energyEntities" :key="e.id">
+                <robo-text size="small" weight="bold">{{ formatLabel(e.deviceEntity) }}</robo-text>
+                <robo-text size="small">{{ datalog.entities[e.id].state }} <template v-if="datalog.entities[e.id].state !== 'unavailable'">{{ unitMap[e.deviceEntity] }}</template></robo-text>
+              </robo-grid>
+              
+            </robo-details>
+        </robo-grid>
+      </robo-section>
     </div>
 
   </robo-section>
@@ -163,23 +175,10 @@ defineOptions({ name: 'RoboSmarthomeDeviceRoboswitch1' })
 
 <style>
 .robo-switch-1g-button .robo-button {
-  font-size: 5rem !important;
+  font-size: 7rem !important;
 }
 .robo-switch-1g-button .robo-button.is-on {
   color: #f9bb01 !important;
-}
-
-.energy-list {
-  list-style: none;
-  padding: 0;
-  margin: var(--robo-space) 0;
-}
-.energy-list .label {
-  font-weight: bold;
-}
-.energy-list .value,
-.energy-list .unit {
-  margin-left: 4px;
 }
 </style>
 

@@ -1,11 +1,11 @@
 <template>
     <robo-grid type="flex" gap="x2" galign="stretch" valign="center">
-      <robo-grid type="flex" gap="x2">
+      <robo-grid type="flex" gap="x1">
         <robo-section>
           <robo-details class="devices-dashboard-details" summarystyle="link">
             <template #summary>
               <!-- <robo-text size="small" class="dotted">Settings</robo-text> -->
-              <robo-text size="small" class="dotted" weight="bold">
+              <robo-text size="small" weight="bold">
                 <robo-grid type="flex" gap="x025">
 
                   <robo-icon 
@@ -48,16 +48,54 @@
           </robo-details>
         </robo-section>
 
+        <!-- <robo-section>
+          <robo-details class="devices-dashboard-details" summarystyle="link" popupMinWidth="350px">
+            <template #summary>
+              <robo-text size="small" weight="bold">
+                <robo-grid type="flex" gap="x025">
+                  <robo-icon icon="ipfs"/>
+                  <div class="narrowhidden">IPFS</div>
+                </robo-grid>
+              </robo-text>
+            </template>
+
+            <robo-grid :columns="1" gap="x025" offset="x025">
+
+              <form @submit="addGateway">
+                <robo-grid :columns="1" gap="x025" offset="x025">
+
+                  <robo-input-new 
+                    type="text" 
+                    v-model="customgateway" 
+                    size="small" 
+                    label="Your custom gateway" 
+                    width="wide"
+                  />
+
+                  <robo-button size="small" block>Add gateway</robo-button>
+
+                </robo-grid>
+              </form>
+
+              <robo-details type="inital" fitContent>
+                <template #summary>Available gateways</template>
+                {{store.state.robonomicsUIvue.ipfs.gateways}}
+              </robo-details>
+
+            </robo-grid>
+          </robo-details>
+        </robo-section> -->
+
         <robo-section>
           <robo-details class="devices-dashboard-details" summarystyle="link" popupMinWidth="350px">
             <template #summary>
-              <robo-text size="small" class="dotted" weight="bold">
+              <robo-text size="small" weight="bold">
                 <robo-grid type="flex" gap="x025" valign="center">
                   <robo-icon icon="user"/>
-                  <div class="narrowhidden">Subscription checks</div>
+                  <div class="narrowhidden">Subscription</div>
                   <robo-icon 
                     :icon="checksubscription ? 'check' : 'ban'" 
-                    :color="checksubscription ? 'var(--robo-color-green)' : 'var(--robo-color-red)'" 
+                    :color="checksubscription ? 'var(--robo-color-green)' : 'var(--robo-color-orange)'" 
                     size="small" 
                   />
 
@@ -66,19 +104,31 @@
             </template>
 
             <robo-grid :columns="1" gap="x025">
-              <robo-text size="small">
-                Subscription:
-                <robo-text v-if="!expiration" highlight="error" inline>not found</robo-text>
-                <robo-text v-if="expiration && dateGetRange(expiration) > -1" highlight="warning" inline>expired</robo-text>
-                <robo-text v-if="expiration && dateGetRange(expiration) < 0" highlight="ok" inline>active</robo-text>
-              </robo-text>
+              <robo-grid type="flex" gap="x025" valign="center">
+                <robo-text size="small">
+                  Subscription:
+                  <robo-text v-if="!expiration" highlight="error" inline>not found</robo-text>
+                  <robo-text v-if="expiration && dateGetRange(expiration) > -1" highlight="warning" inline>expired</robo-text>
+                  <robo-text v-if="expiration && dateGetRange(expiration) < 0" highlight="ok" inline>active</robo-text>
+                </robo-text>
+
+                <robo-button 
+                  v-if="!expiration || dateGetRange(expiration) > -1"
+                  :router="store.state.robonomicsUIvue.rws.links.activate"
+                  title="Renew"
+                  clean 
+                  size="small"
+                >
+                  <robo-icon icon="arrow-rotate-left" />
+                </robo-button>
+              </robo-grid>
             
               <robo-grid v-if="controller" type="flex" gap="x025" valign="center">
                 <robo-text size="small">Controller: {{shortenAddress(controller)}}</robo-text>
 
                 <robo-icon 
                   :icon="checkuser(controller) ? 'check' : 'ban'" 
-                  :color="checkuser(controller) ? 'var(--robo-color-green)' : 'var(--robo-color-red)'" 
+                  :color="checkuser(controller) ? 'var(--robo-color-green)' : 'var(--robo-color-orange)'" 
                   size="small" 
                 />
 
@@ -99,7 +149,7 @@
                 
                 <robo-icon
                  :icon="checkuser(useraccount) ? 'check' : 'ban'" 
-                 :color="checkuser(useraccount) ? 'var(--robo-color-green)' : 'var(--robo-color-red)'" 
+                 :color="checkuser(useraccount) ? 'var(--robo-color-green)' : 'var(--robo-color-orange)'" 
                  size="small" 
                 />
 
@@ -124,7 +174,7 @@
         <robo-section>
           <robo-details v-if="telemetryupd" class="devices-dashboard-details" summarystyle="link" popupMinWidth="350px">
             <template #summary>
-              <robo-text size="small" class="dotted" weight="bold">
+              <robo-text size="small" weight="bold">
                 <robo-grid type="flex" gap="x025" valign="center">
 
                   <robo-icon 
@@ -132,13 +182,10 @@
                     :class="((!updateTime || !config || !datalog) && !updateTimeTimeout) ? 'waiting' : null"
                   />
 
-                  <div class="narrowhidden">
-                    <template v-if="updateTime && config && datalog">Updated {{ timeAgo }}</template>
-                    <template v-if="updateTime && (!config || !datalog) && updateTimeTimeout">Not updated</template>
-                    <span v-if="(!updateTime || !config || !datalog) && !updateTimeTimeout" class="waiting">Trying to get data</span>
+                  <div class="narrowhidden" :class="(!updateTime || !config || !datalog) ? 'waiting' : null">
+                    Datalog
                   </div>
 
-                  <!-- <robo-loader v-if="updState !== 'ok' && updState !== 'error'" /> -->
                   <robo-icon v-if="updState === 'ok'" icon="check" color="var(--robo-color-green)" size="small" />
                   <robo-icon v-if="updState === 'error'" icon="warning" color="var(--robo-color-orange)" size="small" />
                 </robo-grid>
@@ -146,16 +193,15 @@
             </template>
 
             <robo-grid :columns="1" gap="x025">
-              <robo-text size="small">Updated: <robo-text inline>{{telemetryupd}}</robo-text></robo-text>
+              <robo-text size="small" weight="bold" offset="x05">
+                <template v-if="updateTime && config && datalog">Updated {{ timeAgo }}</template>
+                <template v-if="updateTime && (!config || !datalog) && updateTimeTimeout">Not updated</template>
+                <span v-if="(!updateTime || !config || !datalog) && !updateTimeTimeout" class="waiting">Trying to get data</span>
+              </robo-text>
               <robo-text v-if="config" size="small">Config is ready <robo-button @click.prevent="downloadJson(config, formatFileName('Config ' + rwslist[active].name))" clean><robo-icon icon="download" size="small" /></robo-button></robo-text>
               <robo-text v-if="!config" highlight="warning">Config is missing</robo-text>
               <robo-text v-if="datalog" size="small">Datalog is ready <robo-button @click.prevent="downloadJson(datalog, formatFileName('Datalog ' + rwslist[active].name))" clean><robo-icon icon="download" size="small" /></robo-button></robo-text>
               <robo-text v-if="!datalog" highlight="warning">Datalog is missing</robo-text>
-
-              <!-- обсудить с Сашей работу с ipfs gateway -->
-              <!-- <form v-if="!telemetryupd">
-                <robo-button size="small">Reconnect</robo-button>
-              </form> -->
             </robo-grid>
 
           </robo-details>
@@ -273,6 +319,29 @@ watch( () => store.state.robonomicsUIvue.polkadot.connection.network, v => {
 /* - Connection */
 
 
+/* + IPFS */
+const customgateway = ref();
+
+// watch(() => customgateway.value, newGateway => {
+//   if (!newGateway) return;
+  
+//   const list = [...store.state.robonomicsUIvue.ipfs.gateways];
+  
+//   if (!list.includes(newGateway)) {
+//     list.push(newGateway);
+//     store.commit('ipfs/setGateways', list);
+//   }
+  
+//   store.commit('ipfs/setActiveGateway', newGateway);
+// });
+
+const addGateway = () => {
+  console.log('addGateway  pu pu pu pu');
+}
+
+/* - IPFS */
+
+
 /* + Checks */
 const checkuser = user => {
   if(activeusers.value) {
@@ -348,19 +417,26 @@ watch(() => sortVariant.value, newv => {
 <style>
   .devices-dashboard-details {
     --robo-details-content-padding: 10px !important;
+    --robo-details-summary-background: var(--robo-color-light);
+    --robo-details-summary-padding: 10px;
+    box-shadow: var(--robo-box-shadow);
   }
 </style>
 
 <style scoped>
+  form {
+    width: 100%;
+  }
+
   .robo-section {
     width: fit-content !important;
     margin: 0 !important;
   }
 
-  .dotted {
+  /* .dotted {
     border-bottom: 1px dotted var(--robo-color-link);
     padding-bottom: 2px;
-  }
+  } */
 
   /* .network-default-icon {
     display: block;

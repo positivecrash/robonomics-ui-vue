@@ -86,7 +86,7 @@ const props = defineProps({
     type: String,
     default: 'text',
     validator: function (value) {
-      return ['text', 'link', 'select', 'info', 'expandlink'].includes(value)
+      return ['text', 'link', 'select', 'info'].includes(value)
     }
   },
 
@@ -727,13 +727,8 @@ onMounted(() => {
   /* - popup animation */
 
   /* + summarystyle */
-  .robo-details--summarystyle-link summary, .robo-details--summarystyle-expandlink summary {
+  .robo-details--summarystyle-link summary {
     color: var(--robo-color-blue);
-  }
-
-  .robo-details--summarystyle-expandlink summary {
-    border-bottom: 1px dotted currentColor;
-    padding-bottom: 4px;
   }
 
   .robo-details--summarystyle-select {

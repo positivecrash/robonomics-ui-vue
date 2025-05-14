@@ -63,6 +63,8 @@
 
 	--robo-card-padding: var(--robo-space);
 	--robo-card-background-color: var(--robo-color-light);
+
+	--robo-box-shadow: 0 5px 10px rgba(0,0,0,.2);
 }
 
 /* @media (prefers-color-scheme: dark){
