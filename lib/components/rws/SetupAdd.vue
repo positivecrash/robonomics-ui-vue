@@ -135,6 +135,8 @@ const setSubscriptionName = (tab = 'connected') => {
 }
 
 const getExpired = (owner) => {
+
+    console.log('getExpired', owner)
     status.value = 'init';
     message.value = null;
 
@@ -158,6 +160,7 @@ const addSetupConnected = async () => {
 }
 
 const addSetup = async (owner, name, expiration) => {
+    console.log('addSetup', owner)
     status.value = 'process';
     message.value = null;
 

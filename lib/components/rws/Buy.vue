@@ -1,5 +1,5 @@
 <template>
-    <robo-section width="narrow">
+    <robo-section width="narrow" centered>
         <robo-grid gap="x1" columns="1">
 
             <robo-account-polkadot

@@ -392,6 +392,8 @@
 
         // общий метод для сохранения через инпут и генерации нового контроллера
 
+        console.log('handleController', newcontroller)
+
         if(!isValidAddress(newcontroller)) {
             gencontrollerstatus.value = 'error';
             gencontrollermsg.value = 'Please, enter valid address for an account in ' + network.value + ' network';

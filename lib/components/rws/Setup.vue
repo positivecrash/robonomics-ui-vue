@@ -1,6 +1,6 @@
 <template>
     <template v-if="rws?.length > 0">
-      <robo-section width="narrow">
+      <robo-section width="narrow" centered>
         <robo-text title="3" offset="x1">Saved subscription setups</robo-text>
 
         <robo-section offset="x1">
@@ -47,7 +47,7 @@
     </template>
 
     <template v-else>
-        <robo-section width="narrow" gcenter>
+        <robo-section width="narrow" gcenter centered>
           <robo-text size="small" weight="bold" offset="x05">You haven't added any setups yet</robo-text>
           <robo-button 
               v-if="store.state.robonomicsUIvue.rws.links.setupnew" 

@@ -306,6 +306,7 @@
 
   /* + Watchers */
   watch(() => store.state.robonomicsUIvue.polkadot.address, value => {
+    console.log('watch Account polka ext', value)
     if(isValidAddress(value)) {
       activeAddress.value = encodeAddress(value, activeChain.value)
     }

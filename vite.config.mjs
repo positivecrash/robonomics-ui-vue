@@ -150,7 +150,8 @@ export default defineConfig({
         '@polkadot/util',
         'mipd',
         'highcharts',
-        'highcharts-vue'
+        'highcharts-vue',
+        'ipfs-smart-gateway'
       ],
       output: {
         globals: {
@@ -163,7 +164,7 @@ export default defineConfig({
           '@polkadot/ui-keyring': '@polkadot/ui-keyring',
           '@polkadot/util-crypto': '@polkadot/util-crypto',
           '@polkadot/util': '@polkadot/util',
-          mipd: 'mipd',
+          mipd: 'mipd'
         },
         dir: './dist',
         inlineDynamicImports: true,

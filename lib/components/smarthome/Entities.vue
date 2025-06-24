@@ -66,7 +66,7 @@
       >
         <robo-grid :columns="1" gap="x05">
           <template v-for="(entityData, entity) in sortedAutomations(automations)" :key="entity">
-            <robo-section card shadow>
+            <robo-section card shadow width="wide">
               <robo-text class="device-title" title="5" :class="'automation-title-state-' + entityData.state">
                 {{ entity }}
               </robo-text>
@@ -418,19 +418,19 @@ function splitIntoColumns(items, colCount) {
 .robo-section {
   padding: 0 !important;
 }
+
 .device-title {
-  background-color: var(--robo-color-dark-70);
-  color: var(--robo-color-light);
   padding: var(--robo-space);
 }
+
 .device-title[class*="automation-title-state-"] {
   position: relative;
 }
 .device-title[class*="automation-title-state-"]:after {
   content: "";
   position: absolute;
-  top: calc(50% - 7px);
-  right: var(--robo-space);
+  top: 4px;
+  right: 4px;
   display: block;
   width: 14px;
   height: 14px;

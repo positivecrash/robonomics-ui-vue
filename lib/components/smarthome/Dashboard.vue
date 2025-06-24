@@ -20,6 +20,7 @@
                 <robo-smarthome-controls
                     :config = "config"
                     :datalog = "datalog"
+                    :cid="cid"
                     :updateTime="updateTime"
                 />
 
@@ -48,8 +49,8 @@ const props = defineProps({
     datalog: {
         type: [Object, String]
     },
-    launchStatus: {
-        type: Array
+    cid: {
+        type: String
     },
     //timestamp
     updateTime: {

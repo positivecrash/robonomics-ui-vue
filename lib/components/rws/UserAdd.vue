@@ -61,6 +61,7 @@ const add = (st, msg) => {
 }
 
 const adduser = () => {
+    console.log('adduser', useraddress.value)
     status.value = 'loading';
     message.value = null;
 

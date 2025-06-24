@@ -46,7 +46,7 @@ const props = defineProps({
   highlight: {
     type: String,
     default: null,
-    validator: (v) => ['ok', 'error', 'link', 'warning'].includes(v)
+    validator: (v) => ['ok', 'error', 'link', 'warning', 'disabled'].includes(v)
   },
   highlightLabel: {
     type: String,
@@ -197,6 +197,7 @@ onUpdated(() => {
 <style scoped>
 .robo-text {
   margin-bottom: var(--offset);
+  color: var(--robo-color-text);
 }
 
 .robo-text--offset-x0 {
@@ -305,22 +306,22 @@ onUpdated(() => {
 
 .robo-text--highlight-warning {
   --robo-color-text: var(--robo-color-orange);
-  color: var(--robo-color-orange);
 }
 
 .robo-text--highlight-ok {
   --robo-color-text: var(--robo-color-green);
-  color: var(--robo-color-green);
 }
 
 .robo-text--highlight-error {
   --robo-color-text: var(--robo-color-red);
-  color: var(--robo-color-red);
 }
 
 .robo-text--highlight-link {
   --robo-color-text: var(--robo-color-blue);
-  color: var(--robo-color-blue);
+}
+
+.robo-text--highlight-disabled {
+  opacity: 0.5;
 }
 
 div[class*='robo-text--highlight-label-'] {

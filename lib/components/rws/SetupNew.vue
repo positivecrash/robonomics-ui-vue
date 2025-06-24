@@ -1,5 +1,5 @@
 <template>
-    <robo-section width="narrow">
+    <robo-section width="narrow" centered>
 
         <robo-text title="1">Add a setup into dapp</robo-text>
 

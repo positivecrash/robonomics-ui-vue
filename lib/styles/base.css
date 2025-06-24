@@ -38,7 +38,7 @@
 	--robo-color-blue-110: hsl(214, 98%, 40%);
 	--robo-color-blue-80: hsl(214, 98%, 70%);
 
-	--robo-color-green: hsl(83, 100%, 38%);
+	--robo-color-green: hsl(83, 100%, 41%);
 	--robo-color-green-110: hsl(83, 100%, 28%);
 
 	--robo-color-orange: hsl(39, 100%, 50%);
@@ -56,6 +56,7 @@
 	--robo-color-inputcolor: var(--robo-color-dark-80);
 	--robo-color-inputborder: var(--robo-color-dark-80);
 	--robo-color-inputborderdisabled: var(--robo-color-dark-30);
+	/* --robo-color-inputcoloractive: var(--robo-color-blue); */
 	--robo-color-inputcoloractive: var(--robo-color-blue);
 	--robo-opacity-inputdisabled: 0.6;
 

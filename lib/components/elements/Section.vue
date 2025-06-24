@@ -18,6 +18,11 @@ const props = defineProps({
     default: false
   },
 
+  centered: {
+    type: Boolean,
+    default: false
+  },
+
   disabled: {
     type: Boolean,
     default: false
@@ -43,7 +48,7 @@ const props = defineProps({
 
   width: {
     type: String,
-    default: 'wide',
+    default: null,
     validator(value) {
       return ['wide', 'middle', 'narrow'].includes(value)
     }
@@ -54,6 +59,7 @@ const classes = computed(() => {
   return {
     [`robo-section`]: true,
     [`robo-section-card`]: props.card,
+    [`robo-section-centered`]: props.centered,
     [`robo-section-disabled`]: props.disabled,
     [`robo-section-gcenter`]: props.gcenter,
     [`robo-section-shadow`]: props.shadow,
@@ -75,11 +81,22 @@ const offsetFromData = computed( () => {
   return calcGap(props.offset);
 });
 
-const calcWidth = prop => 
+const calcMaxWidth = prop => 
   ({
     'wide': '100%',
     'middle': '1000px',
     'narrow': '600px'
+  }[prop] ?? 'auto');
+
+const maxWidthFromData = computed( () => {
+  return calcMaxWidth(props.width);
+});
+
+const calcWidth = prop => 
+  ({
+    'wide': '100%',
+    'middle': '100%',
+    'narrow': '100%'
   }[prop] ?? 'auto');
 
 const widthFromData = computed( () => {
@@ -92,13 +109,12 @@ const widthFromData = computed( () => {
     .robo-section {
         --offset: v-bind(offsetFromData);
         --section-width: v-bind(widthFromData);
+        --section-maxwidth: v-bind(maxWidthFromData);
         margin-top: var(--offset);
         margin-bottom: var(--offset);
         
-        width: 100%;
-        max-width: var(--section-width);
-        margin-left: auto;
-        margin-right: auto;
+        width: var(--section-width);
+        max-width: var(--section-maxwidth);
     }
 
     .robo-section-card {
@@ -119,5 +135,10 @@ const widthFromData = computed( () => {
 
     .robo-section-shadow {
       box-shadow: var(--robo-box-shadow);
+    }
+
+    .robo-section-centered {
+      margin-left: auto;
+      margin-right: auto;
     }
 </style>
