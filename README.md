@@ -59,7 +59,7 @@ Use `build.config.example.mjs` as a reference.
 
 ## 🚀 Publish a new version
 
-1. **Build the library**
+1. **Build the library (optional for local checks)**
 
    ~~~bash
    yarn build
