@@ -70,6 +70,7 @@ Use `build.config.example.mjs` as a reference.
    ~~~bash
    git add package.json
    git commit -m "chore: release vX.Y.Z"
+   git push
    ~~~
 
 3. **Create an annotated tag**
