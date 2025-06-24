@@ -39,6 +39,7 @@ jobs:
       # 5. Публикуем в npm ТОЛЬКО при пуше тега-версии
       - name: Publish to npm
         if: startsWith(github.ref, 'refs/tags/')
+        working-directory: ./dist
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
