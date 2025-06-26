@@ -1,4 +1,6 @@
 v0.8.0
 
 - Fix: peerDependencies added
-- Feat: IPFS gateways usage (get list of available, get the fastes gateway, user gateways support)
+- Feat: IPFS gateways usage (get list of available, get the fastes gateway, user gateways support):
+store.robonomicsUIvue.ipfs.activeGateway - active available gateway
+store.robonomicsUIvue.ipfs.availableGateways - all available gateways

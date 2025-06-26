@@ -49,7 +49,7 @@
           popup-min-width="350px"
           fitContent>
           <template #summary>
-            <robo-text size="small" weight="bold" :class="(availableGateways.length === 0 && !notFoundGateways) ? 'waiting' : null">
+            <robo-text size="small" weight="bold" :class="(!activeGateway && loadingGateways) ? 'waiting' : null">
               <robo-grid type="flex" gap="x025">
                 <robo-icon icon="ipfs"/>
                 <div class="narrowhidden">IPFS</div>
@@ -64,14 +64,14 @@
           </template>
           <robo-grid :columns="1" gap="x05">
             <robo-section width="wide">
-              <robo-text v-if="availableGateways.length === 0" size="small" offset="x05" weight="bold">
-                <robo-status v-if="notFoundGateways === 'not found'" type="warning">
+              <robo-text v-if="!activeGateway && loadingGateways" size="small" offset="x05" weight="bold">
+                <template v-if="loadingGateways">
+                  <robo-loader />
+                  Checking available gateways
+                </template>
+                <robo-status v-else type="warning">
                   No available gateways found. Try adding your custom gateway or wait.
                 </robo-status>
-                <template v-if="!notFoundGateways">
-                  <robo-loader />
-                  Looking for available gateways
-                </template>
               </robo-text>
 
               <robo-grid v-else type="flex" offset="x05" gap="x025">
@@ -88,7 +88,7 @@
                     name="ipfsgateway"
                     :value="i"
                     v-model="pickedGatewayRadio"
-                    :disabled="!isGatewayAvailable(i)"
+                    :disabled="!isGatewayAvailable(i) && !isActiveGateway(i)"
                   />
 
                   <robo-text
@@ -368,13 +368,13 @@ const activeGateway = ref(null);
 const pickedGatewayRadio = ref(activeGateway.value);
 const userGateways = ref([]);
 const customGateway = ref('');
-const notFoundGateways = ref(null);
 const userGatewayAdded = ref(null);
+const loadingGateways = ref(false);
 
 const configureIpfsGateway = () => {
   ipfsGateway.configure({
     stopOnFirstSuccess: false,
-    timeout: 5000
+    timeout: 30000
   });
   ipfsGateway.setDefaultGateways(defaultGateways);
 }
@@ -462,49 +462,68 @@ const switchGateway = async (url) => {
   await refreshGateways(props.cid);
 }
 
+/* ── utils ────────────────────────────────────────────────────── */
+const setPickedGateway = (url) => {
+  ipfsGateway.setPickedGateway(url);
+  activeGateway.value = url;
+  pickedGatewayRadio.value = url;
+  store.commit('ipfs/setActiveGateway', url);
+};
+
+/* ── refresh ──────────────────────────────────────────────────── */
 const refreshGateways = async (cid) => {
 
-  const manualPicked = ipfsGateway.getPickedGateway();
+  const hasCid  = typeof cid === 'string' && cid.trim().length;
+  if (!hasCid) return;
 
-  /* показать лоадер и визуально снять активный шлюз */
+  /* 1. быстрая проверка выбранного шлюза */
+  const currentAlive = activeGateway.value
+    ? (await ipfsGateway.measureGateway(activeGateway.value, cid)) !== null
+    : false;
+
+  /* 2. если шлюз жив, обновляем список «тихо» — без лоадера */
+  if (currentAlive) {
+    console.log('[currentAlive]', cid)
+    const list = await ipfsGateway.checkGateways({
+      cid,
+      gateways: allGateways.value,
+      retry: 3
+    }).then(r => r.map(g => g.url));
+
+    availableGateways.value = list;
+    store.commit('ipfs/setGateways', list);
+
+    // setPickedGateway(activeGateway.value);
+    return;
+  }
+
+  /* 3. если выбранный упал — стандартный сценарий с лоадером */
+  loadingGateways.value = true;
   activeGateway.value = null;
   pickedGatewayRadio.value = null;
   store.commit('ipfs/setActiveGateway', null);
 
-  availableGateways.value = [];
-  notFoundGateways.value = null;
-
-  if (!cid?.trim()) return;
-
-  const gateways = await ipfsGateway.checkGateways({
+  const list = await ipfsGateway.checkGateways({
     cid,
     gateways: allGateways.value,
     retry: 3
-  });
+  }).then(r => r.map(g => g.url));
 
-  availableGateways.value = gateways.map(g => g.url);
-  notFoundGateways.value = gateways.length ? 'found' : 'not found';
+  availableGateways.value = list;
+  store.commit('ipfs/setGateways', list);
+  loadingGateways.value = false;
 
-  /* пакет выбрал fastest → синхронизируем стейт */
-  loadGateways();
+  loadGateways(); // fastest → state
 
-  /* вернём пользовательский шлюз, если он был выбран и доступен */
-  const manualOK = manualPicked &&
-    availableGateways.value
-      .map(safeNormalize)
-      .includes(safeNormalize(manualPicked));
-
-  if (manualOK) {
-    ipfsGateway.setPickedGateway(manualPicked);
-    activeGateway.value = manualPicked;
-    pickedGatewayRadio.value = manualPicked;
-    store.commit('ipfs/setActiveGateway', manualPicked);
+  /* вернуть пользовательский, если теперь доступен */
+  if (activeGateway.value &&
+      list.map(safeNormalize).includes(safeNormalize(activeGateway.value))) {
+    setPickedGateway(activeGateway.value);
   } else {
-    pickedGatewayRadio.value = activeGateway.value;
+    pickedGatewayRadio.value = activeGateway.value; // fastest
   }
-  
-  store.commit('ipfs/setGateways', availableGateways.value);
 };
+
 
 const isUserGateway = (url) => {
   return userGateways.value
@@ -532,6 +551,7 @@ loadGateways();
 watch(() => props.cid, async (v) => {
   refreshGateways(v);
 }, { immediate: true });
+
 /* - IPFS */
 
 

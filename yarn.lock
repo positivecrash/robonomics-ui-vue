@@ -1104,10 +1104,10 @@ inherits@2, inherits@^2.0.3, inherits@~2.0.1:
   resolved "https://registry.npmjs.org/inherits/-/inherits-2.0.4.tgz"
   integrity sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==
 
-ipfs-smart-gateway@^1.0.9:
-  version "1.0.9"
-  resolved "https://registry.yarnpkg.com/ipfs-smart-gateway/-/ipfs-smart-gateway-1.0.9.tgz#522dab0f3ce42b04071cfb6a0807bc3fac26fe53"
-  integrity sha512-1q7cS5TPl0e7fpgPiTwAaJCVv+PSuFrg12GlYrlP0RFqN6LNo0EGXRp29I44ZOVOjuHw73O5TgeGrAMIUeUqsg==
+ipfs-smart-gateway@^1.0.11:
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/ipfs-smart-gateway/-/ipfs-smart-gateway-1.0.11.tgz#c6872481d6fe69db84665a325ed99d967acf1f9c"
+  integrity sha512-8EhJSgRR/kwk4vulZ8ubyglFOKACqG70cLgA7YMH7SjNiN/lkIbge+B/qTQFZjE+b2c9uuIbj6oVQbQ6RDBtDA==
 
 is-arrayish@^0.2.1:
   version "0.2.1"
