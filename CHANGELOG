@@ -1,4 +1,7 @@
-v0.8.0
+v0.9.1
+- Fixes for details, controller reset
+
+v0.9.0
 
 - Fix: peerDependencies added
 - Feat: IPFS gateways usage (get list of available, get the fastes gateway, user gateways support):

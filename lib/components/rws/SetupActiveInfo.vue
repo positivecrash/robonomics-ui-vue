@@ -200,7 +200,7 @@
                     type="error" 
                     size="small"
                 >
-                    Remove setup from the dapp
+                Remove setup from the dapp
             </robo-button-approve>
         </robo-section>
     </robo-text>
@@ -606,8 +606,9 @@
 
     /* - BACKUP */
 
-    const removesetup = () => {
-        store.dispatch('rws/deleteSetup', activerwsowner.value);
+    const removesetup = async () => {
+        await store.dispatch('rws/deleteSetup', activerwsowner.value);
+        controller.value = activecontroller.value;
     }
 
     const blinkContent = ref(true);
@@ -643,7 +644,7 @@
         --robo-text-lines-padding: 10px;
     }
 
-    .setupinfonew {
+    /* .setupinfonew {
         animation: Blink 0.8s linear 2 forwards;
-    }
+    } */
 </style>

@@ -32,7 +32,7 @@
         <robo-tab label="With Extention">
             <form @submit.prevent="addSetupConnected">
                 <robo-grid gap="x05" columns="1">
-                    <robo-section offset="x05">
+                    <robo-section offset="x05" width="wide">
                         <robo-text size="small" offset="x025" weight="bold">
                             Owner & Network:
                             <robo-text 

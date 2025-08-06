@@ -386,6 +386,8 @@ watch(()=>props.doClose, doClose => {
 });
 
 const clickHandler = (e) => {
+
+  if (!props.contentCloseOutOfFocus) return;
   if (!details.value) return;
   
   const path = e.composedPath();
@@ -407,18 +409,12 @@ const clickHandler = (e) => {
 
 onMounted(() => {
   isOpened.value = details?.value?.open;
-
-  if (props.contentCloseOutOfFocus) {
-    document.body.addEventListener('click', clickHandler);
-  }
-
+  document.body.addEventListener('click', clickHandler);
 });
 
 
 onUnmounted(() => {
-  if (props.contentCloseOutOfFocus) {
-    document.body.removeEventListener('click', clickHandler);
-  }
+  document.body.removeEventListener('click', clickHandler);
 });
 
 </script>

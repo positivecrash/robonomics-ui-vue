@@ -1,7 +1,13 @@
 <template>
   <robo-button v-bind="$attrs" @click.prevent="init"><slot /></robo-button>
   
-  <robo-details class="robo-button-approval-details" type="popup" :open="needApprove" :afterCloseDetails="afterAction" :doClose="doClose">
+  <robo-details 
+    class="robo-button-approval-details"
+    type="popup" 
+    :open="needApprove" 
+    :afterCloseDetails="afterAction" 
+    :doClose="doClose"
+    :contentCloseOutOfFocus="false">
     <robo-text title="5" v-html="approvetext" />
 
     <robo-grid class="actions" type="flex" gap="x05" offset="x05" galign="stretch">

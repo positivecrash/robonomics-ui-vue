@@ -148,6 +148,10 @@
     --robo-button-error-color: var(--robo-color-light);
     --robo-button-error-background-hover: var(--robo-color-red);
   }
+
+  .robo-button .robo-text {
+      color: inherit !important;
+  }
 </style>
 
 
