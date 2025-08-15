@@ -202,12 +202,27 @@ const signin = async () => {
             if(!keepsigned.value) {
                 /* remove from db */
                 IDBworkflow('dbrws', 1, 'dbrwsuser', 'readwrite', store => {
-                    const request = store.delete(useraccount.value);
+                    const getRequest = store.get(useraccount.value);
 
-                    request.onsuccess = () => {
-                        idbchanged();
+                    getRequest.onsuccess = () => {
+                        if (getRequest.result) {
+                            const deleteRequest = store.delete(useraccount.value);
+
+                            deleteRequest.onsuccess = () => {
+                                idbchanged();
+                            }
+
+                            deleteRequest.onerror = (e) => {
+                                console.error('Error deleting user:', e.target.error);
+                            }
+                        } else {
+                            console.log('User not found in DB, nothing to delete.');
+                        }
                     }
 
+                    getRequest.onerror = (e) => {
+                        console.error('Error checking user in DB:', e.target.error);
+                    }
                 }, {index: 'user', autoIncrement: false}, [{index: 'user', unique: true}]);
             } else {
                 /* save to db */
