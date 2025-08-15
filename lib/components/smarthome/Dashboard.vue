@@ -1,17 +1,17 @@
 <template>
     <robo-layout-section>
 
-        <robo-section v-if="!rws || rws?.length < 1" width="narrow" gcenter>
+        <robo-section v-if="!rws || rws?.length < 1" width="narrow" gcenter centered>
             <robo-text size="small" weight="bold" offset="x05">Your smart devices dashboard will appear here</robo-text>
             <robo-button :router="store.state.robonomicsUIvue.rws.links.setupnew">Add a setup</robo-button>
         </robo-section>
 
         <template v-else>
-            <robo-section v-if="!users || users.length < 1" width="narrow" gcenter>
+            <robo-section v-if="!users || users.length < 1" width="narrow" gcenter centered>
                 <robo-text size="small" weight="bold" offset="x05">No users found in current subscription</robo-text>
                 <robo-button :router="store.state.robonomicsUIvue.rws.links.setup">Edit a setup</robo-button>
             </robo-section>
-            <robo-section v-else width="narrow">
+            <robo-section v-else width="narrow" gcenter centered>
                 <robo-rws-user-signin />
             </robo-section>
 
