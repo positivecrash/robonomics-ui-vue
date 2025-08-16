@@ -1,10 +1,9 @@
 <template>
     <template v-if="rws?.length > 0">
       <robo-section width="narrow" centered>
-        <robo-text title="3" offset="x1">Saved subscription setups</robo-text>
-
+    
         <robo-section offset="x1">
-            <robo-text size="small" offset="x025" v-if="rws?.length > 1">Added setups</robo-text>
+            <!-- <robo-text size="small" offset="x025" v-if="rws?.length > 1">Added setups</robo-text> -->
             <robo-rws-setup-active-select />
 
             <robo-text size="small" offset="x025">
@@ -29,7 +28,6 @@
         </robo-section>
     
         <robo-section>
-
             <robo-section card>
               <robo-rws-setup-active 
                 :onUserDelete="onUserDelete" 
