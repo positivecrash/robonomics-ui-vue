@@ -315,7 +315,7 @@ const activerwsowner = computed(() => store.state.robonomicsUIvue.rws.active)
 const active = computed(() => rwslist.value.map(item => item.owner).indexOf(activerwsowner.value))
 const useraccount = computed(() => store.state.robonomicsUIvue.rws.user.account)
 const userkey = computed(() => store.state.robonomicsUIvue.rws.user.key)
-const controller = computed(() => rwslist.value[active.value].controller.address)
+const controller = computed(() => rwslist.value[active.value]?.controller?.address)
 const expiration = computed(() => store.state.robonomicsUIvue.rws.expiredate)
 const activeusers = computed(() => rwslist.value[active.value]?.users)
 

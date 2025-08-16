@@ -28,19 +28,6 @@
 
     </template>
 
-      <robo-section offset="x05">
-        <robo-polkadot-network-select block class="robo-polkadot-account--networkselect" />
-      </robo-section>
-
-      <robo-section offset="x05" v-if="extensionAllowShift">
-        <robo-grid type="grid" offset="x05" gap="x1" :columns="4">
-          <template v-for="item in extensions" :key="item.id">
-            <robo-account-polkadot-extension :wallet="item.wallet" />
-          </template>
-        </robo-grid>
-      </robo-section>
-
-      <robo-status type="warning" v-if="activeExtension && !activeAddress">Account not found</robo-status>
 
       <robo-select
         v-if="(accounts?.length > 1) && activeAddress && selectable"
@@ -50,6 +37,10 @@
         block
         size="small"
       />
+
+      <robo-section offset="x05">
+        <robo-polkadot-network-select block class="robo-polkadot-account--networkselect" />
+      </robo-section>
       
       <robo-section offset="x05" v-if="activeAddress">
         <robo-text lines="dotted" size="small">
@@ -75,6 +66,16 @@
 
         </robo-text>
       </robo-section>
+
+      <robo-section offset="x05" v-if="extensionAllowShift">
+        <robo-grid type="grid" offset="x05" gap="x1" :columns="4">
+          <template v-for="item in extensions" :key="item.id">
+            <robo-account-polkadot-extension :wallet="item.wallet" />
+          </template>
+        </robo-grid>
+      </robo-section>
+
+      <robo-status type="warning" v-if="activeExtension && !activeAddress">Account not found</robo-status>
 
       <robo-button v-if="activeWallet && accounts?.length > 0" @click.prevent="disconnect" type="error" size="tiny" outline block>Disconnect accounts</robo-button>
 

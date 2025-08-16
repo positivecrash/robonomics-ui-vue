@@ -42,7 +42,7 @@
                 :statusmsg="gencontrollermsg"
                 :modellabel="controller ? shortenAddress(controller) : null"
                 :placeholder="network.charAt(0).toUpperCase() + network.slice(1) + ' account'"
-                type="text" 
+                type="text"
                 width="fit" 
                 view="line" 
                 edit 
@@ -338,11 +338,11 @@
     /* - NAME */
 
     const isInUserList = (user) => {
-        return users?.value && users?.value?.length > 1 && users?.value.find(u => u === user);
+         return Array.isArray(users?.value) && users.value.length > 0 && users.value.includes(user);
     }
 
     /* + CONTROLLER */
-    const controller = ref(rwslist.value[active.value].controller.address);
+    const controller = ref(rwslist.value[active.value]?.controller?.address || null);
     const gencontrollerstatus = ref(null);
     const gencontrollermsg = ref(null);
 
@@ -392,14 +392,14 @@
 
         // общий метод для сохранения через инпут и генерации нового контроллера
 
-        console.log('handleController', newcontroller)
-
         if(!isValidAddress(newcontroller)) {
             gencontrollerstatus.value = 'error';
             gencontrollermsg.value = 'Please, enter valid address for an account in ' + network.value + ' network';
         } else {
+            
             // если подключен владелец подписки, то нам нужно добавить контроллер не только в настройки даппа, но и в список юзеров
             if(isAdmin.value) {
+                console.log('если подключен владелец подписки')
                 if(!expiresin.value) {
                     gencontrollerstatus.value = 'error';
                     gencontrollermsg.value = 'Please, buy a subscription first';
@@ -419,15 +419,29 @@
 
             // сохраняем контроллер локально в даппе
             // если он уже в списке юзеров или подключен не админ (например юзер просто вручную меняет адрес)
-            if(isInUserList(newcontroller) || !isAdmin.value) {
-                savecontroller(
-                    newcontroller, 
-                    newcontrollerkey, 
-                    'ok', 
-                    'Controller setup saved locally in dapp. Make sure this account has been added as a user in the subscription and is used as a controller in Home Assistant integration.', 
-                    saveCallback
-                );
+
+            // Если подключен не админ (владалец подписки) - например если надо просто вручную добавить адрес контроллера
+            if(!isAdmin.value) {
+                if(isInUserList(newcontroller)) {
+                    // Если контроллер добавлен как юзер в подписку
+                    savecontroller(
+                        newcontroller, 
+                        newcontrollerkey, 
+                        'ok', 
+                        'Controller setup saved locally in dapp. Make sure this account has been added as a user in the subscription and is used as a controller in Home Assistant integration.', 
+                        saveCallback
+                    );
+                } else {
+                    savecontroller(
+                        newcontroller, 
+                        null, 
+                        'error', 
+                        'The address of controller has not been added in the subscription yet.', 
+                        saveCallback
+                    );
+                }
             }
+            
         }
 
         if(saveCallback) {

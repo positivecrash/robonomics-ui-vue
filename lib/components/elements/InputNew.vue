@@ -92,50 +92,23 @@ import { computed, ref, onMounted, watch, useAttrs } from 'vue';
 const attrs = useAttrs();
 const model = defineModel();
 const input = ref(null);
-const savedValue = ref(null);
 
+/* baseline: последнее успешно сохранённое значение */
+const committedValue = ref('');
+
+/* нормализация */
+const norm = v => (v == null ? '' : String(v));
+
+/* props */
 const props = defineProps({
-  edit: {
-    type: Boolean,
-    default: false
-  },
-
-  highlight: {
-    type: String,
-    default: null,
-    validator: (v) => ['ok', 'error'].includes(v)
-  },
-
-  label: {
-    type: String, 
-    default: null 
-  },
-
-  size: {
-    type: String,
-    default: 'medium',
-    validator: v => ['small', 'medium'].includes(v)
-  },
-
-  statuscode: {
-    type: String
-  },
-
-  statusmsg: {
-    type: String
-  },
-
-  view: {
-    type: String,
-    default: 'initial',
-    validator: v => ['initial', 'line'].includes(v)
-  },
-
-  width: {
-    type: String,
-    default: 'initial',
-    validator: v => ['initial', 'wide', 'fit'].includes(v)
-  }
+  edit: { type: Boolean, default: false },
+  highlight: { type: String, default: null, validator: v => ['ok','error'].includes(v) },
+  label: { type: String, default: null },
+  size: { type: String, default: 'medium', validator: v => ['small','medium'].includes(v) },
+  statuscode: { type: String },
+  statusmsg: { type: String },
+  view: { type: String, default: 'initial', validator: v => ['initial','line'].includes(v) },
+  width: { type: String, default: 'initial', validator: v => ['initial','wide','fit'].includes(v) }
 });
 
 const inputtype = ref(attrs.type);
@@ -155,7 +128,7 @@ const classes = computed(() => ({
 
 const getInputWidth = computed(() => {
   if (props.width === 'fit') {
-    if (model?.value) return `${model?.value.length}ch`;
+    if (model?.value) return `${norm(model.value).length}ch`;
     if (attrs.hasOwnProperty('placeholder')) return `${attrs.placeholder.length}ch`;
     return 'auto';
   }
@@ -168,43 +141,45 @@ const isFocused = ref(attrs.hasOwnProperty('autofocus'));
 const focused = () => { if (inputtype.value !== 'radio') isFocused.value = true; }
 const blurred = () => { if (inputtype.value !== 'radio') isFocused.value = false; }
 
-/* Edit (inline edit for input[type=text]) */
+/* Edit */
 const emit = defineEmits(['onEdit']);
 const editStatus = ref('init');
-const isChanged = ref(false);
 const message = ref(null);
-const firstchange = ref(false);
+/* флаг своего сохранения */
+const isSaving = ref(false);
 
+/* изменённость */
+const isChanged = computed(() => {
+  return norm(model.value) !== norm(committedValue.value);
+});
+
+/* ввод */
 const changing = () => {
   editStatus.value = 'init';
   message.value = null;
-  if (firstchange.value) {
-    if (savedValue.value !== input.value?.value) isChanged.value = true;
-    savedValue.value = input.value?.value;
-    firstchange.value = false;
-  } else {
-    isChanged.value = (savedValue.value !== input.value?.value);
-  }
 };
+
 const edit = () => {
+  console.log('isChanged.value, isFocused.value', isChanged.value, isFocused.value)
   if (!isChanged.value && !isFocused.value) {
     isFocused.value = true;
-    setTimeout(() => { input.value.focus(); }, 10);
+    setTimeout(() => { input.value?.focus(); }, 10);
   } else {
     editStatus.value = 'loading';
+    isSaving.value = true;
     emit('onEdit', (status, msg) => save(status, msg));
   }
-}
+};
+
 const save = (status, msg) => {
   editStatus.value = status;
   message.value = msg || null;
   if (status === 'ok') {
-    isChanged.value = false;
-    firstchange.value = true;
-    savedValue.value = input.value.value;
+    committedValue.value = norm(model.value);
   }
-  if (status === 'error') input.value.focus();
-}
+  isSaving.value = false;
+  if (status === 'error') input.value?.focus();
+};
 
 /* Password support */
 const showPasswordPressed = ref(false);
@@ -212,26 +187,44 @@ const showPassword = () => {
   showPasswordPressed.value = !showPasswordPressed.value;
   if (inputtype.value === 'password') inputtype.value = 'text';
   else inputtype.value = 'password';
-}
+};
 
 const radioChange = () => {
   model.value = attrs.value;
 };
 
 onMounted(() => {
+  committedValue.value = norm(model.value);
+
+  /* внешний статус только отображаем; baseline не трогаем,
+     кроме случая, когда это ответ на наше сохранение */
   watch(() => props.statuscode, v => {
     editStatus.value = v;
-    if (v === 'ok') {
-      isChanged.value = false;
-      firstchange.value = true;
-      savedValue.value = input.value.value;
+    if (isSaving.value && v === 'ok') {
+      committedValue.value = norm(model.value);
+      isSaving.value = false;
+    }
+    if (isSaving.value && (v === 'error')) {
+      isSaving.value = false;
+      input.value?.focus();
     }
   }, { immediate: true });
+
   watch(() => props.statusmsg, v => {
     message.value = v;
   }, { immediate: true });
+
+  /* если родитель программно меняет модель и поле не редактируется,
+     считаем это новым подтверждённым значением */
+  watch(() => model.value, (nv, ov) => {
+    if (!isFocused.value && !isSaving.value && editStatus.value !== 'loading') {
+      committedValue.value = norm(nv);
+    }
+  });
 });
 </script>
+
+
 
 <style scoped>
 .robo-input {
