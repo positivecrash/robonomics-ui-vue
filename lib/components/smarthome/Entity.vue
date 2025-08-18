@@ -13,6 +13,7 @@
 </script>
 
 <script setup>
+    import { computed } from 'vue';
     import { useStore } from 'vuex';
     const store = useStore();
 
@@ -26,6 +27,11 @@
         services: {
             type: Object
         }
+    });
+
+
+    const entityType = computed(() => {
+        return props.entityID?.split('.')[0] || 'unknown';
     });
 
     const getEntityComponent = (type) => {
