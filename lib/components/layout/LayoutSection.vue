@@ -1,7 +1,6 @@
 <template>
     <div :class="classList">
       <slot/>
-      <robo-template-rws-setup-backup v-if="rwsrecover" recoverRedirect :save="rwssave" />
     </div>
 </template>
 
