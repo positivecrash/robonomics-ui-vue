@@ -118,6 +118,7 @@ const widthFromData = computed( () => {
     }
 
     .robo-section-card {
+      position: relative;
       background: var(--robo-card-background-color);
       border-radius: var(--border-radius);
       padding: var(--robo-card-padding);

@@ -26,7 +26,13 @@
               <template v-else>
                 <robo-section card shadow>
                   <robo-section>
-                    <robo-text class="device-title" title="5">{{ device.name }}</robo-text>
+                    <robo-text
+                      v-if="!Object.keys(device.entities).some(eid => eid.startsWith('light.'))"
+                      class="device-title"
+                      title="5"
+                    >
+                      {{ device.name }}
+                    </robo-text>
                     <robo-grid class="device-content" :columns="1" gap="x1" offset="x1">
                       <robo-smarthome-entity
                         v-for="(entData, entID) in sortedEntities(device.entities, categoryName)"
@@ -202,8 +208,9 @@ function getdevices() {
       entObj[entID] = {
         state: entData.state || "Unknown",
         units: entData.units || null,
+        history: entData.history.length && entData.history || null,
         attributes: entData.attributes || {},
-        lastUpdated: lastHist
+        lastUpdated: lastHist,
       };
     });
     return {
