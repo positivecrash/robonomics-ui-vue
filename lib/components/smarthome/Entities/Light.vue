@@ -125,7 +125,7 @@
         <robo-button @click="applySettings">Apply Changes</robo-button>
       </div>
 
-      <robo-history-chart v-if="entityData.history" :history="entityData.history"/>
+      <robo-history-chart v-if="entityData.history" :history="entityData.history" title="Light History"/>
 
     </robo-details>
   
@@ -283,7 +283,6 @@ const sendRequest = (service, extraParams = {}) => {
   requestStatus.value = 'waiting'
   requestMsg.value = 'Waiting for request complete'
 
-  console.log(request)
   store.commit('rws/setLaunch', JSON.stringify({ launch: request, tx: { tx_status: 'pending' } }))
 }
 
