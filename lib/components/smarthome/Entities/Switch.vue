@@ -30,22 +30,7 @@
           {{ sw.showHistory ? 'Hide History' : 'Show History' }}
         </button>
 
-        <div v-if="sw.showHistory" class="history-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Time</th>
-                <th>State</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="h in sw.history.slice(-5)" :key="h.date">
-                <td>{{ formatDate(h.date) }}</td>
-                <td>{{ h.state }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <robo-history-chart v-if="sw.showHistory"  :history="sw.history" title="History"/>
       </div>
     </div>
   </div>
@@ -104,15 +89,13 @@ const sendRequest = (req) => {
   store.commit('rws/setLaunch', JSON.stringify({ launch: req, tx: { tx_status: 'pending' } }));
 };
 
-const formatDate = (d) => new Date(d).toLocaleTimeString();
-
 const gangSwitchIcon = (sw) => {
   const name = sw.friendlyName || '';
   const match = name.match(/\d+/);
   const isOn = sw.isOn;
 
-  const baseStroke = '#aaa';
-  const activeColor = '#ffa600';
+  const baseStroke = 'var(--robo-color-dark-70)';
+  const activeColor = 'var(--robo-color-blue)';
   const strokeColor = baseStroke;
 
   if (match) {
@@ -212,7 +195,7 @@ const getIcon = (sw) => {
   border-radius: 50%;
 }
 input:checked + .slider {
-  background-color: var(--robo-color-orange);
+  background-color: var(--robo-color-blue);
 }
 input:checked + .slider:before {
   transform: translateX(18px);
@@ -224,7 +207,7 @@ input:checked + .slider:before {
 .history-btn {
   background: none;
   border: none;
-  color: #0077cc;
+  color: var(--robo-color-blue-80);
   cursor: pointer;
   font-size: 0.85rem;
   padding: 0;

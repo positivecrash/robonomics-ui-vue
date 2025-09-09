@@ -28,7 +28,8 @@ import Highcharts from 'highcharts'
 defineOptions({ name: 'RoboHistoryChart' })
 
 const props = defineProps({
-  history: { type: Array, default: () => [] }
+  history: { type: Array, default: () => [] },
+  title: { type: String }
 })
 
 const lightChartContainer = ref(null)
@@ -37,7 +38,7 @@ let chart = null
 function initChart() {
   chart = Highcharts.chart(lightChartContainer.value, {
     chart: { type: 'line', height: 250 },
-    title: { text: 'Light History' },
+    title: { text: props.title },
     xAxis: { type: 'datetime' },
     yAxis: {
       min: 0,
@@ -45,7 +46,7 @@ function initChart() {
       tickPositions: [0, 1],
       labels: { formatter() { return this.value ? 'ON' : 'OFF' } }
     },
-    series: [{ name: 'Light', data: [], step: 'left' }],
+    series: [{ name: props.title, data: [], step: 'left' }],
     credits: { enabled: false },
     tooltip: {
       formatter() {

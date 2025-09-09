@@ -147,6 +147,10 @@
     --robo-button-error-background: var(--robo-color-red);
     --robo-button-error-color: var(--robo-color-light);
     --robo-button-error-background-hover: var(--robo-color-red);
+
+    --robo-button-na-background: var(--robo-color-dark-70);
+    --robo-button-na-color: var(--robo-color-light);
+    --robo-button-na-background-hover: var(--robo-color-dark-90);
   }
 
   .robo-button .robo-text {
@@ -277,6 +281,12 @@
     --robo-button-background: var(--robo-button-error-background);
     --robo-button-color: var(--robo-button-error-color);
     --robo-button-background-hover: var(--robo-button-error-background-hover);
+  }
+
+   .robo-button-na {
+    --robo-button-background: var(--robo-button-na-background);
+    --robo-button-color: var(--robo-button-na-color);
+    --robo-button-background-hover: var(--robo-button-na-background-hover);
   }
   /* - coloring */
 

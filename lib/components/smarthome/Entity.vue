@@ -43,6 +43,10 @@
             // case "fan":
             // case "cover":
             //     return 'RoboSmarthomeEntitySwitcher';
+            case "climate":
+            case "humidifier":
+            case "water_heater":
+                return 'RoboSmarthomeEntityClimate';
             default: 
                 return 'RoboSmarthomeEntityDefault';
         }
