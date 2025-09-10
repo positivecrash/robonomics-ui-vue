@@ -1,8 +1,8 @@
 <template>
-  <robo-grid type="flex" gap="x05" offset="x025" galign="stretch">
+  <robo-grid type="flex" gap="x1" offset="x025" galign="stretch">
     <div class="robo-entity-default-part">
       <robo-text size="small" weight="bold">
-        {{ entityData?.attributes?.friendly_name || 'Unnamed Entity' }}
+        {{ entityData?.attributes?.friendly_name || 'Unnamed Entity' }}<span v-if="!hasServices">:</span>
       </robo-text>
       <!-- Тут выводим текущее состояние, если есть сервис (оставляя сбоку место под сервис) -->
       <robo-text v-if="hasServices && entityData.state" size="small">
@@ -11,9 +11,9 @@
       </robo-text>
     </div>
 
-    <div class="robo-entity-default-part">
+    <div class="robo-entity-default-part robo-entity-default-part--value">
         <!-- Выводим текущее состояние здесь сбоку, если нет сервиса -->
-      <robo-text v-if="!hasServices" size="small" weight="bold" :nowrap="12">
+      <robo-text v-if="!hasServices" size="small" :nowrap="12">
         {{ entityData.state }}
         <template v-if="entityUnits"> {{ entityUnits }} </template>
       </robo-text>
@@ -266,5 +266,11 @@ watch( () => props.entityData, () => {
 <style scoped>
 .robo-entity-default-part {
   max-width: 300px;
+}
+
+.robo-entity-default-part--value > .robo-text:first-of-type  {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 </style>
