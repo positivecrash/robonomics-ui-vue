@@ -38,11 +38,6 @@
         switch(type) {
             case "light": 
                 return 'RoboSmarthomeEntityLight';
-            // case "switch":
-            // case "outlet":
-            // case "fan":
-            // case "cover":
-            //     return 'RoboSmarthomeEntitySwitcher';
             case "climate":
             case "humidifier":
             case "water_heater":
