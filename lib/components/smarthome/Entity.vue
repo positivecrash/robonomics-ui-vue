@@ -42,6 +42,8 @@
             case "humidifier":
             case "water_heater":
                 return 'RoboSmarthomeEntityClimate';
+            case "weather": 
+                return 'RoboSmarthomeEntityWeather';
             default: 
                 return 'RoboSmarthomeEntityDefault';
         }

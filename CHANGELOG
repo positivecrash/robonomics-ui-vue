@@ -1,3 +1,7 @@
+v0.9.6
+- Refactor: updated weather card
+- Test: backup for missing datalog and config
+
 v0.9.5
 - Refactor: updated light and climate cards
 
