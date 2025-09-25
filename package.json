@@ -1,7 +1,7 @@
 {
   "name": "robonomics-ui-vue",
   "type": "module",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "main": "index.js",
   "module": "index.es.js",
   "private": false,
