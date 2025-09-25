@@ -27,7 +27,7 @@
                 <robo-section card shadow>
                   <robo-section>
                     <robo-text
-                      v-if="!Object.keys(device.entities).some(eid => eid.startsWith('light.'))"
+                      v-if="!Object.keys(device.entities).some(eid => eid.startsWith('light.')) && !Object.keys(device.entities).some(eid => eid.startsWith('weather.'))"
                       class="device-title"
                       title="5"
                     >
@@ -160,7 +160,8 @@ const categoryNames = {
   sensors: "Sensors & Detectors",
   tracking: "Device Tracking",
   other: "Other Devices",
-  automation: "Automations"
+  automation: "Automations",
+  weather: "Weather"
 };
 
 const typePriority = {
@@ -171,11 +172,12 @@ const typePriority = {
   security: ["alarm_control_panel", "lock", "camera"],
   media: ["media_player"],
   tracking: ["device_tracker"],
-  other: ["button", "number", "select", "text", "update", "weather"]
+  weather: ["weather"],
+  other: ["button", "number", "select", "text", "update"]
 };
 
 // Порядок категорий для сортировки вкладок в режиме Category
-const categoryOrder = ["lighting", "switches", "sensors", "climate", "security", "media", "tracking", "other"];
+const categoryOrder = ["lighting", "switches", "sensors", "climate", "security", "media", "tracking", "weather", "other"];
 
 // Реактивные переменные
 const devices = ref([]);

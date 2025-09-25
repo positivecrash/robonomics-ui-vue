@@ -241,12 +241,13 @@
                 </div>
                 <robo-icon v-if="updState === 'ok'" icon="check" color="var(--robo-color-green)" size="small" />
                 <robo-icon v-if="updState === 'error'" icon="warning" color="var(--robo-color-orange)" size="small" />
+                <robo-icon v-if="updState === 'backup'" icon="warning" color="var(--robo-color-orange)" size="small" />
               </robo-grid>
             </robo-text>
           </template>
           <robo-grid :columns="1" gap="x025">
             <robo-text size="small" weight="bold" offset="x05">
-              <template v-if="updateTime && config && datalog">Updated {{ timeAgo }}</template>
+              <template v-if="updateTime && config && datalog">Updated {{ configBackupUpdate || datalogBackupUpdate ? 'from backup' : '' }} {{ timeAgo }}</template>
               <template v-if="updateTime && (!config || !datalog) && updateTimeTimeout">Not updated</template>
               <template v-if="(!updateTime || !config || !datalog) && !updateTimeTimeout">
                 <robo-loader />
@@ -308,6 +309,14 @@ const props = defineProps({
     type: Number,
     default: null
   },
+  datalogBackupUpdate: {
+    type: String,
+    default: null
+  },
+  configBackupUpdate: {
+    type: String,
+    default: null
+  }
 })
 
 const rwslist = computed(() => store.state.robonomicsUIvue.rws.list)
@@ -320,9 +329,15 @@ const expiration = computed(() => store.state.robonomicsUIvue.rws.expiredate)
 const activeusers = computed(() => rwslist.value[active.value]?.users)
 
 const updState = computed(() => {
+
+  if (props.updateTime && props.config && props.datalog && (props.configBackupUpdate || props.datalogBackupUpdate)) {
+    return 'backup'
+  }
+
   if (props.updateTime && props.config && props.datalog) {
     return 'ok'
   }
+
   setTimeout(() => {
     if (!props.config || !props.datalog) {
       return 'error'
