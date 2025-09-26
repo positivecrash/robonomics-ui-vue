@@ -20,7 +20,7 @@
                 class="masonry-item"
               >
 
-              <template v-if="device?.model === 'Altruist Sensor'">
+              <template v-if="device?.model === 'Altruist Sensor' || device?.model === 'Altruist'">
                 <robo-smarthome-device-altruist :devicedata="device" :datalog="datalog" />
               </template>
               <template v-else>
@@ -161,7 +161,7 @@ const categoryNames = {
   tracking: "Device Tracking",
   other: "Other Devices",
   automation: "Automations",
-  weather: "Weather"
+  weather: "Forecast"
 };
 
 const typePriority = {

@@ -1,3 +1,6 @@
+v0.9.7
+- Fix: fixes for the cards
+
 v0.9.6
 - Refactor: updated weather card
 - Test: backup for missing datalog and config

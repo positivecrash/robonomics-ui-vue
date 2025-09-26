@@ -114,6 +114,7 @@ defineOptions({ name: 'RoboSmarthomeDeviceAltruist' })
 
 const SUFFIXES = [
   'wifi_signal',
+  'signal_strength',
   'pm10',
   'pm2_5',
   'humidity',
@@ -133,20 +134,21 @@ function parse(hist) {
 }
 
 // вычисляем общий префикс устройства
+const getBaseKey = (entityId) => {
+  const obj = entityId.split('.')[1] || ''
+  return obj.split('_')[0] || ''
+
+}
+
 const deviceKey = computed(() => {
   const first = Object.keys(props.devicedata.entities)[0] || ''
-  const obj = first.split('.')[1] || ''
-  const suf = SUFFIXES.find(s => obj.endsWith(`_${s}`))
-  return suf
-    ? obj.slice(0, obj.length - suf.length - 1)
-    : obj.split('_')[0]
+  return getBaseKey(first)
 })
 
 // ищем все entity этого устройства в datalog
 const allEntityIds = computed(() => {
-  const prefix = deviceKey.value + '_'
   return Object.keys(props.datalog.entities || {}).filter(id =>
-    (id.split('.')[1] || '').startsWith(prefix)
+    getBaseKey(id) === deviceKey.value
   )
 })
 
@@ -197,7 +199,7 @@ const pressureEntity = computed(
 
 // Wi-Fi сигнал
 const wifiStrength = computed(() => {
-  const w = parsedEntities.value.find(e => e.suffix === 'wifi_signal')
+  const w = parsedEntities.value.find(e => e.suffix === 'wifi_signal' || e.suffix === 'signal_strength')
   if (!w) return null
   const n = parseInt(w.data.state, 10)
   return isNaN(n) ? null : n
