@@ -297,7 +297,7 @@ const getProperties = (data) => {
 
 const toggleClimate = () => {
   isOn.value = !isOn.value
-  sendRequest(isOn.value ? "turn_off" : "turn_on")
+  sendRequest(!isOn.value ? "turn_off" : "turn_on")
 }
 
 const sendTemperature = () => {
@@ -327,6 +327,10 @@ const applySettings = () => {
 
 const sendRequest = (service, extraParams = {}) => {
   if (!serviceAvailable(props.services, service)) return
+
+  if(service === 'set_temperature' && !isOn.value) {
+    isOn.value = true
+  }
 
   const request = {
     platform: "climate",

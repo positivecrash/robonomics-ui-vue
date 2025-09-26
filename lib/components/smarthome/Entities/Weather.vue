@@ -79,7 +79,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue"
+import { ref, computed } from "vue"
 import { useStore } from 'vuex'
 
 const props = defineProps({
@@ -2160,49 +2160,6 @@ const weatherIcon = computed(
 const getIcon = (condition) => icons[condition] || icons["cloudy"]
 
 
-// methods
-const fetchForecast = (type = "daily") => {
-  if (!props.entityData || !props.services?.get_forecasts) return
-
-  const request = {
-    platform: "weather",
-    name: "get_forecasts",
-    params: {
-      entity_id: props.entityID,
-      type: type
-    }
-  }
-
-  // send via Vuex store
-  store.commit("rws/setLaunch", JSON.stringify({ launch: request, tx: { tx_status: "pending" } }))
-}
-
-watch(
-  () => store.state.robonomicsUIvue.rws.launch,
-  (v) => {
-    const resp = JSON.parse(v)
-    // console.log(resp)
-    if (resp?.launch?.params?.entity === props.entityData.entity_id && resp.launch.name === "get_forecasts") {
-      const data = resp.launch.response
-        if (data && data[props.entityID]?.forecast) {
-          forecast.value = data[props.entityID].forecast.map(d => ({
-            date: new Date(d.datetime).toLocaleDateString(),
-            max: d.temperature ?? d.temperature_high ?? null,
-            min: d.templow ?? d.temperature_low ?? null,
-            state: d.condition
-          }))
-      } else {
-        console.warn("Forecast request failed or pending", resp)
-      }
-    }
-  }
-)
-
-
-// onMounted(async () => {
-//   // fetchForecast("daily") 
-//   console.log(props)
-// })
 </script>
 
 <style scoped>

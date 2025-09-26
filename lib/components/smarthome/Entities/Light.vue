@@ -274,6 +274,14 @@ const sendBrightness = () => sendRequest('turn_on', { brightness: brightness.val
 const sendRequest = (service, extraParams = {}) => {
   if (!serviceAvailable(props.services, service)) return
 
+  if(service === 'turn_on') {
+    isOn.value = true
+  }
+
+    if(service === 'turn_off') {
+      isOn.value = false
+    }
+
   const request = {
     platform: 'light',
     name: service,
