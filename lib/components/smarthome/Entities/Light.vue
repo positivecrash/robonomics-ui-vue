@@ -10,10 +10,14 @@
           @update:modelValue="sendBrightness"
         />
         <div class="center-icon" @click="toggleLight">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-              class="bulb-svg" :style="iconStyle">
-            <path d="M12,2A7,7 0 0,0 5,9c0,3.5 2.5,5.5 3.5,6.5a2,2 0 0,1 0.5,1.5V19a1,1 0 0,0 1,1h4a1,1 0 0,0 1-1v-2a2,2 0 0,1 0.5-1.5C16.5,14.5 19,12.5 19,9A7,7 0 0,0 12,2Z"
-                  fill="currentColor"/>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="bulb-svg" :style="iconStyle">
+            <!-- Bulb glass -->
+            <path d="M12,2A7,7 0 0,0 5,9c0,3.5 2.5,5.5 3.5,6.5a2,2 0 0,1 0.5,1.5V19a1,1 0 0,0 1,1h4a1,1 0 0,0 1-1v-2a2,2 0 0,1 0.5-1.5C16.5,14.5 19,12.5 19,9A7,7 0 0,0 12,2Z" fill="currentColor"/>
+
+            <!-- Bulb base -->
+            <rect x="10" y="19" width="4" height="3" rx="0.5" ry="0.5" fill="currentColor"/>
+            <line x1="10" y1="20" x2="14" y2="20" stroke="#555" stroke-width="0.5"/>
+            <line x1="10" y1="21" x2="14" y2="21" stroke="#555" stroke-width="0.5"/>
           </svg>
         </div>
       </div>
@@ -122,7 +126,7 @@
       </div>
 
       <div class="apply-settings">
-        <robo-button @click="applySettings">Apply Changes</robo-button>
+        <robo-button :disabled="requestStatus === 'waiting'" @click="applySettings">Apply Changes</robo-button>
       </div>
 
       <robo-history-chart v-if="entityData.history" :history="entityData.history" title="Light History"/>
@@ -133,7 +137,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch} from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useStore } from 'vuex'
 import { serviceAvailable } from '../tools'
 
@@ -217,8 +221,27 @@ const availableEffects = computed(() => {
 })
 
 const supportsBrightness = computed(() => 'brightness' in (props.entityData?.attributes || {}))
-const supportsColor = computed(() => 'rgb_color' in (props.entityData?.attributes || {}))
-const supportsColorTemp = computed(() => 'color_temp' in (props.entityData?.attributes || {}))
+const supportsColor = computed(() => {
+  const attrs = props.entityData?.attributes || {}
+  const modes = attrs.supported_color_modes
+  let arr = []
+  if (Array.isArray(modes)) arr = modes
+  else if (typeof modes === 'string') {
+    try { arr = JSON.parse(modes.replace(/'/g, '"')) } catch {}
+  }
+  return arr.some(m => ['rgb', 'rgbw', 'rgbww', 'hs', 'xy'].includes(String(m)))
+})
+const supportsColorTemp = computed(() => {
+  const attrs = props.entityData?.attributes || {}
+  const modes = attrs.supported_color_modes
+  let arr = []
+  if (Array.isArray(modes)) arr = modes
+  else if (typeof modes === 'string') {
+    try { arr = JSON.parse(modes.replace(/'/g, '"')) } catch {}
+  }
+  if (arr.length) return arr.includes('color_temp')
+  return 'color_temp' in attrs
+})
 const supportsTransitions = computed(() => {
   const features = props.entityData?.attributes?.supported_features ?? 0
   return (features & 32) !== 0
@@ -243,7 +266,20 @@ const iconStyle = computed(() => {
     color: bulbRgb,
     filter: `drop-shadow(0 0 8px ${shadowColor})`
   }
+  
 });
+
+const kelvinToMired = (k) => {
+  const n = Number(k)
+  if (!n || isNaN(n) || n <= 0) return null
+  return Math.round(1000000 / n)
+}
+
+const miredToKelvin = (m) => {
+  const n = Number(m)
+  if (!n || isNaN(n) || n <= 0) return null
+  return Math.round(1000000 / n)
+}
 
 const toggleLight = () => {
   isOn.value = !isOn.value
@@ -258,11 +294,23 @@ const toggleLight = () => {
 const applySettings = () => {
  const params = {}
 
+  const effectActive = supportsEffects.value && currentEffect.value && currentEffect.value !== 'none'
+
   if (supportsBrightness.value) params.brightness = brightness.value
-  if (supportsColor.value) params.rgb_color = color.value
-  if (supportsColorTemp.value) params.color_temp = colorTemp.value
   if (supportsTransitions.value) params.transition = transition.value
-  if (supportsEffects.value && currentEffect.value !== 'none') {
+
+  if (!effectActive) {
+    if (supportsColor.value) params.rgb_color = color.value
+    if (supportsColorTemp.value) {
+      const attrs = props.entityData?.attributes || {}
+      const kelvin = Math.min(Math.max(displayColorTemp.value, minKelvin.value), maxKelvin.value)
+      const minMireds = Number(attrs.min_mireds) || kelvinToMired(maxKelvin.value)
+      const maxMireds = Number(attrs.max_mireds) || kelvinToMired(minKelvin.value)
+      const mired = kelvinToMired(kelvin)
+      const clampedMired = Math.min(Math.max(mired, minMireds), maxMireds)
+      params.color_temp = clampedMired
+    }
+  } else {
     params.effect = currentEffect.value
   }
 
@@ -290,6 +338,11 @@ const sendRequest = (service, extraParams = {}) => {
 
   requestStatus.value = 'waiting'
   requestMsg.value = 'Waiting for request complete'
+
+  if (statusTimeout) clearTimeout(statusTimeout)
+  statusTimeout = setTimeout(() => {
+    showStatus('error', 'Request timed out')
+  }, 60000)
 
   store.commit('rws/setLaunch', JSON.stringify({ launch: request, tx: { tx_status: 'pending' } }))
 }
@@ -323,10 +376,12 @@ const showStatus = (status, msg, duration = 4000) => {
   if (statusTimeout) clearTimeout(statusTimeout)
 
   
-  statusTimeout = setTimeout(() => {
-    requestStatus.value = 'init'
-    requestMsg.value = null
-  }, duration)
+  if (status !== 'waiting') {
+    statusTimeout = setTimeout(() => {
+      requestStatus.value = 'init'
+      requestMsg.value = null
+    }, duration)
+  }
 }
 
 watch(showSettings, () => {
@@ -345,7 +400,8 @@ watch(() => props.entityData, () => {
   const rgb = data.attributes?.rgb_color
   color.value = Array.isArray(rgb) ? rgb.map(c => Number(c) || 0) : [255, 180, 0]
 
-  colorTemp.value = data.attributes?.color_temp ?? null
+  const ctMireds = data.attributes?.color_temp
+  colorTemp.value = (typeof ctMireds === 'number' && ctMireds > 0) ? miredToKelvin(ctMireds) : null
 
   currentEffect.value = 
     (data.attributes?.effect && data.attributes.effect !== 'None')
@@ -372,6 +428,7 @@ watch(
 
 <style scoped>
 .light-card {
+  position: relative;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -401,7 +458,7 @@ watch(
 
 .bulb-svg {
   width: 7rem;
-  height: 5rem;
+  height: 6rem;
   transition: all 0.3s ease;
 }
 
