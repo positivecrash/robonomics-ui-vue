@@ -20,7 +20,7 @@
                 class="masonry-item"
               >
 
-              <template v-if="device?.model === 'Altruist Sensor' || device?.model === 'Altruist'">
+              <template v-if="device?.model && device.model.includes('Altruist')">
                 <robo-smarthome-device-altruist :devicedata="device" :datalog="datalog" />
               </template>
               <template v-else>

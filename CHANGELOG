@@ -1,3 +1,7 @@
+v0.9.8
+- Refactor: some cards updates
+- Fix: a few fixes for requests
+
 v0.9.7
 - Fix: fixes for the cards
 
@@ -15,9 +19,9 @@ v0.9.3
 - Feat: list of all subscriptions (just started this)
 
 v0.9.2
-- Fix: controller editting issue
+- Fix: controller editing issue
 - Fix: controller error when empty
-- Fix: layout fix (forms sentering)
+- Fix: layout fix (forms centering)
 
 v0.9.1
 - Fixes for details, controller reset
@@ -25,6 +29,6 @@ v0.9.1
 v0.9.0
 
 - Fix: peerDependencies added
-- Feat: IPFS gateways usage (get list of available, get the fastes gateway, user gateways support):
+- Feat: IPFS gateways usage (get list of available, get the fastest gateway, user gateways support):
 store.robonomicsUIvue.ipfs.activeGateway - active available gateway
 store.robonomicsUIvue.ipfs.availableGateways - all available gateways

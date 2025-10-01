@@ -61,35 +61,21 @@
             ref="airQualityChartContainer"
             v-show="pm10Data.length || pm25Data.length"
           ></div>
+
+          <robo-status type="info" v-if="!pm10Data.length && !pm25Data.length">No data available for display</robo-status>
         </robo-tab>
 
         <robo-tab label="Atmosphere">
-          <div
-            class="current-value"
-            v-if="temperatureEntity && temperatureEntity.data.state !== 'unavailable'"
-          >
-            <b>Temperature:</b> {{ temperatureEntity.data.state }}
-            <span class="unit">{{ temperatureEntity.data.units }}</span>
-          </div>
-          <div
-            class="current-value"
-            v-if="humidityEntity && humidityEntity.data.state !== 'unavailable'"
-          >
-            <b>Humidity:</b> {{ humidityEntity.data.state }}
-            <span class="unit">{{ humidityEntity.data.units }}</span>
-          </div>
-          <div
-            class="current-value"
-            v-if="pressureEntity && pressureEntity.data.state !== 'unavailable'"
-          >
-            <b>Pressure:</b> {{ pressureEntity.data.state }}
-            <span class="unit">{{ pressureEntity.data.units }}</span>
+          <div class="current-value" v-if="currentAtmosEntity">
+            <b>{{ currentAtmosLabel }}:</b>
+            {{ currentAtmosValue }}
+            <span class="unit">{{ currentAtmosEntity.data.units }}</span>
           </div>
 
           <div
             class="chart-container"
             ref="atmosphereChartContainer"
-            v-show="tempData.length"
+            v-show="selectedAtmosData.length"
           ></div>
         </robo-tab>
       </robo-tabs>
@@ -98,7 +84,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch, nextTick, onMounted } from 'vue'
+import { computed, ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import Highcharts from 'highcharts'
 
 Highcharts.setOptions({
@@ -197,6 +183,47 @@ const pressureEntity = computed(
   () => atmosphereEntities.value.find(e => e.suffix === 'pressure') || null
 )
 
+const availableAtmosMetrics = computed(() => {
+  const list = []
+  if (temperatureEntity.value) list.push('temperature')
+  if (humidityEntity.value) list.push('humidity')
+  if (pressureEntity.value) list.push('pressure')
+  return list
+})
+
+const selectedAtmosMetric = ref('temperature')
+watch(availableAtmosMetrics, (avail) => {
+  if (!avail.includes(selectedAtmosMetric.value)) {
+    selectedAtmosMetric.value = avail[0] || 'temperature'
+  }
+}, { immediate: true })
+
+const currentAtmosEntity = computed(() => {
+  if (selectedAtmosMetric.value === 'humidity') return humidityEntity.value
+  if (selectedAtmosMetric.value === 'pressure') return pressureEntity.value
+  return temperatureEntity.value
+})
+
+const currentAtmosLabel = computed(() => {
+  return {
+    temperature: 'Temperature',
+    humidity: 'Humidity',
+    pressure: 'Pressure'
+  }[selectedAtmosMetric.value]
+})
+
+const selectedAtmosData = computed(() => {
+  if (selectedAtmosMetric.value === 'humidity') return humidityData.value
+  if (selectedAtmosMetric.value === 'pressure') return pressureData.value
+  return tempData.value
+})
+
+const currentAtmosValue = computed(() => {
+  const raw = Number(currentAtmosEntity.value?.data?.state)
+  if (isNaN(raw)) return currentAtmosEntity.value?.data?.state || ''
+  return raw.toFixed(2)
+})
+
 // Wi-Fi сигнал
 const wifiStrength = computed(() => {
   const w = parsedEntities.value.find(e => e.suffix === 'wifi_signal' || e.suffix === 'signal_strength')
@@ -228,11 +255,18 @@ const pm25Data = computed(() =>
 const tempData = computed(() =>
   parse(atmosphereEntities.value.find(e => e.suffix === 'temperature')?.data.history || [])
 )
+const humidityData = computed(() =>
+  parse(atmosphereEntities.value.find(e => e.suffix === 'humidity')?.data.history || [])
+)
+const pressureData = computed(() =>
+  parse(atmosphereEntities.value.find(e => e.suffix === 'pressure')?.data.history || [])
+)
 
 // контейнеры для рендера
 const noiseChartContainer = ref(null)
 const airQualityChartContainer = ref(null)
 const atmosphereChartContainer = ref(null)
+const atmosphereChart = ref(null)
 
 // зоны для Highcharts
 const noiseZones = [
@@ -266,7 +300,7 @@ function renderNoiseChart() {
     plotOptions: { series: { zoneAxis: 'y', lineWidth: 2 } },
     tooltip: {
       headerFormat: '<span style="font-size:12px">{point.x:%H:%M}</span><br/>',
-      pointFormat: '<b>{series.name}</b>: {point.y}<br/>'
+      pointFormat: '<b>{series.name}</b>: {point.y:.2f}<br/>'
     },
     xAxis: { type: 'datetime' },
     yAxis: { title: { text: null } },
@@ -289,7 +323,7 @@ function renderAirQualityChart() {
     plotOptions: { series: { zoneAxis: 'y', lineWidth: 2 } },
     tooltip: {
       headerFormat: '<span style="font-size:12px">{point.x:%H:%M}</span><br/>',
-      pointFormat: '<b>{series.name}</b>: {point.y}<br/>'
+      pointFormat: '<b>{series.name}</b>: {point.y:.2f}<br/>'
     },
     xAxis: { type: 'datetime' },
     yAxis: { title: { text: null } },
@@ -301,35 +335,92 @@ function renderAirQualityChart() {
 }
 
 function renderAtmosphereChart() {
-  if (!tempData.value.length || !atmosphereChartContainer.value) {
+  if ((!selectedAtmosData.value.length) || !atmosphereChartContainer.value) {
     return
   }
-  Highcharts.chart(atmosphereChartContainer.value, {
+  const labelMap = { temperature: 'Temperature', humidity: 'Humidity', pressure: 'Pressure' }
+  const seriesDefs = []
+  if (tempData.value.length) {
+    seriesDefs.push({
+      name: labelMap.temperature,
+      data: tempData.value.slice(),
+      visible: selectedAtmosMetric.value === 'temperature',
+      events: { legendItemClick: function() { legendClickHandler('temperature'); return false } }
+    })
+  }
+  if (humidityData.value.length) {
+    seriesDefs.push({
+      name: labelMap.humidity,
+      data: humidityData.value.slice(),
+      visible: selectedAtmosMetric.value === 'humidity',
+      events: { legendItemClick: function() { legendClickHandler('humidity'); return false } }
+    })
+  }
+  if (pressureData.value.length) {
+    seriesDefs.push({
+      name: labelMap.pressure,
+      data: pressureData.value.slice(),
+      visible: selectedAtmosMetric.value === 'pressure',
+      events: { legendItemClick: function() { legendClickHandler('pressure'); return false } }
+    })
+  }
+
+  const unitLabel = selectedAtmosMetric.value === 'temperature' ? '{value}°' : (selectedAtmosMetric.value === 'humidity' ? '{value}%' : '{value} hPa')
+
+  if (atmosphereChart.value) {
+    try { atmosphereChart.value.destroy() } catch {}
+    atmosphereChart.value = null
+  }
+
+  atmosphereChart.value = Highcharts.chart(atmosphereChartContainer.value, {
     chart: { type: 'spline', zoomType: 'x' },
     title: { text: null },
     credits: { enabled: false },
-    legend: { enabled: false },
+    legend: { enabled: true, symbolWidth: 0 },
     plotOptions: { series: { lineWidth: 2 } },
     tooltip: {
       headerFormat: '<span style="font-size:12px">{point.x:%H:%M}</span><br/>',
-      pointFormat: '<b>{series.name}</b>: {point.y}<br/>'
+      pointFormat: '<b>{series.name}</b>: {point.y:.2f}<br/>'
     },
     xAxis: { type: 'datetime' },
-    yAxis: { title: { text: null } },
-    series: [{ name: 'Temperature', data: tempData.value }]
+    yAxis: { title: { text: null }, labels: { format: unitLabel } },
+    series: seriesDefs
   })
+}
+
+function legendClickHandler(metric) {
+  selectedAtmosMetric.value = metric
+  const chart = atmosphereChart.value
+  if (!chart) return false
+  const labelMap = { temperature: 'Temperature', humidity: 'Humidity', pressure: 'Pressure' }
+  const targetName = labelMap[metric]
+  chart.series.forEach(s => {
+    const shouldBeVisible = s.name === targetName
+    if (s.visible !== shouldBeVisible) {
+      s.setVisible(shouldBeVisible, false)
+    }
+  })
+  chart.redraw()
+  return false
 }
 
 // отслеживаем изменения данных
 watch([noiseMaxData, avgNoiseData], renderNoiseChart)
 watch([pm10Data, pm25Data], renderAirQualityChart)
-watch(tempData, renderAtmosphereChart)
+watch([tempData, humidityData, pressureData], renderAtmosphereChart)
 
 onMounted(async () => {
   await nextTick()
   renderNoiseChart()
   renderAirQualityChart()
   renderAtmosphereChart()
+})
+
+onUnmounted(() => {
+  if (atmosphereChart.value) {
+    try { atmosphereChart.value.destroy() } catch {}
+    atmosphereChart.value = null
+  }
 })
 </script>
 
