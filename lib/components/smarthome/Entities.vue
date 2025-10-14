@@ -73,10 +73,10 @@
         <robo-grid :columns="1" gap="x05">
           <template v-for="(entityData, entity) in sortedAutomations(automations)" :key="entity">
             <robo-section card shadow width="wide">
-              <robo-text class="device-title" title="5" :class="'automation-title-state-' + entityData.state">
-                {{ entity }}
-              </robo-text>
-              <robo-text class="device-content" size="small">{{ entityData }}</robo-text>
+              <robo-smarthome-entity-automation        
+                :entityID="entity"
+                :entityData="entityData">
+                </robo-smarthome-entity-automation>
             </robo-section>
           </template>
         </robo-grid>
@@ -432,25 +432,6 @@ function splitIntoColumns(items, colCount) {
   padding: var(--robo-space);
 }
 
-.device-title[class*="automation-title-state-"] {
-  position: relative;
-}
-.device-title[class*="automation-title-state-"]:after {
-  content: "";
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  display: block;
-  width: 14px;
-  height: 14px;
-  border-radius: 7px;
-}
-.automation-title-state-on:after {
-  background-color: var(--robo-color-green);
-}
-.automation-title-state-off:after {
-  background-color: var(--robo-color-red);
-}
 .device-expand {
   display: block;
   width: 100%;
