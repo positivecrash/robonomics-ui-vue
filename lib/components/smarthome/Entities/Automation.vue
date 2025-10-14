@@ -16,7 +16,7 @@
         @input="error = null, status = 'init'"
       ></textarea>
       <div class="editor-actions">
-        <robo-button size="small" @click="cancelEdit"             :disabled="status !== 'init'">Cancel</robo-button>
+        <robo-button size="small" @click="cancelEdit" :disabled="status !== 'init'">Cancel</robo-button>
         <robo-button
           size="small"
           :disabled="saving || status !== 'init'"
@@ -29,7 +29,7 @@
 
     <template v-else>
       <!-- Click on YAML to edit -->
-      <pre class="yaml-preview" @click="startEdit">{{ entityYaml }}</pre>
+      <pre class="yaml-preview">{{ entityYaml }}</pre>
     </template>
 
     <div class="error">{{ error }}</div>
@@ -103,11 +103,8 @@ const saveYaml = async () => {
   try {
     const parsed = yaml.load(yamlText.value)
 
-
     if (!parsed || typeof parsed !== 'object') throw new Error('Invalid YAML structure')
-    if (!parsed.attributes || typeof parsed.attributes !== 'object') {
-      throw new Error('Automation must have an "attributes" object')
-    }
+  
 
     sendAutomationUpdate(parsed)
 
@@ -121,9 +118,9 @@ const saveYaml = async () => {
 }
 
 const sendAutomationUpdate = (configJson) => {
-  const request = {
-    platform: 'automation',
-    name: 'update_config',
+  const updateRequest = {
+    platform: 'config',
+    name: 'update_automation',
     params: {
       entity_id: props.entityID,
       config: configJson
@@ -133,7 +130,7 @@ const sendAutomationUpdate = (configJson) => {
   store.commit(
     'rws/setLaunch',
     JSON.stringify({
-      launch: request,
+      launch: updateRequest,
       tx: { tx_status: 'pending' }
     })
   )
@@ -149,7 +146,7 @@ const handleRequest = (response) => {
   }
 
   if (resp?.launch?.params?.entity_id === props.entityID &&
-      resp?.launch?.name === 'update_config') {
+      resp?.launch?.name === 'update_automation') {
 
     if (resp?.tx?.tx_status === 'success') {
       status.value = 'ok'
