@@ -3,6 +3,7 @@
     ref="sliderRef"
     :viewBox="type === 'line' ? `0 0 ${lineWidth} ${lineHeight}` : `0 0 ${size} ${size}`"
     class="circular-slider"
+    :class="disabled ? 'disabled' : ''"
     @mousedown="startDrag"
     @touchstart="startDrag"
     @click="handleClick"
@@ -261,5 +262,10 @@ watch(
   touch-action: none;
   width: 100%;
   height: 100%;
+}
+
+.circular-slider.disabled {
+  pointer-events: none;
+  opacity: 0.4;
 }
 </style>

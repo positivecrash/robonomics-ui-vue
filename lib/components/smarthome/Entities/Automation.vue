@@ -1,5 +1,5 @@
 <template>
-  <div class="automation-card">
+  <div class="automation-card" @click="sendRequest">
     <robo-text
       class="device-title"
       title="5"
@@ -43,7 +43,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import yaml from 'js-yaml'
 import { useStore } from 'vuex'
 
@@ -106,8 +106,6 @@ const saveYaml = async () => {
     if (!parsed || typeof parsed !== 'object') throw new Error('Invalid YAML structure')
   
 
-    sendAutomationUpdate(parsed)
-
   } catch (e) {
     error.value = 'YAML error: ' + e.message
     status.value = 'error'
@@ -117,20 +115,26 @@ const saveYaml = async () => {
   }
 }
 
-const sendAutomationUpdate = (configJson) => {
-  const updateRequest = {
-    platform: 'config',
-    name: 'update_automation',
-    params: {
-      entity_id: props.entityID,
-      config: configJson
-    }
+const sendRequest = (extraParams = {}) => {
+  let service = 'disable'
+
+  if(props.entityData.state === 'off') {
+    service = 'enable'
   }
+
+  const request = {
+    platform: 'automation',
+    name: service,
+    params: {entity_id: props.entityID, state: service === 'disable' ? 'off' : 'on', ...extraParams },
+  }
+
+  status.value = "waiting"
+  message.value = "Waiting for request complete"
 
   store.commit(
     'rws/setLaunch',
     JSON.stringify({
-      launch: updateRequest,
+      launch: request,
       tx: { tx_status: 'pending' }
     })
   )
@@ -145,13 +149,12 @@ const handleRequest = (response) => {
     return 
   }
 
-  if (resp?.launch?.params?.entity_id === props.entityID &&
-      resp?.launch?.name === 'update_automation') {
+  if (resp?.launch?.params?.entity_id === props.entityID) {
 
     if (resp?.tx?.tx_status === 'success') {
       status.value = 'ok'
       message.value = 'Automation updated successfully!'
-      entityYaml.value = yamlText.value
+      // entityYaml.value = yamlText.value
       editing.value = false
       success.value = true
       setTimeout(() => (success.value = false), 4000)
@@ -175,6 +178,10 @@ watch(
     if (v) handleRequest(v)
   }
 )
+
+onMounted(() => {
+  console.log(props)
+})
 </script>
 
 <style scoped>
