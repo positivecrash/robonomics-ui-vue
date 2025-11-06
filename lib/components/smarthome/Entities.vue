@@ -75,7 +75,9 @@
             <robo-section card shadow width="wide">
               <robo-smarthome-entity-automation        
                 :entityID="entity"
-                :entityData="entityData">
+                :entityData="entityData"
+                :services="services[entity.split('.')[0]]"
+                >
                 </robo-smarthome-entity-automation>
             </robo-section>
           </template>

@@ -46,6 +46,7 @@
 import { onMounted, ref, watch } from 'vue'
 import yaml from 'js-yaml'
 import { useStore } from 'vuex'
+import { serviceAvailable } from '../tools'
 
 defineOptions({
   name: 'RoboSmarthomeEntityAutomation'
@@ -54,7 +55,7 @@ defineOptions({
 const props = defineProps({
   entityData: { type: Object, required: true },
   entityID: { type: String, required: true },
-  services: { type: Array, default: () => [] }
+  services: { type: Object }
 })
 
 /* Store */
@@ -116,17 +117,15 @@ const saveYaml = async () => {
 }
 
 const sendRequest = (extraParams = {}) => {
-  let service = 'disable'
-
-  if(props.entityData.state === 'off') {
-    service = 'enable'
-  }
+  let service = props.entityData.state === 'off' ? 'turn_on' : 'turn_off'
 
   const request = {
     platform: 'automation',
     name: service,
-    params: {entity_id: props.entityID, state: service === 'disable' ? 'off' : 'on', ...extraParams },
+    params: { entity_id: props.entityID },
   }
+
+  console.log('Sending automation request:', request)
 
   status.value = "waiting"
   message.value = "Waiting for request complete"
