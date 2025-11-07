@@ -1,5 +1,5 @@
 <template>
-  <div class="automation-card">
+  <div class="automation-card" @click="sendRequest">
     <robo-text
       class="device-title"
       title="5"
@@ -46,6 +46,7 @@
 import { ref, watch } from 'vue'
 import yaml from 'js-yaml'
 import { useStore } from 'vuex'
+import { serviceAvailable } from '../tools'
 
 defineOptions({
   name: 'RoboSmarthomeEntityAutomation'
@@ -54,7 +55,7 @@ defineOptions({
 const props = defineProps({
   entityData: { type: Object, required: true },
   entityID: { type: String, required: true },
-  services: { type: Array, default: () => [] }
+  services: { type: Object }
 })
 
 /* Store */
@@ -106,8 +107,6 @@ const saveYaml = async () => {
     if (!parsed || typeof parsed !== 'object') throw new Error('Invalid YAML structure')
   
 
-    sendAutomationUpdate(parsed)
-
   } catch (e) {
     error.value = 'YAML error: ' + e.message
     status.value = 'error'
@@ -117,20 +116,26 @@ const saveYaml = async () => {
   }
 }
 
-const sendAutomationUpdate = (configJson) => {
-  const updateRequest = {
-    platform: 'config',
-    name: 'update_automation',
-    params: {
-      entity_id: props.entityID,
-      config: configJson
-    }
+const sendRequest = () => {
+  let service = props.entityData.state === 'off' ? 'turn_on' : 'turn_off'
+
+  if (!serviceAvailable(props.services, service)) return
+
+  const request = {
+    platform: 'automation',
+    name: service,
+    params: { entity_id: props.entityID },
   }
+
+  console.log('Sending automation request:', request)
+
+  status.value = "waiting"
+  message.value = "Waiting for request complete"
 
   store.commit(
     'rws/setLaunch',
     JSON.stringify({
-      launch: updateRequest,
+      launch: request,
       tx: { tx_status: 'pending' }
     })
   )
@@ -145,13 +150,12 @@ const handleRequest = (response) => {
     return 
   }
 
-  if (resp?.launch?.params?.entity_id === props.entityID &&
-      resp?.launch?.name === 'update_automation') {
+  if (resp?.launch?.params?.entity_id === props.entityID) {
 
     if (resp?.tx?.tx_status === 'success') {
       status.value = 'ok'
       message.value = 'Automation updated successfully!'
-      entityYaml.value = yamlText.value
+      // entityYaml.value = yamlText.value
       editing.value = false
       success.value = true
       setTimeout(() => (success.value = false), 4000)
