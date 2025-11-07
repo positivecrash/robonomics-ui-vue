@@ -43,7 +43,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import yaml from 'js-yaml'
 import { useStore } from 'vuex'
 import { serviceAvailable } from '../tools'
@@ -116,8 +116,10 @@ const saveYaml = async () => {
   }
 }
 
-const sendRequest = (extraParams = {}) => {
+const sendRequest = () => {
   let service = props.entityData.state === 'off' ? 'turn_on' : 'turn_off'
+
+  if (!serviceAvailable(props.services, service)) return
 
   const request = {
     platform: 'automation',
@@ -177,10 +179,6 @@ watch(
     if (v) handleRequest(v)
   }
 )
-
-onMounted(() => {
-  console.log(props)
-})
 </script>
 
 <style scoped>
