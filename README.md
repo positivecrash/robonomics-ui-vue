@@ -16,7 +16,7 @@ This project uses [Vite](https://vitejs.dev/) to build a Vue 3 component library
 To build the library for production (for publishing or packaging):
 
 ```bash
-yarn build
+npm run build
 ```
 
 This will:
@@ -36,7 +36,7 @@ This will:
 To build and test the package locally with a dependent dApp project:
 
 ```bash
-yarn build-dev
+npm run build-dev
 ```
 
 This will:
@@ -62,7 +62,7 @@ Use `build.config.example.mjs` as a reference.
 1. **Build the library (optional for local checks)**
 
    ~~~bash
-   yarn build
+   npm run build
    ~~~
 
 2. **Bump version & commit**
@@ -93,7 +93,7 @@ That’s all! The GitHub Action defined in `.github/workflows/publish.yml` will:
 
 > **Manual publish (without CI)**  
 > ~~~bash
-> yarn build && cd dist && npm publish --access public
+> npm run build && cd dist && npm publish --access public
 > ~~~  
 > Ensure `NPM_TOKEN` with **publish** permission is configured.
 

@@ -1,4 +1,5 @@
 <template>
+  <div>
   <robo-details 
     :class="classes" 
     :summarystyle="selectstyle ? 'select' : 'text'" 
@@ -69,9 +70,11 @@
 
       <robo-section offset="x05" v-if="extensionAllowShift">
         <robo-grid type="grid" offset="x05" gap="x1" :columns="4">
-          <template v-for="item in extensions" :key="item.id">
-            <robo-account-polkadot-extension :wallet="item.wallet" />
-          </template>
+          <robo-account-polkadot-extension
+            v-for="item in extensions"
+            :key="item.id"
+            :wallet="item.wallet"
+          />
         </robo-grid>
       </robo-section>
 
@@ -82,7 +85,7 @@
   </robo-details>
 
   <robo-text size="tiny" weight="bold" highlight="error" v-if="typeerror">Your account's type is {{activeAccount?.type}}, you need here {{props.type}}. Try another account.</robo-text>
-
+  </div>
 </template>
 
 <script>
@@ -95,6 +98,7 @@
   import { isValidAddress } from './tools'
   import { shortenAddress } from '../../tools'
   import extensions from './extensions'
+  import { getExtensionIconUrl } from './extensions/icons'
   import chains from './chains'
 
   import { useStore } from 'vuex'
@@ -190,14 +194,10 @@
     return store.state.robonomicsUIvue.polkadot.wallet ?? ''
   })
 
-  const activeExtensionImg = computed( () => {
+  const activeExtensionImg = computed(() => {
     const wallet = store.state.robonomicsUIvue.polkadot.wallet
     const data = extensions.find(ext => ext.wallet === wallet)
-    if(data) {
-      return new URL(`../polkadot/extensions/${data.picture}`, import.meta.url)
-    } else {
-      return null
-    }
+    return data?.picture ? getExtensionIconUrl(data.picture) : null
   })
   
   /* balanceXRT needs to be rewritten with getting balance here */

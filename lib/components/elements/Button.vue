@@ -81,19 +81,9 @@
   })
 
   const componentType = computed( () => {
-    
-    if(props.href) {
-      return 'a'
-    }
-
-    if(props.router) {
-      return 'router-link'
-    }
-
-    if(!props.href && !props.router) {
-      return 'button'
-    }
-
+    if (props.href) return 'a';
+    if (props.router) return 'router-link';
+    return 'button';
   })
 
   const classes = computed( () => {

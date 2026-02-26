@@ -128,9 +128,12 @@ async function saveIconFont() {
 }
 
 // 📦 Конфигурация Vite
+// Не инлайнить ассеты в data URI — иначе при использовании бандла в Webpack-приложении
+// строка data:image/svg+xml,... попадает в резолвер модулей и даёт "Cannot find module 'data:...'"
 export default defineConfig({
   build: {
     emptyOutDir: false,
+    assetsInlineLimit: 0,
     lib: {
       entry: path.resolve(__dirname, 'lib/index.js'),
       name: 'RobonomicsUiVue',

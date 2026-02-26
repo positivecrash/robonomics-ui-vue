@@ -7,7 +7,7 @@
     :title="extensionData.name"
     :class="classes"
     clean>
-        <img :src="getImageUrl(extensionData.picture)" />
+        <img v-if="extensionData?.picture" :src="getImageUrl(extensionData.picture)" />
 
         <span class="robo-dotlabel" :class="walletInstalled ? 'green' : null">
             <robo-icon :icon="walletInstalled ? 'check' : 'arrow-down'" size="supertiny" />
@@ -21,8 +21,9 @@
 </script>
 
 <script setup>
-    import {computed, ref, onMounted, watch } from 'vue'
+    import { computed, ref, onMounted, watch } from 'vue'
     import extensions from './extensions'
+    import { getExtensionIconUrl } from './extensions/icons'
 
     import { useStore } from 'vuex'
     const store = useStore()
@@ -40,8 +41,8 @@
     const getExtension = ref(null);
     const walletConnected = ref(false);
 
-    const extensionData = computed( () => { return extensions.find(ext => ext.wallet === props.wallet) });
-    const getImageUrl = image => { return new URL(`../polkadot/extensions/${image}`, import.meta.url) }
+    const extensionData = computed(() => extensions.find(ext => ext.wallet === props.wallet) || extensions[0]);
+    const getImageUrl = (image) => getExtensionIconUrl(image);
 
     const enable = async () => {
         await getExtension.value.enable().then(

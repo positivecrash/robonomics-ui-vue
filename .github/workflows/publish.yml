@@ -20,21 +20,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 2. Устанавливаем Node LTS и включаем yarn-кэш
+      # 2. Устанавливаем Node 24 и кэш npm
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org/'
-          cache: 'yarn'
+          cache: 'npm'
 
-      # 3. Ставим зависимости из yarn.lock
+      # 3. Ставим зависимости из package-lock.json
       - name: Install deps
-        run: yarn install --frozen-lockfile
+        run: npm ci
 
       # 4. Сборка библиотеки (скрипт уже есть в package.json)
       - name: Build package
-        run: yarn build
+        run: npm run build
 
       # 5. Публикуем в npm ТОЛЬКО при пуше тега-версии
       - name: Publish to npm

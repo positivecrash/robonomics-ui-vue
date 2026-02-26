@@ -1,6 +1,6 @@
 <template>
   <span
-    v-if="props.icon"
+    v-if="safeIcon"
     v-bind="$attrs"
     :class="classes"
     :style="styles"
@@ -23,7 +23,8 @@ const props = defineProps({
   },
   icon: {
     type: String,
-    required: true
+    default: '',
+    required: false
   },
   size: {
     type: String,
@@ -32,16 +33,17 @@ const props = defineProps({
   }
 })
 
+const safeIcon = computed(() => props.icon ?? '')
 const classes = computed(() => ({
   'robo-icon': true,
   [`robo-icon--size-${props.size}`]: props.size,
-  [`robo-icon--${props.icon}`]: props.icon, // Позволяет кастомные стили для каждой иконки
+  [`robo-icon--${safeIcon.value}`]: safeIcon.value,
 }))
 
 const styles = computed(() => ({
   '--icon-color': props.color,
   '--icon-size': calcIconSize(props.size),
-  '--icon-content': `var(--icon-${props.icon})`
+  '--icon-content': safeIcon.value ? `var(--icon-${safeIcon.value})` : ''
 }))
 
 const calcIconSize = icon => ({
