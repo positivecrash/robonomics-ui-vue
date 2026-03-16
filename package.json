@@ -57,6 +57,10 @@
     "type": "git",
     "url": "https://github.com/positivecrash/robonomics-ui-vue.git"
   },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
   "overrides": {
     "@polkadot/keyring": "^14.0.0",
     "@polkadot/util": "^14.0.0",
