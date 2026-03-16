@@ -12,7 +12,7 @@ const distDir = './dist';
 // 1. Сборка через Vite
 execSync('vite build', { stdio: 'inherit' });
 
-// 2. Копируем SVG иконок расширений в dist (без этого в бандле были бы data URI → ошибка в Webpack-приложении)
+// 2. Копируем SVG иконок расширений в dist (для опционального использования путём /assets/extensions/; в бандле иконки уже встроены как data URI)
 const extensionsDir = path.resolve(__dirname, 'lib/components/polkadot/extensions');
 const outExtensionsDir = path.resolve(__dirname, distDir, 'assets/extensions');
 if (fs.existsSync(extensionsDir)) {

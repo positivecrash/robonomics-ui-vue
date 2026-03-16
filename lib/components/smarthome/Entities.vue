@@ -212,7 +212,7 @@ function getdevices() {
       entObj[entID] = {
         state: entData.state || "Unknown",
         units: entData.units || null,
-        history: entData.history.length && entData.history || null,
+        history: entData.history && entData.history.length ? entData.history : null,
         attributes: entData.attributes || {},
         lastUpdated: lastHist,
       };

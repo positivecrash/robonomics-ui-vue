@@ -1,11 +1,11 @@
-# Релиз 1.0.1
+# Релиз 1.0.3
 
 ## Публикация в npm
 
-Из корня репозитория robonomics-ui-vue:
+Из корня репозитория robonomics-ui-vue (версия в package.json должна быть уже 1.0.3):
 
 ```bash
-# Сборка скопирует package.json (version 1.0.1) в dist, затем публикация из dist
+# Сборка скопирует package.json в dist, затем публикация из dist
 npm run publish:package
 ```
 
@@ -15,21 +15,21 @@ npm run publish:package
 
 ```bash
 git add -A
-git commit -m "chore: release 1.0.1"
-git tag v1.0.1
+git commit -m "chore: release 1.0.3"
+git tag v1.0.3
 git push origin main
-git push origin v1.0.1
+git push origin v1.0.3
 ```
 
 (Замените `main` на имя вашей ветки по умолчанию.)
 
 ## Обновление в приложении
 
-В robonomics-app зависимость уже указана как `"robonomics-ui-vue": "^1.0.1"`. После публикации пакета в npm:
+В robonomics-app зависимость указана как `"robonomics-ui-vue": "^1.0.x"`. После публикации пакета в npm:
 
 ```bash
 cd robonomics-app
 npm install
 ```
 
-Либо явно: `npm install robonomics-ui-vue@1.0.1`.
+Либо явно: `npm install robonomics-ui-vue@1.0.3`.
