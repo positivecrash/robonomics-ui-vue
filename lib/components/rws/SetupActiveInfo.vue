@@ -338,7 +338,8 @@
     /* - NAME */
 
     const isInUserList = (user) => {
-         return Array.isArray(users?.value) && users.value.length > 0 && users.value.includes(user);
+         // compare by public key: the same account may come in another SS58 format
+         return Array.isArray(users?.value) && users.value.some((item) => isAccountsIdentical(item, user));
     }
 
     /* + CONTROLLER */

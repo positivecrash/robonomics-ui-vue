@@ -61,9 +61,7 @@
                             <robo-grid gap="x05">
                                 <robo-text size="small">To purchase or renew a subscription, you only need to have apprx. {{Number(roundprice(price)) + Number(roundprice(1))}} XRT tokens in your account balance. Learn about XRT on Robonomics’ website - https://robonomics.network/xrt/</robo-text>
                                 <robo-text weight="bold" size="small">Where to buy XRT</robo-text>
-                                <robo-link href="https://app.basilisk.cloud/trade"><robo-text size="small">Basilisk</robo-text></robo-link>
-                                <robo-link href="https://app.solarbeam.io/exchange/swap"><robo-text size="small">Solarbeam</robo-text></robo-link>
-                                <robo-link href="https://trade.kraken.com/markets/kraken/xrt/usd"><robo-text size="small">Kraken</robo-text></robo-link>
+                                <robo-link href="https://app.uniswap.org/swap?chain=mainnet&inputCurrency=NATIVE&outputCurrency=0x1f752250f518e419f2f03804e25728c5c6dff73f"><robo-text size="small">Uniswap</robo-text></robo-link>
                             </robo-grid>
                         </robo-details>
                     </robo-grid-item>

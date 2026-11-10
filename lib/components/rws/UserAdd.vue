@@ -30,7 +30,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import { isValidAddress } from '../polkadot/tools'
+import { isAccountsIdentical, isValidAddress } from '../polkadot/tools'
 import { encodeAddress } from '@polkadot/keyring'
 import { dateGetRange } from '../../tools'
 
@@ -75,7 +75,7 @@ const adduser = () => {
         if( useraddress.value && useraddress.value != '' && isValidAddress(useraddress.value) ) {
             useraddress.value = encodeAddress(useraddress.value, 32);
 
-            if(users.value.includes(useraddress.value)) {
+            if(users.value.some((item) => isAccountsIdentical(item, useraddress.value))) {
                 status.value = 'error';
                 message.value = 'This account is already has been added to the subscription';
                 return;
@@ -86,7 +86,7 @@ const adduser = () => {
             watch(users, v => {
                 try {
                     /* assume that message 'user list updated' is in the list, no need here */
-                    if(v.includes(useraddress.value)) {
+                    if(v.some((item) => isAccountsIdentical(item, useraddress.value))) {
                         
                         /* add label */
                         store.dispatch('rws/editUserListLabel', {address: useraddress.value, label: userlabel.value}).then(() => {
